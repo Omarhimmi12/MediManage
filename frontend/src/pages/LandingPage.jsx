@@ -491,7 +491,7 @@ export default function LandingPage() {
         <div className="medi-navbar">
           <div className="medi-navbar-logo" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
             <div className="medi-navbar-logo-icon">
-              <i className="bi bi-hospital-fill" aria-hidden="true" />
+              <img className="medi-brand-logo-image" src="/images/brand.png" alt="MediManage logo" />
             </div>
             <span className="medi-navbar-logo-text">MediManage</span>
           </div>
@@ -763,11 +763,11 @@ export default function LandingPage() {
           <div className="medi-social-proof-inner reveal">
             <div className="medi-social-proof-text">{t('social.proof.text')}</div>
             <div className="medi-social-proof-logos">
-              <div className="medi-social-proof-logo"> {t('social.proof.clinic1')}</div>
-              <div className="medi-social-proof-logo"> {t('social.proof.clinic2')}</div>
-              <div className="medi-social-proof-logo"> {t('social.proof.clinic3')}</div>
-              <div className="medi-social-proof-logo"> {t('social.proof.clinic4')}</div>
-              <div className="medi-social-proof-logo"> {t('social.proof.clinic5')}</div>
+              <div className="medi-social-proof-logo">{t('social.proof.clinic1')}</div>
+              <div className="medi-social-proof-logo">{t('social.proof.clinic2')}</div>
+              <div className="medi-social-proof-logo">{t('social.proof.clinic3')}</div>
+              <div className="medi-social-proof-logo">{t('social.proof.clinic4')}</div>
+              <div className="medi-social-proof-logo">{t('social.proof.clinic5')}</div>
               
             </div>
             <div className="medi-social-proof-stats">
@@ -1021,7 +1021,7 @@ export default function LandingPage() {
             <div className="medi-footer-brand">
               <div className="medi-footer-brand-logo">
                 <div className="medi-footer-brand-logo-icon">
-                  <i className="bi bi-hospital-fill" aria-hidden="true" />
+                  <img className="medi-brand-logo-image" src="/images/brand.png" alt="MediManage logo" />
                 </div>
                 <span className="medi-footer-brand-logo-text">MediManage</span>
               </div>
@@ -1062,7 +1062,6 @@ export default function LandingPage() {
             <div className="medi-footer-legal">
               <a href="#">{t('footer.legal.privacy')}</a>
               <a href="#">{t('footer.legal.terms')}</a>
-              <a href="#">{t('footer.legal.cookie')}</a>
             </div>
           </div>
         </div>

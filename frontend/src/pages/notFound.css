@@ -1,0 +1,70 @@
+.nf-page {
+  height: 100vh;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  overflow: hidden;
+}
+
+.nf-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+}
+
+.nf-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: white;
+  max-width: 420px;
+  padding: 20px;
+}
+
+.nf-icon {
+  margin-bottom: 15px;
+  opacity: 0.9;
+}
+
+.nf-content h1 {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.nf-content p {
+  font-size: 14px;
+  line-height: 1.6;
+  opacity: 0.8;
+}
+
+.nf-footer {
+  position: absolute;
+  bottom: 50px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.nf-footer button {
+  background: transparent;
+  border: none;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 18px;
+  text-decoration: none;
+  opacity: 0.9;
+  transition: 0.2s ease;
+}
+
+.nf-footer button:hover {
+  opacity: 1;
+  text-decoration: none;
+  color: black;
+}

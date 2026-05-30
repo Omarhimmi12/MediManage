@@ -1,0 +1,1151 @@
+/* MediManage Dashboard - Redesigned with Dasher UI Style */
+/* Modern, professional medical dashboard with clean aesthetics */
+
+.mmd-medecin-dashboard {
+  min-height: 100vh;
+  background: #f8f9fc;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  display: flex;
+}
+
+/* ========================================
+   SIDEBAR STYLING
+======================================== */
+
+.mmd-sidebar {
+  width: 260px;
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  color: #fff;
+  padding: 24px 20px;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 4px 0 24px rgba(15, 23, 42, 0.1);
+  position: relative;
+  overflow-y: auto;
+}
+
+.mmd-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 32px;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.mmd-brand::before {
+  content: "";
+  font-size: 1.8rem;
+}
+
+/* Navigation Buttons */
+.mmd-navbtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 14px 16px !important;
+  margin-bottom: 8px !important;
+  border-radius: 10px !important;
+  border: none !important;
+  background: transparent !important;
+  color: rgba(255, 255, 255, 0.75) !important;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  position: relative;
+  text-align: left;
+}
+
+.mmd-navbtn:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+  transform: translateX(4px);
+}
+
+.mmd-navbtn--active {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  color: #fff !important;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+
+.mmd-navbtn--active::before {
+  content: none;
+}
+
+/* Space between icon and label in sidebar */
+.mmd-navbtn__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  width: 22px; /* alignment */
+}
+
+.mmd-navbtn__icon .bi {
+  font-size: 18px;
+}
+
+.mmd-navbtn__label {
+  flex: 1;
+  text-align: left !important;
+  padding-left: 0;
+}
+
+/* Space between icon and label in sidebar */
+.mmd-navbtn__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  width: 22px; /* keep alignment when collapsed */
+}
+
+.mmd-navbtn__icon .bi {
+  font-size: 18px;
+}
+
+/* Logout Button */
+.mmd-sidebar .btn.btn-outline-light {
+  margin-top: 24px;
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  color: #fff;
+  transition: all 0.2s ease;
+}
+
+.mmd-sidebar .btn.btn-outline-light:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: #ef4444;
+  color: #fca5a5;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+/* ========================================
+   MAIN CONTENT AREA
+======================================== */
+
+.mmd-content {
+  flex: 1;
+  padding: 32px 40px;
+  overflow-y: auto;
+  background: #f8f9fc;
+}
+
+/* compensate for the fixed/sticky topbar in this dashboard */
+.mmd-topbar--placeholder {
+  height: 64px;
+}
+
+/* Topbar / Header */
+.mmd-topbar {
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 16px !important;
+  padding: 20px 24px !important;
+  margin-bottom: 32px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mmd-content h2,
+.mmd-content h3,
+.mmd-content h5 {
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+.mmd-content h2 {
+  font-size: 1.875rem;
+  letter-spacing: -0.5px;
+}
+
+.mmd-content h3 {
+  font-size: 1.5rem;
+}
+
+/* ========================================
+   CARDS & STATS
+======================================== */
+
+.mmd-content .card {
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.mmd-content .card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+/* Stats Cards */
+.mmd-content .row .card {
+  height: 100%;
+}
+
+.mmd-content .card h6 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.mmd-content .card h4 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.mmd-content .card h4.text-success {
+  color: #10b981 !important;
+}
+
+/* Card Headers */
+.mmd-content .card-header {
+  background: #f8fafc;
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: #1e293b;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 20px 24px;
+}
+
+.mmd-content .card-body {
+  padding: 24px;
+}
+
+/* ========================================
+   TABLES
+======================================== */
+
+.mmd-content .table {
+  margin-bottom: 0;
+}
+
+.mmd-content .table thead th {
+  background: #f8fafc !important;
+  color: #475569 !important;
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #e5e7eb !important;
+  padding: 16px 20px;
+}
+
+.mmd-content .table tbody tr {
+  background: #fff;
+  transition: background-color 0.15s ease;
+}
+
+.mmd-content .table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.mmd-content .table td,
+.mmd-content .table th {
+  vertical-align: middle;
+  border-color: #f1f5f9;
+  padding: 16px 20px;
+  color: #334155;
+}
+
+.mmd-content .table td {
+  font-size: 0.9375rem;
+}
+
+/* ========================================
+   BUTTONS
+======================================== */
+
+.mmd-content .btn {
+  border-radius: 10px !important;
+  font-weight: 600;
+  padding: 10px 20px;
+  font-size: 0.9375rem;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.mmd-content .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.mmd-content .btn:active {
+  transform: translateY(0);
+}
+
+.mmd-content .btn-primary {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-color: #10b981;
+  color: #fff;
+}
+
+.mmd-content .btn-primary:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  border-color: #059669;
+}
+
+.mmd-content .btn-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-color: #10b981;
+}
+
+.mmd-content .btn-success:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
+.mmd-content .btn-info {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border-color: #3b82f6;
+}
+
+.mmd-content .btn-info:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+}
+
+.mmd-content .btn-warning {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border-color: #f59e0b;
+  color: #fff;
+}
+
+.mmd-content .btn-warning:hover {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+}
+
+.mmd-content .btn-danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  border-color: #ef4444;
+}
+
+.mmd-content .btn-danger:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+}
+
+.mmd-content .btn-secondary {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  color: #475569;
+}
+
+.mmd-content .btn-secondary:hover {
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+.mmd-content .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.mmd-content .btn-sm {
+  padding: 6px 14px;
+  font-size: 0.875rem;
+}
+
+/* ========================================
+   BADGES
+======================================== */
+
+.mmd-content .badge {
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  letter-spacing: 0.3px;
+  border: 1px solid transparent;
+}
+
+.mmd-content .badge.bg-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.mmd-content .badge.bg-warning {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #fff !important;
+}
+
+.mmd-content .badge.bg-danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.mmd-content .badge.bg-info {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.mmd-content .badge.bg-secondary {
+  background: #64748b !important;
+  border-color: rgba(100, 116, 139, 0.3);
+}
+
+/* ========================================
+   FORMS & INPUTS
+======================================== */
+
+.mmd-content .form-control,
+.mmd-content .form-select {
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  padding: 12px 16px;
+  font-size: 0.9375rem;
+  transition: all 0.2s ease;
+  background: #ffffff;
+}
+
+.mmd-content .form-control:focus,
+.mmd-content .form-select:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  outline: none;
+}
+
+.mmd-content label {
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 8px;
+  font-size: 0.875rem;
+}
+
+/* ========================================
+   MODALS
+======================================== */
+
+.mmd-content .modal-content {
+  border-radius: 16px !important;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.mmd-content .modal-header {
+  border-bottom: 1px solid #e5e7eb !important;
+  padding: 24px 28px;
+  background: #f8fafc;
+}
+
+.mmd-content .modal-header .modal-title {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: #1e293b;
+}
+
+.mmd-content .modal-body {
+  padding: 28px;
+}
+
+.mmd-content .modal-footer {
+  border-top: 1px solid #e5e7eb !important;
+  padding: 20px 28px;
+  background: #f8fafc;
+}
+
+/* ========================================
+   ALERTS & MESSAGES
+======================================== */
+
+.mmd-content .alert {
+  border-radius: 12px;
+  border: 1px solid;
+  padding: 16px 20px;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.mmd-content .alert-success {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #15803d;
+}
+
+.mmd-content .alert-danger {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.mmd-content .alert-info {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1e40af;
+}
+
+.mmd-content .alert-warning {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #b45309;
+}
+
+/* ========================================
+   PAGINATION
+======================================== */
+
+.mmd-content .pagination {
+  margin-top: 24px;
+}
+
+.mmd-content .page-link {
+  border-radius: 8px;
+  margin: 0 4px;
+  border: 1px solid #e5e7eb;
+  color: #475569;
+  font-weight: 600;
+  padding: 8px 14px;
+  transition: all 0.2s ease;
+}
+
+.mmd-content .page-link:hover {
+  background: #f8fafc;
+  border-color: #10b981;
+  color: #10b981;
+}
+
+.mmd-content .page-item.active .page-link {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-color: #10b981;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.mmd-content .page-item.disabled .page-link {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   UTILITY CLASSES
+======================================== */
+
+.mmd-content .text-muted {
+  color: #64748b !important;
+}
+
+.mmd-content .fw-bold {
+  font-weight: 700 !important;
+}
+
+.mmd-content .shadow-sm {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+}
+
+/* Search & Filter Inputs */
+.mmd-content input[type="search"],
+.mmd-content input[type="text"].search {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px 16px;
+  padding-left: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 14px center;
+  background-size: 16px;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+======================================== */
+
+@media (max-width: 1200px) {
+  .mmd-content {
+    padding: 24px 28px;
+  }
+}
+
+@media (max-width: 992px) {
+  .mmd-sidebar {
+    width: 220px;
+    padding: 20px 16px;
+  }
+
+  .mmd-content {
+    padding: 20px 24px;
+  }
+
+  .mmd-brand {
+    font-size: 1.25rem;
+    padding: 12px;
+  }
+
+  .mmd-navbtn {
+    padding: 12px 14px !important;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .mmd-medecin-dashboard {
+    flex-direction: column;
+  }
+
+  .mmd-sidebar {
+    width: 100%;
+    padding: 16px;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .mmd-content {
+    padding: 16px 20px;
+  }
+
+  .mmd-content .card-body,
+  .mmd-content .modal-body {
+    padding: 20px;
+  }
+
+  .mmd-content h2 {
+    font-size: 1.5rem;
+  }
+
+  .mmd-content .table {
+    font-size: 0.875rem;
+  }
+
+  .mmd-content .btn {
+    font-size: 0.875rem;
+    padding: 8px 16px;
+  }
+}
+
+@media (max-width: 576px) {
+  .mmd-content {
+    padding: 16px;
+  }
+
+  .mmd-topbar {
+    padding: 16px !important;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .mmd-content .card-header {
+    padding: 16px 20px;
+    font-size: 1rem;
+  }
+
+  .mmd-content h2 {
+    font-size: 1.375rem;
+  }
+
+  .mmd-content .modal-header,
+  .mmd-content .modal-footer {
+    padding: 20px;
+  }
+}
+
+/* ========================================
+   SCROLLBAR STYLING
+======================================== */
+
+.mmd-sidebar::-webkit-scrollbar,
+.mmd-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.mmd-sidebar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.mmd-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.mmd-sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.mmd-content::-webkit-scrollbar-track {
+  background: #f8f9fc;
+}
+
+.mmd-content::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.mmd-content::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ========================================
+   LOADING STATES
+======================================== */
+
+.mmd-content .spinner-border {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-width: 2px;
+}
+
+.mmd-content .spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 2px;
+}
+
+/* ========================================
+   CUSTOM ACCENTS FOR MEDICAL CONTEXT
+======================================== */
+
+/* Accent color for medical actions */
+.medical-accent {
+  color: #10b981 !important;
+}
+
+.medical-accent-bg {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  color: #fff;
+}
+
+/* Status indicators */
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.status-dot.active {
+  background: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+.status-dot.pending {
+  background: #f59e0b;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+}
+
+.status-dot.inactive {
+  background: #64748b;
+}
+
+/* ========================================
+   SECRETAIRES PAGE OVERRIDES
+   (Remove custom inline styling and match dashboard design)
+======================================== */
+
+/* Override heavy inline borders on secretaires page */
+.mmd-content input[style*="border: 2px solid #0b0b0b"],
+.mmd-content input[style*="border: \"2px solid #0b0b0b\""] {
+  border: 1px solid #e5e7eb !important;
+  font-weight: 500 !important;
+}
+
+.mmd-content input[style*="border: 2px solid #0b0b0b"]:focus,
+.mmd-content input[style*="border: \"2px solid #0b0b0b\""]:focus {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+}
+
+/* Fix modal styling in secretaires page */
+.mmd-content div[style*="border: 3px solid #0b0b0b"],
+.mmd-content div[style*="border: \"3px solid #0b0b0b\""] {
+  border: 1px solid #e5e7eb !important;
+  border-radius: 16px !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Fix modal header in secretaires */
+.mmd-content div[style*="border: 3px solid #0b0b0b"] > div:first-child {
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 20px;
+}
+
+/* Fix buttons with heavy borders */
+.mmd-content button[style*="border: 2px solid #0b0b0b"] {
+  border: 1px solid #e5e7eb !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  padding: 10px 20px !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.mmd-content button[style*="border: 2px solid #0b0b0b"]:hover:not(:disabled) {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Fix primary action buttons in secretaires */
+.mmd-content button[style*="background: #19a2a8"],
+.mmd-content button[style*="background: \"#19a2a8\""] {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  border-color: #10b981 !important;
+  color: #fff !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.mmd-content button[style*="background: #19a2a8"]:hover:not(:disabled),
+.mmd-content button[style*="background: \"#19a2a8\""]:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2) !important;
+}
+
+/* Fix white background buttons */
+.mmd-content button[style*="background: #fff"],
+.mmd-content button[style*="background: \"#fff\""] {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  color: #475569 !important;
+}
+
+.mmd-content button[style*="background: #fff"]:hover:not(:disabled),
+.mmd-content button[style*="background: \"#fff\""]:hover:not(:disabled) {
+  background: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+}
+
+/* Fix grid info boxes in secretaires view modal */
+.mmd-content div[style*="border: 2px solid #0b0b0b"][style*="padding: 12"] {
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+  background: #f8fafc !important;
+  font-weight: 500 !important;
+}
+
+.mmd-content div[style*="border: 2px solid #0b0b0b"][style*="padding: 12"] > div:first-child {
+  color: #64748b !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  opacity: 1 !important;
+}
+
+.mmd-content div[style*="border: 2px solid #0b0b0b"][style*="padding: 12"] > div:last-child {
+  color: #1e293b !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+}
+
+/* Fix labels in forms */
+.mmd-content label[style*="fontWeight: 900"] {
+  font-weight: 600 !important;
+  color: #475569 !important;
+  margin-bottom: 8px !important;
+  font-size: 0.875rem !important;
+}
+
+/* Fix form error messages */
+.mmd-content div[style*="color: crimson"] {
+  color: #dc2626 !important;
+  font-weight: 600 !important;
+  padding: 12px 16px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  margin-top: 16px !important;
+}
+
+/* Fix modal titles */
+.mmd-content div[style*="fontWeight: 1000"][style*="fontSize: 20"] {
+  font-weight: 700 !important;
+  font-size: 1.25rem !important;
+  color: #1e293b !important;
+  line-height: 1.4 !important;
+}
+
+.mmd-content div[style*="fontWeight: 800"][style*="opacity: 0.9"] {
+  font-weight: 500 !important;
+  color: #64748b !important;
+  opacity: 1 !important;
+  margin-top: 4px !important;
+}
+
+/* Fix top action bar */
+.mmd-content div[style*="borderBottom: 2px solid #0b0b0b"],
+.mmd-content div[style*="borderBottom: \"2px solid #0b0b0b\""] {
+  border-bottom: 1px solid #e5e7eb !important;
+  padding-bottom: 20px !important;
+  margin-bottom: 24px !important;
+}
+
+/* Fix secretary cards/list items */
+.mmd-content div[style*="border: 1px solid #e8e8e8"] {
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  transition: all 0.2s ease !important;
+}
+
+.mmd-content div[style*="border: 1px solid #e8e8e8"]:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  transform: translateY(-2px) !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Fix any remaining heavy font weights */
+.mmd-content [style*="fontWeight: 1000"] {
+  font-weight: 700 !important;
+}
+
+.mmd-content [style*="fontWeight: 950"] {
+  font-weight: 700 !important;
+}
+
+.mmd-content [style*="fontWeight: 900"] {
+  font-weight: 600 !important;
+}
+
+.mmd-content [style*="fontWeight: 800"] {
+  font-weight: 600 !important;
+}
+
+.mmd-content [style*="fontWeight: 700"] {
+  font-weight: 600 !important;
+}
+
+/* Ensure grid layouts in secretaires work well */
+.mmd-content div[style*="gridTemplateColumns"] {
+  gap: 16px !important;
+}
+
+/* Fix modal overlay backdrop */
+.mmd-content div[role="dialog"][aria-modal="true"] {
+  background: rgba(15, 23, 42, 0.5) !important;
+  backdrop-filter: blur(4px);
+}
+
+/* Fix close button in modals */
+.mmd-content div[role="dialog"] button[style*="Fermer"] {
+  background: transparent !important;
+  border: 1px solid #e5e7eb !important;
+  color: #64748b !important;
+}
+
+.mmd-content div[role="dialog"] button:hover {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* ========================================
+   FIXED TOPBAR + PROFILE DROPDOWN (MedecinDashboard)
+======================================== */
+
+.mmd-topbar--fixed {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #ffffff;
+  padding: 14px 18px;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+/* reserved space; kept for layout clarity if needed */
+.mmd-topbar__spacer {
+  flex: 1;
+}
+
+.mmd-topbar--placeholder {
+  height: 0px;
+}
+
+/* Toggle button (topbar) - beautiful medical style */
+.mmd-topbar__toggle {
+  border: 2px solid rgba(16, 185, 129, 0.35);
+  background: #ffffff;
+  color: #0f172a;
+  border-radius: 14px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: 0 10px 20px rgba(16, 185, 129, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease,
+    background 160ms ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 46px;
+}
+
+.mmd-topbar__toggle:hover {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.7);
+  transform: translateY(-1px);
+  box-shadow: 0 16px 28px rgba(16, 185, 129, 0.18), 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.mmd-topbar__toggle:active {
+  transform: translateY(0);
+  box-shadow: 0 10px 18px rgba(16, 185, 129, 0.14), 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* ========================================
+   SIDEBAR COLLAPSE (MedecinDashboard)
+======================================== */
+
+.mmd-sidebar--collapsed {
+  width: 72px;
+  min-width: 72px;
+}
+
+.mmd-sidebar--collapsed .mmd-brand__text {
+  display: none;
+}
+
+.mmd-sidebar__toggle {
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-radius: 10px;
+  padding: 6px 8px;
+  cursor: pointer;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.mmd-sidebar--collapsed .mmd-sidebar__toggle {
+  /* keep visible even when collapsed */
+}
+
+.mmd-sidebar--collapsed .mmd-navbtn {
+  justify-content: center;
+  padding: 14px 12px !important;
+}
+
+.mmd-sidebar:not(.mmd-sidebar--collapsed) .mmd-navbtn {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.mmd-sidebar--collapsed .mmd-navbtn__label {
+  display: none;
+}
+
+.mmd-sidebar--collapsed .mmd-navbtn__icon {
+  font-size: 18px;
+  width: 100%;
+  margin-right: 0;
+  justify-content: center;
+}
+
+.mmd-sidebar--collapsed .mmd-sidebar__logout .mmd-navbtn__label {
+  display: none;
+}
+
+.mmd-sidebar--collapsed .mmd-sidebar__logout .mmd-navbtn__icon {
+  margin-right: 0;
+}
+
+/* optional: slightly adjust active indicator when labels hidden */
+.mmd-sidebar--collapsed .mmd-navbtn--active::before {
+  left: auto;
+  right: 0;
+  width: 3px;
+  border-radius: 4px 0 0 4px;
+}
+
+/* Profile dropdown */
+.mmd-profile {
+  position: relative;
+  margin-left: auto;
+}
+
+.mmd-profile__button {
+  border: 1px solid #e5e7eb;
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  color: #0f172a;
+  cursor: pointer;
+}
+
+.mmd-profile__button:hover {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+}
+
+.mmd-profile__label {
+  white-space: nowrap;
+}
+
+.mmd-profile__chevron {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.mmd-profile__menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 220px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
+  padding: 8px;
+  z-index: 200;
+}
+
+.mmd-profile__item {
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-weight: 700;
+  color: #111827;
+}
+
+.mmd-profile__item:hover {
+  background: #f3f4f6;
+}
+
+.mmd-profile__divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 6px 2px;
+}
+
+.mmd-profile__item--logout {
+  color: #dc2626;
+  font-weight: 800;
+}

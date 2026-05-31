@@ -124,7 +124,7 @@ const SplashScreen = ({ onFinish = () => {} }) => {
 
         <div className="feature-row">
           <span>Patients</span>
-          <span>Agenda</span>
+          <span>Rendez-Vous</span>
           <span>Dossiers</span>
         </div>        
       </div>

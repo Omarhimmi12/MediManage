@@ -490,9 +490,7 @@ export default function LandingPage() {
       <nav className={`medi-navbar-wrapper${scrolled ? ' scrolled' : ''}`}>
         <div className="medi-navbar">
           <div className="medi-navbar-logo" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <div className="medi-navbar-logo-icon">
               <img className="medi-brand-logo-image" src="/images/brand.png" alt="MediManage logo" />
-            </div>
             <span className="medi-navbar-logo-text">MediManage</span>
           </div>
 
@@ -910,7 +908,6 @@ export default function LandingPage() {
         <div className="medi-container">
           <div className="medi-section-header reveal">
             <div className="medi-section-label">{t('testimonials.label')}</div>
-            <h2 className="medi-section-title">{t('testimonials.title')}</h2>
             <p className="medi-section-subtitle">{t('testimonials.subtitle')}</p>
           </div>
 
@@ -941,14 +938,18 @@ export default function LandingPage() {
       {/* ────────────────── CONTACT ────────────────── */}
       <section id="contact" className="medi-contact-section">
         <div className="container">
+          <div className="medi-contact-header reveal">
+            <div className="medi-contact-label">{t('contact.label')}</div>
+              <h5 className="medi-contact-headline">{t('contact.title')}</h5>
+
+            
+          </div>
+
           <div className="row g-4 align-items-start">
             {/* Left column: info */}
             <div className="col-12 col-lg-5">
+              <p className="medi-contact-subtitle">{t('contact.subtitle')}</p>
               <div className="medi-contact-left reveal-left">
-                <div className="medi-contact-label">{t('contact.label')}</div>
-                <h2 className="medi-contact-headline">{t('contact.title')}</h2>
-                <p className="medi-contact-subtitle">{t('contact.subtitle')}</p>
-
                 <div className="medi-contact-methods" aria-label={t('contact.methods.ariaLabel')}>
                   <div className="medi-contact-card">
                     <div className="medi-contact-icon" aria-hidden="true">
@@ -1053,6 +1054,26 @@ export default function LandingPage() {
               <a href="#">{t('nav.whyUs')}</a>
               <a href="#">{t('nav.reviews')}</a>
               <a href="#">{t('footer.contact')}</a>
+            </div>
+
+            <div className="medi-footer-subscribe">
+              <div className="medi-footer-subscribe-title">{t('footer.subscribe.title') ?? 'Subscribe to newsletter'}</div>
+              <form className="medi-footer-subscribe-form" onSubmit={(e) => { 
+                e.preventDefault();
+                const form = e.currentTarget;
+                const input = form.querySelector('#footer-subscribe-email');
+                const email = input?.value?.trim();
+                if (!email) return;
+                
+                if (input) input.value = '';
+              }}>
+                <label className="sr-only" htmlFor="footer-subscribe-email">Email</label>
+                <input id="footer-subscribe-email" className="medi-footer-subscribe-input"
+                  type="email" placeholder="email@email.com" required />
+                <button className="medi-footer-subscribe-btn" type="submit">
+                  {t('footer.subscribe.button') ?? 'Subscribe'}
+                </button>
+              </form>
             </div>
 
           </div>

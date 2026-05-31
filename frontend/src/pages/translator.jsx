@@ -139,6 +139,9 @@ export const dict = {
     'footer.careers': 'Careers',
     'footer.press': 'Press',
     'footer.contact': 'Contact',
+    'footer.subscribe.title': 'Subscribe to our newsletter',
+    'footer.subscribe.button': 'Subscribe',
+
 
     'footer.helpCenter': 'Help Center',
     'footer.community': 'Community',
@@ -382,6 +385,9 @@ export const dict = {
     'footer.careers': 'Carrières',
     'footer.press': 'Presse',
     'footer.contact': 'Contact',
+    'footer.subscribe.title': 'S’abonner à la newsletter',
+    'footer.subscribe.button': 'S’abonner',
+
 
     'footer.helpCenter': "Centre d'aide",
     'footer.community': 'Communauté',
@@ -622,6 +628,10 @@ export const dict = {
     'footer.careers': 'وظائف',
     'footer.press': 'الصحافة',
     'footer.contact': 'تواصل معنا',
+    'footer.subscribe.title': 'الاشتراك في النشرة الإخبارية',
+    'footer.subscribe.button': 'اشتراك',
+
+
 
     'footer.helpCenter': 'مركز المساعدة',
     'footer.community': 'المجتمع',

@@ -101,18 +101,16 @@
   align-items: center;
   gap: 8px;
   padding: 6px 16px;
-  background: var(--emerald-50);
-  border: 1px solid var(--emerald-200);
-  border-radius: var(--radius-full);
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 45px;
+  font-weight: 900;
   color: var(--emerald-700);
   letter-spacing: 0.02em;
   margin-bottom: 20px;
+  font-family: 'Times New Roman', Times, serif;
 }
 
 .medi-section-title {
-  font-size: clamp(32px, 4.5vw, 52px);
+  font-size: 20px;
   font-weight: 800;
   line-height: 1.1;
   letter-spacing: -0.03em;
@@ -204,7 +202,7 @@
 }
 
 .medi-navbar {
-  width: 85%;
+  width: 90%;
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -223,7 +221,7 @@
 }
 
 .medi-navbar-wrapper.scrolled .medi-navbar {
-  width: 75%;
+  width: 80%;
   box-shadow: 0 4px 30px rgba(0,0,0,0.1);
   background: rgba(255, 255, 255, 0.88);
 }
@@ -468,7 +466,6 @@
   right: -200px;
   width: 700px;
   height: 700px;
-  background: radial-gradient(circle, rgba(16,185,129,0.08) 0%, transparent 70%);
   pointer-events: none;
 }
 .medi-hero::after {
@@ -478,7 +475,6 @@
   left: -200px;
   width: 600px;
   height: 600px;
-  background: radial-gradient(circle, rgba(168,85,247,0.06) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -1610,6 +1606,73 @@ font-family: "Roboto", sans-serif;
   background-color: var(--gray-950);
 }
 
+.medi-footer-subscribe {
+  align-self: end;
+  justify-self: end;
+  max-width: 450px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: var(--radius-xl);
+  padding: 18px 18px 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.medi-footer-subscribe-title {
+  font-size: 15px;
+  font-weight: 800;
+  display: flex;
+  justify-content: center;
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 10px;
+}
+
+.medi-footer-subscribe-form {
+  display: flex;
+  gap: 10px;
+}
+
+.medi-footer-subscribe-input {
+  flex: 1;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 14px;
+  color: white;
+  outline: none;
+}
+
+.medi-footer-subscribe-input::placeholder {
+  color: rgba(255,255,255,0.55);
+}
+
+.medi-footer-subscribe-input:focus {
+  border-color: rgba(16,185,129,0.7);
+  box-shadow: 0 0 0 4px rgba(16,185,129,0.15);
+}
+
+.medi-footer-subscribe-btn {
+  border: none;
+  border-radius: 14px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 800;
+  color: white;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--emerald-500) 0%, var(--emerald-600) 100%);
+  white-space: nowrap;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  box-shadow: 0 4px 16px rgba(16,185,129,0.25);
+}
+
+.medi-footer-subscribe-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(16,185,129,0.35);
+}
+
+
 .medi-footer::before {
   content: "";
   position: absolute;
@@ -1637,7 +1700,7 @@ font-family: "Roboto", sans-serif;
 
 .medi-footer-top {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr;
   gap: 48px;
   margin-bottom: 60px;
 }
@@ -1663,24 +1726,19 @@ font-family: "Roboto", sans-serif;
   font-size: 25px;
 }
 
-.medi-brand-logo-image {
-  width: 100%;
-  height: 100%;
+.medi-brand-logo-image {  
   object-fit: contain;
   display: block;
-  
-}
-.medi-footer-brand-logo-icon {
   width: 45px;
   height: 45px;
-  background: #ffffff;
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  font-size: 18px;
+  font-size: 18px;  
 }
+
 .medi-footer-brand-desc {
   font-size: 14px;
   color: rgba(255,255,255,0.4);
@@ -1771,7 +1829,6 @@ font-family: "Roboto", sans-serif;
   right: -200px;
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(16,185,129,0.08) 0%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
 }
@@ -1783,9 +1840,13 @@ font-family: "Roboto", sans-serif;
   left: -150px;
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, rgba(168,85,247,0.06) 0%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
+}
+
+.medi-contact-header {
+  text-align: center;
+  margin-bottom: 48px;
 }
 
 .medi-contact-left {
@@ -1793,8 +1854,9 @@ font-family: "Roboto", sans-serif;
 }
 
 .medi-contact-label {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 45px;
+  font-weight: 900;
+  font-family: 'Times New Roman', Times, serif;
   color: var(--emerald-500);
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -1803,7 +1865,7 @@ font-family: "Roboto", sans-serif;
 }
 
 .medi-contact-headline {
-  font-size: 42px;
+  font-size: 22px;
   font-weight: 800;
   color: #0f172a;
   line-height: 1.2;
@@ -1816,8 +1878,11 @@ font-family: "Roboto", sans-serif;
   font-weight: 400;
   color: var(--gray-500);
   line-height: 1.7;
-  margin-bottom: 40px;
-  max-width: 480px;
+  margin-bottom: 0;
+  max-width: 680px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 30px;
 }
 
 .medi-contact-methods {
@@ -2267,6 +2332,74 @@ font-family: "Roboto", sans-serif;
     grid-template-columns: 1fr;
     gap: 32px;
   }
+
+  .medi-footer-subscribe {
+    max-width: 440px;
+  }
+
+  .medi-footer-subscribe-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+.medi-footer-subscribe-btn {
+  width: 100%;
+}
+
+.medi-footer-subscribe-input-wrap {
+  position: relative;
+}
+
+.medi-footer-subscribe-toast {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-weight: 700;
+  color: #065f46;
+}
+
+.medi-footer-subscribe-toast.show {
+  display: flex;
+  animation: mediSubscribeToast 2.2s ease forwards;
+}
+
+@keyframes mediSubscribeToast {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+    display: none;
+  }
+}
+
+.medi-footer-subscribe-input-wrap.pulse {
+  animation: mediSubscribePulse 650ms ease;
+}
+
+@keyframes mediSubscribePulse {
+  0% {
+    box-shadow: 0 0 0 rgba(16,185,129,0);
+  }
+  30% {
+    box-shadow: 0 0 0 4px rgba(16,185,129,0.18);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(16,185,129,0);
+  }
+}
   .medi-footer-bottom {
     flex-direction: column;
     text-align: center;

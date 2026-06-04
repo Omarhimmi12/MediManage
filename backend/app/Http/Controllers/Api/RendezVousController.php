@@ -187,6 +187,12 @@ class RendezVousController extends Controller
 
         $rdv->update(['statut' => 'confirme']);
 
+        // Link patient to this cabinet if not already linked
+        $patient = \App\Models\Patient::find($rdv->patient_id);
+        if ($patient && !$patient->cabinet_id) {
+            $patient->update(['cabinet_id' => $rdv->cabinet_id]);
+        }
+
         return response()->json(['message' => 'Confirmed']);
     }
     
@@ -214,6 +220,14 @@ class RendezVousController extends Controller
         }
 
         $rdv->update(['statut' => $request->statut]);
+
+        // Link patient to cabinet when confirmed
+        if ($request->statut === 'confirme') {
+            $patient = \App\Models\Patient::find($rdv->patient_id);
+            if ($patient && !$patient->cabinet_id) {
+                $patient->update(['cabinet_id' => $rdv->cabinet_id]);
+            }
+        }
 
         return response()->json([
             'message' => 'Statut mis à jour',

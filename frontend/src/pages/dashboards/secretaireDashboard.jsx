@@ -1,5 +1,5 @@
 import { useContext, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 
 import "./secretaireDashboard.css";
@@ -11,12 +11,11 @@ import PaiementsPage from "./secretaire/paiements.jsx";
 
 const SecretaireDashboard = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, logout } = useContext(AuthContext);
 
   const [activeSection, setActiveSection] = useState("rdv");
-
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const userDisplayName = useMemo(() => {
@@ -25,24 +24,30 @@ const SecretaireDashboard = () => {
     return [nom, prenom].filter(Boolean).join(" ");
   }, [user?.nom, user?.prenom]);
 
-  const handleLogout = async () => {
-    await logout();
-    navigate("/login");
-  };
+  const initialSection = useMemo(() => {
+    const section = location?.state?.section;
+    const allowed = new Set(["patients", "rdv", "consultation", "paiements"]);
+    return typeof section === "string" && allowed.has(section) ? section : "rdv";
+  }, [location?.state?.section]);
 
   useEffect(() => {
-    // si besoin plus tard: reset state sur role change
+    setActiveSection(initialSection);
+  }, [initialSection]);
+
+  useEffect(() => {
+    // Keep for potential future role/state sync.
   }, []);
 
   const renderContent = () => {
     switch (activeSection) {
       case "patients":
         return <PatientsPage />;
+      case "rdv":
+        return <RdvPage />;
       case "consultation":
         return <ConsultationPage />;
       case "paiements":
         return <PaiementsPage />;
-      case "rdv":
       default:
         return <RdvPage />;
     }
@@ -54,6 +59,7 @@ const SecretaireDashboard = () => {
         className={`mmd-sidebar ${isSidebarCollapsed ? "mmd-sidebar--collapsed" : ""}`}
       >
         <div className="mmd-brand">
+          <img className="mmd-brand__img" src="/images/brand.png" alt="MediManage" />
           <span className="mmd-brand__text">MediManage</span>
         </div>
 
@@ -81,7 +87,10 @@ const SecretaireDashboard = () => {
 
         <button
           className="btn btn-outline-light w-100 mt-4 mmd-sidebar__logout"
-          onClick={handleLogout}
+          onClick={async () => {
+            await logout();
+            navigate("/login");
+          }}
           type="button"
         >
           <span className="mmd-navbtn__icon" aria-hidden="true">
@@ -109,9 +118,7 @@ const SecretaireDashboard = () => {
               className="mmd-profile__button"
               onClick={() => setIsProfileOpen((v) => !v)}
             >
-              <span className="mmd-profile__label">
-                {userDisplayName}
-              </span>
+              <span className="mmd-profile__label">{userDisplayName}</span>
               <span className="mmd-profile__chevron" aria-hidden="true">
                 ▼
               </span>
@@ -193,6 +200,7 @@ const SecretaireDashboard = () => {
           </div>
         </div>
 
+        {/* Push content below fixed topbar */}
         <div className="mmd-topbar--placeholder" />
 
         {renderContent()}
@@ -202,3 +210,4 @@ const SecretaireDashboard = () => {
 };
 
 export default SecretaireDashboard;
+

@@ -32,10 +32,15 @@ const SecretairesPage = () => {
   const [isViewOpen, setIsViewOpen] = useState(false);
 
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [formMode, setFormMode] = useState("add"); // add | edit
+  const [formMode, setFormMode] = useState("add");
   const [form, setForm] = useState(initialForm);
   const [formError, setFormError] = useState("");
   const [formSubmitting, setFormSubmitting] = useState(false);
+
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteError, setDeleteError] = useState("");
+  const [deleteSubmitting, setDeleteSubmitting] = useState(false);
 
   const fetchSecretaires = async () => {
     setIsLoading(true);
@@ -150,62 +155,75 @@ const SecretairesPage = () => {
       fetchSecretaires();
     } catch (e) {
       const msg = e?.response?.data?.message;
-      setFormError(msg || "Erreur lors de l’enregistrement.");
+      setFormError(msg || "Erreur lors de l'enregistrement.");
     } finally {
       setFormSubmitting(false);
     }
   };
 
-  const onDelete = async (secretaire) => {
-    const ok = window.confirm(
-      `Supprimer ${secretaire?.user?.nom || ""} ${secretaire?.user?.prenom || ""} ?`
-    );
-    if (!ok) return;
+  const openDelete = (secretaire) => {
+    setDeleteTarget(secretaire);
+    setDeleteError("");
+    setDeleteSubmitting(false);
+    setIsDeleteOpen(true);
+  };
+
+  const closeDelete = () => {
+    setIsDeleteOpen(false);
+    setDeleteTarget(null);
+    setDeleteError("");
+    setDeleteSubmitting(false);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget?.id) return;
+    setDeleteSubmitting(true);
+    setDeleteError("");
 
     try {
-      await api.delete(`/secretaires/${secretaire.id}`);
+      await api.delete(`/secretaires/${deleteTarget.id}`);
+      closeDelete();
       fetchSecretaires();
-      if (selected?.id === secretaire.id) closeView();
+      if (selected?.id === deleteTarget.id) closeView();
     } catch (e) {
-      alert(e?.response?.data?.message || "Impossible de supprimer.");
+      setDeleteError(e?.response?.data?.message || "Impossible de supprimer.");
+    } finally {
+      setDeleteSubmitting(false);
     }
   };
 
+  const overlayStyle = {
+    position: "fixed",
+    inset: 0,
+    zIndex: 99999,
+    backgroundColor: "rgba(15, 23, 42, 0.5)",
+    backdropFilter: "blur(4px)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    overflowY: "auto",
+    padding: "48px 16px 24px",
+  };
+
   return (
-    <div className="card">
+    <div className="card shadow-sm">
       <div className="card-header">Secrétaires</div>
 
       <div className="card-body">
-        <div
-          className="d-flex align-items-center justify-content-between"
-          style={{ gap: 12, flexWrap: "wrap" }}
-        >
-          <div style={{ fontWeight: 800 }}>Liste des secrétaires</div>
-
-          <button
-            type="button"
-            className="btn btn-success"
-            onClick={openAdd}
-          >
+        <div className="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
+          <div className="fw-bold text-muted">Liste des secrétaires</div>
+          <button type="button" className="btn btn-success" onClick={openAdd}>
             + Ajouter
           </button>
         </div>
 
         {isLoading ? (
-          <div style={{ marginTop: 16 }}>Chargement...</div>
+          <div className="text-muted mt-3">Chargement...</div>
         ) : loadError ? (
-          <div
-            style={{
-              marginTop: 16,
-              color: "crimson",
-              fontWeight: 800,
-            }}
-          >
-            {loadError}
-          </div>
+          <div className="alert alert-danger mt-3">{loadError}</div>
         ) : (
-          <div style={{ marginTop: 16, overflowX: "auto" }}>
-            <table className="table" style={{ marginBottom: 0 }}>
+          <div className="table-responsive">
+            <table className="table">
               <thead>
                 <tr>
                   <th>Nom</th>
@@ -214,11 +232,10 @@ const SecretairesPage = () => {
                   <th>Actions</th>
                 </tr>
               </thead>
-
               <tbody>
                 {secretairesSorted.length === 0 ? (
                   <tr>
-                    <td colSpan={4} style={{ fontWeight: 800 }}>
+                    <td colSpan={4} className="fw-bold text-center">
                       Aucune secrétaire enregistrée.
                     </td>
                   </tr>
@@ -229,28 +246,14 @@ const SecretairesPage = () => {
                       <td>{s?.user?.prenom || "-"}</td>
                       <td>{s?.user?.telephone || "-"}</td>
                       <td>
-                        <div className="d-flex" style={{ gap: 8, flexWrap: "wrap" }}>
-                          <button
-                            type="button"
-                            className="btn btn-outline-primary btn-sm"
-                            onClick={() => openView(s)}
-                          >
+                        <div className="d-flex gap-2 flex-wrap">
+                          <button type="button" className="btn btn-info btn-sm" onClick={() => openView(s)}>
                             Voir
                           </button>
-
-                          <button
-                            type="button"
-                            className="btn btn-outline-secondary btn-sm"
-                            onClick={() => openEdit(s)}
-                          >
+                          <button type="button" className="btn btn-secondary btn-sm" onClick={() => openEdit(s)}>
                             Éditer
                           </button>
-
-                          <button
-                            type="button"
-                            className="btn btn-outline-danger btn-sm"
-                            onClick={() => onDelete(s)}
-                          >
+                          <button type="button" className="btn btn-danger btn-sm" onClick={() => openDelete(s)}>
                             Supprimer
                           </button>
                         </div>
@@ -269,86 +272,76 @@ const SecretairesPage = () => {
         <div
           role="dialog"
           aria-modal="true"
+          tabIndex={-1}
           onClick={closeView}
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.35)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 16,
-            zIndex: 9999,
-          }}
+          style={overlayStyle}
         >
           <div
-            onClick={(e) => e.stopPropagation()}
             className="modal-content"
+            onClick={(e) => e.stopPropagation()}
             style={{
-              width: "min(720px, 100%)",
-              background: "#fff",
-              padding: 16,
+              width: "min(920px, 100%)",
+              maxHeight: "calc(100vh - 96px)",
+              overflow: "auto",
+              borderRadius: 16,
+              border: "1px solid #e5e7eb",
+              background: "#ffffff",
             }}
           >
-            <div className="modal-header" style={{ display: "flex", gap: 12 }}>
-              <div>
-                <div style={{ fontWeight: 1000, fontSize: 20, lineHeight: 1.1 }}>
-                  {selected?.user?.nom || "-"} {selected?.user?.prenom || ""}
-                </div>
-                <div style={{ fontWeight: 800, opacity: 0.9, marginTop: 6 }}>
-                  Secrétaire
-                </div>
-              </div>
-
-              <button type="button" className="btn btn-outline-secondary" onClick={closeView}>
-                Fermer
-              </button>
+            <div className="modal-header" style={{ borderBottom: "1px solid #e5e7eb", background: "#f8fafc" }}>
+              <h5 className="modal-title" style={{ fontWeight: 700, fontSize: "1.25rem", color: "#1e293b" }}>
+                {selected?.user?.nom || "-"} {selected?.user?.prenom || ""}
+              </h5>
+              <button type="button" className="btn-close" onClick={closeView} aria-label="Fermer" />
             </div>
 
-            <div className="modal-body" style={{ marginTop: 14 }}>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: 12,
-                }}
-              >
-                <div className="border rounded p-3" style={{ background: "#f8f8f8" }}>
-                  <div style={{ opacity: 0.8 }}>Téléphone</div>
-                  <div style={{ marginTop: 6 }}>{selected?.user?.telephone || "-"}</div>
+            <div className="modal-body" style={{ padding: 28 }}>
+              <div className="row g-3">
+                <div className="col-md-6">
+                  <div className="border rounded p-3 bg-light">
+                    <div className="text-muted small fw-semibold text-uppercase mb-1">Téléphone</div>
+                    <div className="fw-semibold">{selected?.user?.telephone || "-"}</div>
+                  </div>
                 </div>
-
-                <div className="border rounded p-3" style={{ background: "#f8f8f8" }}>
-                  <div style={{ opacity: 0.8 }}>Email</div>
-                  <div style={{ marginTop: 6 }}>{selected?.user?.email || "-"}</div>
+                <div className="col-md-6">
+                  <div className="border rounded p-3 bg-light">
+                    <div className="text-muted small fw-semibold text-uppercase mb-1">Email</div>
+                    <div className="fw-semibold">{selected?.user?.email || "-"}</div>
+                  </div>
                 </div>
-
-                <div
-                  className="border rounded p-3"
-                  style={{
-                    background: "#f8f8f8",
-                    gridColumn: "1 / -1",
-                  }}
-                >
-                  <div style={{ opacity: 0.8 }}>Date d’embauche</div>
-                  <div style={{ marginTop: 6 }}>
-                    {selected?.date_embauche ? String(selected.date_embauche) : "-"}
+                <div className="col-12">
+                  <div className="border rounded p-3 bg-light">
+                    <div className="text-muted small fw-semibold text-uppercase mb-1">Date d'embauche</div>
+                    <div className="fw-semibold">{selected?.date_embauche ? String(selected.date_embauche) : "-"}</div>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <div
-                className="d-flex justify-content-end gap-2 flex-wrap"
-                style={{ marginTop: 14 }}
+            <div className="modal-footer" style={{ borderTop: "1px solid #e5e7eb", background: "#f8fafc" }}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => {
+                  closeView();
+                  openEdit(selected);
+                }}
               >
-                <button type="button" className="btn btn-outline-secondary" onClick={() => openEdit(selected)}>
-                  Éditer
-                </button>
-
-                <button type="button" className="btn btn-outline-danger" onClick={() => onDelete(selected)}>
-                  Supprimer
-                </button>
-              </div>
+                Éditer
+              </button>
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={() => {
+                  closeView();
+                  openDelete(selected);
+                }}
+              >
+                Supprimer
+              </button>
+              <button type="button" className="btn btn-outline-secondary" onClick={closeView}>
+                Fermer
+              </button>
             </div>
           </div>
         </div>
@@ -356,59 +349,36 @@ const SecretairesPage = () => {
 
       {/* ADD / EDIT MODAL */}
       {isFormOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          onClick={closeForm}
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.35)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 16,
-            zIndex: 10000,
-          }}
-        >
+        <div role="dialog" aria-modal="true" tabIndex={-1} onClick={closeForm} style={overlayStyle}>
           <div
-            onClick={(e) => e.stopPropagation()}
             className="modal-content"
+            onClick={(e) => e.stopPropagation()}
             style={{
-              width: "min(760px, 100%)",
-              background: "#fff",
-              padding: 16,
+              width: "min(980px, 100%)",
+              maxHeight: "calc(100vh - 96px)",
+              overflow: "auto",
+              borderRadius: 16,
+              border: "1px solid #e5e7eb",
+              background: "#ffffff",
             }}
           >
-            <div className="modal-header" style={{ display: "flex", gap: 12 }}>
-              <div>
-                <div style={{ fontWeight: 1000, fontSize: 20, lineHeight: 1.1 }}>
-                  {formMode === "add"
-                    ? "Ajouter une secrétaire"
-                    : "Éditer la secrétaire"}
-                </div>
-                <div style={{ fontWeight: 800, opacity: 0.9, marginTop: 6 }}>
-                  {formMode === "add"
-                    ? "Créer un compte + fiche"
-                    : "Mettre à jour les informations"}
-                </div>
-              </div>
-
-              <button type="button" className="btn btn-outline-secondary" onClick={closeForm}>
-                Fermer
-              </button>
+            <div className="modal-header" style={{ borderBottom: "1px solid #e5e7eb", background: "#f8fafc" }}>
+              <h5 className="modal-title" style={{ fontWeight: 700, fontSize: "1.25rem", color: "#1e293b" }}>
+                {formMode === "add" ? "Ajouter une secrétaire" : "Éditer la secrétaire"}
+              </h5>
+              <button type="button" className="btn-close" onClick={closeForm} aria-label="Fermer" />
             </div>
 
-            <div className="modal-body" style={{ marginTop: 14 }}>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: 12,
-                }}
-              >
-                <div style={{ gridColumn: "1 / -1" }}>
-                  <label style={{ fontWeight: 900 }}>Nom</label>
+            <div className="modal-body" style={{ padding: 28 }}>
+              <p className="text-muted small mb-3">
+                {formMode === "add"
+                  ? "Créer un compte + fiche secrétaire"
+                  : "Mettre à jour les informations de la secrétaire"}
+              </p>
+
+              <div className="row g-3">
+                <div className="col-12">
+                  <label className="form-label">Nom</label>
                   <input
                     value={form.nom}
                     onChange={(e) => setForm((f) => ({ ...f, nom: e.target.value }))}
@@ -417,8 +387,8 @@ const SecretairesPage = () => {
                   />
                 </div>
 
-                <div>
-                  <label style={{ fontWeight: 900 }}>Prénom</label>
+                <div className="col-md-6">
+                  <label className="form-label">Prénom</label>
                   <input
                     value={form.prenom}
                     onChange={(e) => setForm((f) => ({ ...f, prenom: e.target.value }))}
@@ -427,8 +397,8 @@ const SecretairesPage = () => {
                   />
                 </div>
 
-                <div>
-                  <label style={{ fontWeight: 900 }}>Téléphone</label>
+                <div className="col-md-6">
+                  <label className="form-label">Téléphone</label>
                   <input
                     value={form.telephone}
                     onChange={(e) => setForm((f) => ({ ...f, telephone: e.target.value }))}
@@ -437,8 +407,8 @@ const SecretairesPage = () => {
                   />
                 </div>
 
-                <div style={{ gridColumn: "1 / -1" }}>
-                  <label style={{ fontWeight: 900 }}>Email</label>
+                <div className="col-12">
+                  <label className="form-label">Email</label>
                   <input
                     value={form.email}
                     onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
@@ -447,8 +417,8 @@ const SecretairesPage = () => {
                   />
                 </div>
 
-                <div style={{ gridColumn: "1 / -1" }}>
-                  <label style={{ fontWeight: 900 }}>Date d’embauche</label>
+                <div className="col-md-6">
+                  <label className="form-label">Date d'embauche</label>
                   <input
                     type="date"
                     value={form.date_embauche}
@@ -457,8 +427,8 @@ const SecretairesPage = () => {
                   />
                 </div>
 
-                <div style={{ gridColumn: "1 / -1" }}>
-                  <label style={{ fontWeight: 900 }}>
+                <div className="col-md-6">
+                  <label className="form-label">
                     Mot de passe {formMode === "add" ? "(requis)" : "(optionnel)"}
                   </label>
                   <input
@@ -475,46 +445,65 @@ const SecretairesPage = () => {
                 </div>
               </div>
 
-              {formError && (
-                <div style={{ marginTop: 12, color: "crimson", fontWeight: 900 }}>
-                  {formError}
-                </div>
-              )}
+              {formError && <div className="alert alert-danger mt-3 mb-0">{formError}</div>}
+            </div>
 
-              <div
-                className="modal-footer"
-                style={{
-                  marginTop: 14,
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  gap: 10,
-                  flexWrap: "wrap",
-                }}
-              >
-                <button
-                  type="button"
-                  className="btn btn-outline-secondary"
-                  onClick={closeForm}
-                  disabled={formSubmitting}
-                  style={{ opacity: formSubmitting ? 0.6 : 1 }}
-                >
-                  Annuler
-                </button>
+            <div className="modal-footer" style={{ borderTop: "1px solid #e5e7eb", background: "#f8fafc" }}>
+              <button type="button" className="btn btn-secondary" onClick={closeForm} disabled={formSubmitting}>
+                Annuler
+              </button>
+              <button type="button" className="btn btn-success" onClick={submitForm} disabled={formSubmitting}>
+                {formSubmitting
+                  ? "Enregistrement..."
+                  : formMode === "add"
+                    ? "Créer"
+                    : "Enregistrer"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
-                <button
-                  type="button"
-                  className="btn btn-success"
-                  onClick={submitForm}
-                  disabled={formSubmitting}
-                  style={{ opacity: formSubmitting ? 0.7 : 1 }}
-                >
-                  {formSubmitting
-                    ? "Enregistrement..."
-                    : formMode === "add"
-                      ? "Créer"
-                      : "Enregistrer"}
-                </button>
-              </div>
+      {/* DELETE CONFIRMATION MODAL */}
+      {isDeleteOpen && deleteTarget && (
+        <div role="dialog" aria-modal="true" tabIndex={-1} onClick={closeDelete} style={overlayStyle}>
+          <div
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: "min(700px, 100%)",
+              maxHeight: "calc(100vh - 96px)",
+              overflow: "auto",
+              borderRadius: 16,
+              border: "1px solid #e5e7eb",
+              background: "#ffffff",
+            }}
+          >
+            <div className="modal-header" style={{ borderBottom: "1px solid #e5e7eb", background: "#f8fafc" }}>
+              <h5 className="modal-title" style={{ fontWeight: 700, fontSize: "1.25rem", color: "#1e293b" }}>
+                Supprimer la secrétaire ?
+              </h5>
+              <button type="button" className="btn-close" onClick={closeDelete} aria-label="Fermer" />
+            </div>
+
+            <div className="modal-body" style={{ padding: 28 }}>
+              <p style={{ marginBottom: 0 }}>
+                Êtes-vous sûr de vouloir supprimer définitivement{" "}
+                <strong>
+                  {deleteTarget?.user?.nom || ""} {deleteTarget?.user?.prenom || ""}
+                </strong>{" "}
+                ? Cette action est irréversible.
+              </p>
+              {deleteError && <div className="alert alert-danger mt-3 mb-0">{deleteError}</div>}
+            </div>
+
+            <div className="modal-footer" style={{ borderTop: "1px solid #e5e7eb", background: "#f8fafc" }}>
+              <button type="button" className="btn btn-secondary" onClick={closeDelete} disabled={deleteSubmitting}>
+                Annuler
+              </button>
+              <button type="button" className="btn btn-danger" onClick={confirmDelete} disabled={deleteSubmitting}>
+                {deleteSubmitting ? "Suppression..." : "Oui, supprimer"}
+              </button>
             </div>
           </div>
         </div>
@@ -524,3 +513,4 @@ const SecretairesPage = () => {
 };
 
 export default SecretairesPage;
+

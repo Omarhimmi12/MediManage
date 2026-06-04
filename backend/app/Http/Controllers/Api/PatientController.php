@@ -34,8 +34,23 @@ class PatientController extends Controller
         return response()->json([]);
     }
 
-    $patients = Patient::with('user', 'dossierMedical')
-        ->where('cabinet_id', $cabinetId)
+    // Patients registered in this cabinet
+    $cabinetPatients = Patient::with(['user', 'dossierMedical'])
+        ->where('cabinet_id', $cabinetId);
+
+    // Patients who have a confirmed RDV in this cabinet (might not have cabinet_id set)
+    $rdvPatientIds = \App\Models\RendezVous::where('cabinet_id', $cabinetId)
+        ->where('statut', 'confirme')
+        ->pluck('patient_id')
+        ->unique();
+
+    $patients = $cabinetPatients
+        ->orWhereIn('id', $rdvPatientIds)
+        ->with(['user', 'dossierMedical', 'rendezVous' => function ($q) use ($cabinetId) {
+            $q->where('cabinet_id', $cabinetId)
+              ->where('statut', 'confirme')
+              ->orderBy('date_rdv', 'desc');
+        }])
         ->orderBy('id')
         ->get();
 

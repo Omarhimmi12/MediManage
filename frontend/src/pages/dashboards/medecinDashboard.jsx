@@ -1,7 +1,6 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
-
 import "./medecinDashboard.css";
 
 import AccueilPage from "./medecin/accueil";
@@ -72,6 +71,7 @@ const MedecinDashboard = () => {
         className={`mmd-sidebar ${isSidebarCollapsed ? "mmd-sidebar--collapsed" : ""}`}
       >
         <div className="mmd-brand">
+          <img className="mmd-brand__img" src="/images/brand.png"/>
           <span className="mmd-brand__text">MediManage</span>
         </div>
 

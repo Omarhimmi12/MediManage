@@ -159,7 +159,6 @@ const PatientDashboard = () => {
     fetchMyRdv();
     fetchAvailableCabinets();
     fetchMyConsultations();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const cancelRdv = async (id) => {
@@ -567,9 +566,9 @@ const PatientDashboard = () => {
         </div>
 
         {[
-          ["rdv", "Mes Rendez-vous", "🗓️"],
-          ["consultations", "Mes Consultations", "🩺"],
-          ["cabinets", "Trouver un cabinet", "🏥"],
+          ["rdv", "Mes Rendez-vous", "bi-calendar-check"],
+          ["consultations", "Mes Consultations", "bi-heart-pulse"],
+          ["cabinets", "Trouver un cabinet", "bi-building"],
         ].map(([key, label, icon]) => {
           const isActive = activeSection === key;
           return (
@@ -580,12 +579,13 @@ const PatientDashboard = () => {
               type="button"
             >
               <span className="mmd-navbtn__icon" aria-hidden="true">
-                {icon}
+                <i className={`bi ${icon}`} />
               </span>
               <span className="mmd-navbtn__label">{label}</span>
             </button>
           );
         })}
+
 
         <button
           className="btn btn-outline-light w-100 mt-4 mmd-sidebar__logout"

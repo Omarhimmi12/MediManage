@@ -28,7 +28,6 @@ const MonCabinetPage = () => {
       const res = await api.get("/cabinet/moncabinet");
       setCabinet(res.data);
 
-      // IMPORTANT: don’t overwrite user edits while editing
       if (!editing) {
         if (res.data) {
           setFormData({
@@ -98,7 +97,6 @@ const MonCabinetPage = () => {
   };
 
   const handleSubmit = async () => {
-    if (!cabinet) return;
     try {
       setUpdateError("");
       setUpdateSuccess("");
@@ -106,23 +104,12 @@ const MonCabinetPage = () => {
 
       const payload = buildMultipartPayload();
 
-      console.log("[MonCabinet] formData lat/lng:", formData.latitude, formData.longitude);
-      console.log(
-        "[MonCabinet] FormData entries:",
-        Array.from(payload.entries()).map(([k, v]) => [k, v])
-      );
-      console.log(
-        "[MonCabinet] FormData lat/lng (get):",
-        payload.get("latitude"),
-        payload.get("longitude")
-      );
-
       const res = cabinet
         ? await api.post(`/cabinet/${cabinet.id}`, payload)
         : await api.post("/cabinet", payload);
 
-      const updated = res?.data ?? null;
-      console.log("[MonCabinet] PUT response:", updated);
+      // store returns {message, cabinet}, update returns cabinet directly
+      const updated = cabinet ? res?.data : res?.data?.cabinet;
 
       if (!updated || typeof updated !== "object") {
         setUpdateError(
@@ -237,35 +224,22 @@ const MonCabinetPage = () => {
 
   return (
     <div className="card shadow-sm p-4">
-      <h4>Mon Cabinet</h4>
+      <h4 className="mb-4">Mon Cabinet</h4>
 
       {cabinet && !editing ? (
         <>
           <div style={{ marginBottom: 10 }}>
-            <p>
-              <strong>Nom:</strong> {cabinet.nom}
-            </p>
-            <p>
-              <strong>Adresse:</strong> {cabinet.adresse}
-            </p>
-            <p>
-              <strong>Téléphone:</strong> {cabinet.telephone}
-            </p>
-            <p>
-              <strong>Spécialité:</strong> {cabinet.specialite}
-            </p>
-            <p>
-              <strong>Latitude:</strong> {cabinet.latitude}
-            </p>
-            <p>
-              <strong>Longitude:</strong> {cabinet.longitude}
-            </p>
+            <p><strong>Nom:</strong> {cabinet.nom}</p>
+            <p><strong>Adresse:</strong> {cabinet.adresse}</p>
+            <p><strong>Téléphone:</strong> {cabinet.telephone}</p>
+            <p><strong>Spécialité:</strong> {cabinet.specialite}</p>
+            <p><strong>Latitude:</strong> {cabinet.latitude}</p>
+            <p><strong>Longitude:</strong> {cabinet.longitude}</p>
 
             {cabinet.logo ? (
               <p>
                 <strong>Logo:</strong>{" "}
-                <img
-                  src={`/uploads/cabinets/${cabinet.logo}`}
+                <img src={`/uploads/cabinets/${cabinet.logo}`}
                   alt="Logo du cabinet"
                   style={{
                     width: 80,
@@ -279,10 +253,7 @@ const MonCabinetPage = () => {
           </div>
 
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            <button className="btn btn-primary" onClick={startEdit}>
-              Modifier
-            </button>
-
+            <button className="btn btn-primary" onClick={startEdit}>Modifier</button>
             <button
               className="btn btn-danger"
               onClick={openDelete}

@@ -104,13 +104,9 @@ const Register = () => {
               <label className="form-label">Type de compte</label>
               <div className="role-selector">
                 <label className={`role-option ${formData.role === "medecin" ? "role-option-selected" : ""}`}>
-                  <input
-                    type="radio"
-                    name="role"
-                    value="medecin"
-                    checked={formData.role === "medecin"}
-                    onChange={handleChange}
-                  />
+                  <input type="radio" name="role"
+                    value="medecin" checked={formData.role === "medecin"}
+                    onChange={handleChange}/>
                   {formData.role === "medecin" && (
                     <div className="role-check">
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
@@ -125,13 +121,10 @@ const Register = () => {
                   <span className="role-sublabel">Gérer mon cabinet</span>
                 </label>
                 <label className={`role-option ${formData.role === "patient" ? "role-option-selected" : ""}`}>
-                  <input
-                    type="radio"
-                    name="role"
-                    value="patient"
-                    checked={formData.role === "patient"}
-                    onChange={handleChange}
-                  />
+                  <input type="radio" name="role"
+                    value="patient" checked={formData.role === "patient"}
+                    onChange={handleChange}/>
+
                   {formData.role === "patient" && (
                     <div className="role-check">
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
@@ -152,27 +145,15 @@ const Register = () => {
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="nom" className="form-label">Nom</label>
-                <input
-                  type="text"
-                  id="nom"
-                  name="nom"
-                  value={formData.nom}
-                  onChange={handleChange}
-                  placeholder="Dupont"
-                  required
-                  className="form-input"
+                <input type="text" id="nom" name="nom" 
+                  value={formData.nom} onChange={handleChange}
+                  placeholder="Mohamed" className="form-input" required
                 />
               </div>
               <div className="form-group">
                 <label htmlFor="prenom" className="form-label">Prénom</label>
-                <input
-                  type="text"
-                  id="prenom"
-                  name="prenom"
-                  value={formData.prenom}
-                  onChange={handleChange}
-                  placeholder="Marie"
-                  className="form-input"
+                <input type="text" id="prenom" name="prenom"
+                  value={formData.prenom} onChange={handleChange} placeholder="Youssef" className="form-input"
                 />
               </div>
             </div>
@@ -180,47 +161,26 @@ const Register = () => {
             {/* Email */}
             <div className="form-group">
               <label htmlFor="email" className="form-label">Adresse email</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="nom@cabinet.com"
-                required
-                autoComplete="email"
-                className="form-input"
-              />
+              <input type="email" id="email" name="email"
+                value={formData.email} onChange={handleChange} placeholder="nom@cabinet.com"
+                required autoComplete="email" className="form-input"/>
             </div>
 
             {/* Phone */}
             <div className="form-group">
               <label htmlFor="telephone" className="form-label">Téléphone</label>
-              <input
-                type="tel"
-                id="telephone"
-                name="telephone"
-                value={formData.telephone}
-                onChange={handleChange}
-                placeholder="+212 6 00 00 00 00"
-                required
-                className="form-input"
-              />
+              <input type="tel" id="telephone" name="telephone"
+                value={formData.telephone} onChange={handleChange} placeholder="+212 6 00 00 00 00"
+                className="form-input" required />
             </div>
 
             {/* Medecin-specific */}
             {formData.role === "medecin" && (
               <div className="form-group">
                 <label htmlFor="specialite" className="form-label">Spécialité médicale</label>
-                <input
-                  type="text"
-                  id="specialite"
-                  name="specialite"
-                  value={formData.specialite}
-                  onChange={handleChange}
-                  placeholder="Cardiologue, Pédiatre…"
-                  required
-                  className="form-input"
+                <input type="text" id="specialite" name="specialite"
+                  value={formData.specialite} onChange={handleChange}
+                  placeholder="Cardiologue, Pédiatre…" className="form-input" required
                 />
               </div>
             )}

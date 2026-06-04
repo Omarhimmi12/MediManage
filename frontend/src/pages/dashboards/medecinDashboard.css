@@ -1,6 +1,3 @@
-/* MediManage Dashboard - Redesigned with Dasher UI Style */
-/* Modern, professional medical dashboard with clean aesthetics */
-
 .mmd-medecin-dashboard {
   min-height: 100vh;
   background: #f8f9fc;
@@ -8,13 +5,10 @@
   display: flex;
 }
 
-/* ========================================
-   SIDEBAR STYLING
-======================================== */
-
 .mmd-sidebar {
   width: 260px;
-  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  background: #0b1220;
+
   color: #fff;
   padding: 24px 20px;
   border-right: 1px solid rgba(255, 255, 255, 0.1);
@@ -26,16 +20,25 @@
 .mmd-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   font-size: 1.5rem;
   font-weight: 700;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.4px;
   margin-bottom: 32px;
   padding: 16px;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: #fff;
+}
+
+.mmd-brand__img {
+  margin-left: -8px;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  object-fit: contain;
+  display: block;
 }
 
 .mmd-brand::before {
@@ -69,8 +72,9 @@
 }
 
 .mmd-navbtn--active {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  background: #0ea371 !important;
   color: #fff !important;
+
   font-weight: 600;
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
 }
@@ -79,13 +83,12 @@
   content: none;
 }
 
-/* Space between icon and label in sidebar */
 .mmd-navbtn__icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   margin-right: 10px;
-  width: 22px; /* alignment */
+  width: 22px;
 }
 
 .mmd-navbtn__icon .bi {
@@ -96,19 +99,6 @@
   flex: 1;
   text-align: left !important;
   padding-left: 0;
-}
-
-/* Space between icon and label in sidebar */
-.mmd-navbtn__icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 10px;
-  width: 22px; /* keep alignment when collapsed */
-}
-
-.mmd-navbtn__icon .bi {
-  font-size: 18px;
 }
 
 /* Logout Button */
@@ -132,33 +122,291 @@
 }
 
 /* ========================================
-   MAIN CONTENT AREA
+   CONTENT AREA
 ======================================== */
 
 .mmd-content {
   flex: 1;
-  padding: 32px 40px;
+  padding: 0;
   overflow-y: auto;
   background: #f8f9fc;
+  display: flex;
+  flex-direction: column;
 }
 
-/* compensate for the fixed/sticky topbar in this dashboard */
+.mmd-content__inner {
+  padding: 32px 40px;
+  flex: 1;
+}
+
 .mmd-topbar--placeholder {
   height: 64px;
 }
 
-/* Topbar / Header */
+/* ========================================
+   TOPBAR — NAVBAR STYLE
+======================================== */
+
 .mmd-topbar {
-  background: #ffffff !important;
-  border: 1px solid #e5e7eb !important;
-  border-radius: 16px !important;
-  padding: 20px 24px !important;
-  margin-bottom: 32px !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%) !important;
+  border: none !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 0 !important;
+  padding: 0 24px !important;
+  margin: 0 !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15) !important;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  height: 64px;
+  min-height: 64px;
 }
+
+.mmd-topbar__left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.mmd-topbar__brand {
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+}
+
+.mmd-topbar__right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.mmd-topbar__greeting {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.mmd-topbar__greeting strong {
+  color: #fff;
+  font-weight: 700;
+}
+
+.mmd-topbar__spacer {
+  flex: 1;
+}
+
+/* Topbar toggle button */
+.mmd-topbar__toggle {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  font-size: 1.25rem;
+  line-height: 1;
+  transition: background 160ms ease, border-color 160ms ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  min-height: 38px;
+}
+
+.mmd-topbar__toggle:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* ========================================
+   PROFILE DROPDOWN
+======================================== */
+
+.mmd-profile {
+  position: relative;
+}
+
+.mmd-profile__button {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 6px 10px 6px 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+
+.mmd-profile__button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.mmd-profile__avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 7px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.mmd-profile__label {
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.mmd-profile__chevron {
+  font-size: 12px;
+  opacity: 0.7;
+  display: inline-flex;
+  align-items: center;
+}
+
+.mmd-profile__menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 220px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.18);
+  padding: 6px;
+  z-index: 200;
+}
+
+.mmd-profile__item {
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-weight: 600;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.875rem;
+  transition: background 120ms ease;
+}
+
+.mmd-profile__item:hover {
+  background: #f1f5f9;
+}
+
+.mmd-profile__itemIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  flex: 0 0 auto;
+}
+
+.mmd-profile__itemIcon .bi {
+  font-size: 15px;
+}
+
+.mmd-profile__itemLabel {
+  flex: 1;
+}
+
+.mmd-profile__divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 4px 6px;
+}
+
+.mmd-profile__item--logout {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.mmd-profile__item--logout:hover {
+  background: #fef2f2;
+}
+
+/* ========================================
+   SIDEBAR COLLAPSE
+======================================== */
+
+.mmd-sidebar--collapsed {
+  width: 72px;
+  min-width: 72px;
+}
+
+.mmd-sidebar--collapsed .mmd-brand__text {
+  display: none;
+}
+
+.mmd-sidebar__toggle {
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-radius: 10px;
+  padding: 6px 8px;
+  cursor: pointer;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.mmd-sidebar--collapsed .mmd-navbtn {
+  justify-content: center;
+  padding: 14px 12px !important;
+}
+
+.mmd-sidebar:not(.mmd-sidebar--collapsed) .mmd-navbtn {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.mmd-sidebar--collapsed .mmd-navbtn__label {
+  display: none;
+}
+
+.mmd-sidebar--collapsed .mmd-navbtn__icon {
+  font-size: 18px;
+  width: 100%;
+  margin-right: 0;
+  justify-content: center;
+}
+
+.mmd-sidebar--collapsed .mmd-sidebar__logout .mmd-navbtn__label {
+  display: none;
+}
+
+.mmd-sidebar--collapsed .mmd-sidebar__logout .mmd-navbtn__icon {
+  margin-right: 0;
+}
+
+.mmd-sidebar--collapsed .mmd-navbtn--active::before {
+  left: auto;
+  right: 0;
+  width: 3px;
+  border-radius: 4px 0 0 4px;
+}
+
+.mmd-topbar--fixed {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* ========================================
+   HEADINGS
+======================================== */
 
 .mmd-content h2,
 .mmd-content h3,
@@ -178,7 +426,7 @@
 }
 
 /* ========================================
-   CARDS & STATS
+   CARDS
 ======================================== */
 
 .mmd-content .card {
@@ -195,7 +443,6 @@
   transform: translateY(-2px);
 }
 
-/* Stats Cards */
 .mmd-content .row .card {
   height: 100%;
 }
@@ -220,7 +467,6 @@
   color: #10b981 !important;
 }
 
-/* Card Headers */
 .mmd-content .card-header {
   background: #f8fafc;
   font-weight: 700;
@@ -540,10 +786,6 @@
   cursor: not-allowed;
 }
 
-/* ========================================
-   UTILITY CLASSES
-======================================== */
-
 .mmd-content .text-muted {
   color: #64748b !important;
 }
@@ -556,7 +798,6 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03) !important;
 }
 
-/* Search & Filter Inputs */
 .mmd-content input[type="search"],
 .mmd-content input[type="text"].search {
   background: #f8fafc;
@@ -571,11 +812,244 @@
 }
 
 /* ========================================
-   RESPONSIVE DESIGN
+   CUSTOM ACCENTS FOR MEDICAL CONTEXT
+======================================== */
+
+.medical-accent {
+  color: #10b981 !important;
+}
+
+.medical-accent-bg {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  color: #fff;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.status-dot.active {
+  background: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+.status-dot.pending {
+  background: #f59e0b;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+}
+
+.status-dot.inactive {
+  background: #64748b;
+}
+
+/* ========================================
+   STYLE OVERRIDES (Secretaires compat)
+======================================== */
+
+.mmd-content input[style*="border: 2px solid #0b0b0b"],
+.mmd-content input[style*="border: \"2px solid #0b0b0b\""] {
+  border: 1px solid #e5e7eb !important;
+  font-weight: 500 !important;
+}
+
+.mmd-content input[style*="border: 2px solid #0b0b0b"]:focus,
+.mmd-content input[style*="border: \"2px solid #0b0b0b\""]:focus {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+}
+
+.mmd-content div[style*="border: 3px solid #0b0b0b"],
+.mmd-content div[style*="border: \"3px solid #0b0b0b\""] {
+  border: 1px solid #e5e7eb !important;
+  border-radius: 16px !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+}
+
+.mmd-content div[style*="border: 3px solid #0b0b0b"] > div:first-child {
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 20px;
+}
+
+.mmd-content button[style*="border: 2px solid #0b0b0b"] {
+  border: 1px solid #e5e7eb !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  padding: 10px 20px !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.mmd-content button[style*="border: 2px solid #0b0b0b"]:hover:not(:disabled) {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.mmd-content button[style*="background: #19a2a8"],
+.mmd-content button[style*="background: \"#19a2a8\""] {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  border-color: #10b981 !important;
+  color: #fff !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.mmd-content button[style*="background: #19a2a8"]:hover:not(:disabled),
+.mmd-content button[style*="background: \"#19a2a8\""]:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2) !important;
+}
+
+.mmd-content button[style*="background: #fff"],
+.mmd-content button[style*="background: \"#fff\""] {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  color: #475569 !important;
+}
+
+.mmd-content button[style*="background: #fff"]:hover:not(:disabled),
+.mmd-content button[style*="background: \"#fff\""]:hover:not(:disabled) {
+  background: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+}
+
+.mmd-content div[style*="border: 2px solid #0b0b0b"][style*="padding: 12"] {
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+  background: #f8fafc !important;
+  font-weight: 500 !important;
+}
+
+.mmd-content div[style*="border: 2px solid #0b0b0b"][style*="padding: 12"] > div:first-child {
+  color: #64748b !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  opacity: 1 !important;
+}
+
+.mmd-content div[style*="border: 2px solid #0b0b0b"][style*="padding: 12"] > div:last-child {
+  color: #1e293b !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+}
+
+.mmd-content label[style*="fontWeight: 900"] {
+  font-weight: 600 !important;
+  color: #475569 !important;
+  margin-bottom: 8px !important;
+  font-size: 0.875rem !important;
+}
+
+.mmd-content div[style*="color: crimson"] {
+  color: #dc2626 !important;
+  font-weight: 600 !important;
+  padding: 12px 16px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  margin-top: 16px !important;
+}
+
+.mmd-content div[style*="fontWeight: 1000"][style*="fontSize: 20"] {
+  font-weight: 700 !important;
+  font-size: 1.25rem !important;
+  color: #1e293b !important;
+  line-height: 1.4 !important;
+}
+
+.mmd-content div[style*="fontWeight: 800"][style*="opacity: 0.9"] {
+  font-weight: 500 !important;
+  color: #64748b !important;
+  opacity: 1 !important;
+  margin-top: 4px !important;
+}
+
+.mmd-content div[style*="borderBottom: 2px solid #0b0b0b"],
+.mmd-content div[style*="borderBottom: \"2px solid #0b0b0b\""] {
+  border-bottom: 1px solid #e5e7eb !important;
+  padding-bottom: 20px !important;
+  margin-bottom: 24px !important;
+}
+
+.mmd-content div[style*="border: 1px solid #e8e8e8"] {
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  transition: all 0.2s ease !important;
+}
+
+.mmd-content div[style*="border: 1px solid #e8e8e8"]:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  transform: translateY(-2px) !important;
+  border-color: #cbd5e1 !important;
+}
+
+.mmd-content [style*="fontWeight: 1000"] {
+  font-weight: 700 !important;
+}
+
+.mmd-content [style*="fontWeight: 950"] {
+  font-weight: 700 !important;
+}
+
+.mmd-content [style*="fontWeight: 900"] {
+  font-weight: 600 !important;
+}
+
+.mmd-content [style*="fontWeight: 800"] {
+  font-weight: 600 !important;
+}
+
+.mmd-content [style*="fontWeight: 700"] {
+  font-weight: 600 !important;
+}
+
+.mmd-content div[style*="gridTemplateColumns"] {
+  gap: 16px !important;
+}
+
+.mmd-content div[role="dialog"][aria-modal="true"] {
+  background: rgba(15, 23, 42, 0.5) !important;
+  backdrop-filter: blur(4px);
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  overflow-y: auto;
+  padding: 48px 16px 24px !important;
+}
+
+.mmd-content div[role="dialog"][aria-modal="true"] > div {
+  width: min(760px, 100%) !important;
+  max-height: calc(100vh - 72px);
+  overflow: auto;
+  border-radius: 16px !important;
+}
+
+.mmd-content div[role="dialog"] button[style*="Fermer"] {
+  background: transparent !important;
+  border: 1px solid #e5e7eb !important;
+  color: #64748b !important;
+}
+
+.mmd-content div[role="dialog"] button:hover {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* ========================================
+   RESPONSIVE
 ======================================== */
 
 @media (max-width: 1200px) {
-  .mmd-content {
+  .mmd-content__inner {
     padding: 24px 28px;
   }
 }
@@ -586,7 +1060,7 @@
     padding: 20px 16px;
   }
 
-  .mmd-content {
+  .mmd-content__inner {
     padding: 20px 24px;
   }
 
@@ -598,6 +1072,10 @@
   .mmd-navbtn {
     padding: 12px 14px !important;
     font-size: 0.875rem;
+  }
+
+  .mmd-topbar__greeting {
+    display: none;
   }
 }
 
@@ -613,7 +1091,7 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 
-  .mmd-content {
+  .mmd-content__inner {
     padding: 16px 20px;
   }
 
@@ -634,17 +1112,25 @@
     font-size: 0.875rem;
     padding: 8px 16px;
   }
+
+  .mmd-topbar__brand {
+    display: none;
+  }
 }
 
 @media (max-width: 576px) {
-  .mmd-content {
+  .mmd-content__inner {
     padding: 16px;
   }
 
   .mmd-topbar {
-    padding: 16px !important;
-    flex-direction: column;
-    gap: 12px;
+    padding: 0 12px !important;
+    height: 56px;
+    min-height: 56px;
+  }
+
+  .mmd-topbar__greeting {
+    display: none;
   }
 
   .mmd-content .card-header {
@@ -663,7 +1149,7 @@
 }
 
 /* ========================================
-   SCROLLBAR STYLING
+   SCROLLBARS
 ======================================== */
 
 .mmd-sidebar::-webkit-scrollbar,
@@ -711,441 +1197,4 @@
   width: 1rem;
   height: 1rem;
   border-width: 2px;
-}
-
-/* ========================================
-   CUSTOM ACCENTS FOR MEDICAL CONTEXT
-======================================== */
-
-/* Accent color for medical actions */
-.medical-accent {
-  color: #10b981 !important;
-}
-
-.medical-accent-bg {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-  color: #fff;
-}
-
-/* Status indicators */
-.status-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-right: 8px;
-}
-
-.status-dot.active {
-  background: #10b981;
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
-}
-
-.status-dot.pending {
-  background: #f59e0b;
-  box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
-}
-
-.status-dot.inactive {
-  background: #64748b;
-}
-
-/* ========================================
-   SECRETAIRES PAGE OVERRIDES
-   (Remove custom inline styling and match dashboard design)
-======================================== */
-
-/* Override heavy inline borders on secretaires page */
-.mmd-content input[style*="border: 2px solid #0b0b0b"],
-.mmd-content input[style*="border: \"2px solid #0b0b0b\""] {
-  border: 1px solid #e5e7eb !important;
-  font-weight: 500 !important;
-}
-
-.mmd-content input[style*="border: 2px solid #0b0b0b"]:focus,
-.mmd-content input[style*="border: \"2px solid #0b0b0b\""]:focus {
-  border-color: #10b981 !important;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
-}
-
-/* Fix modal styling in secretaires page */
-.mmd-content div[style*="border: 3px solid #0b0b0b"],
-.mmd-content div[style*="border: \"3px solid #0b0b0b\""] {
-  border: 1px solid #e5e7eb !important;
-  border-radius: 16px !important;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
-}
-
-/* Fix modal header in secretaires */
-.mmd-content div[style*="border: 3px solid #0b0b0b"] > div:first-child {
-  padding-bottom: 16px;
-  border-bottom: 1px solid #e5e7eb;
-  margin-bottom: 20px;
-}
-
-/* Fix buttons with heavy borders */
-.mmd-content button[style*="border: 2px solid #0b0b0b"] {
-  border: 1px solid #e5e7eb !important;
-  border-radius: 10px !important;
-  font-weight: 600 !important;
-  padding: 10px 20px !important;
-  transition: all 0.2s ease !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
-}
-
-.mmd-content button[style*="border: 2px solid #0b0b0b"]:hover:not(:disabled) {
-  transform: translateY(-1px) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* Fix primary action buttons in secretaires */
-.mmd-content button[style*="background: #19a2a8"],
-.mmd-content button[style*="background: \"#19a2a8\""] {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-  border-color: #10b981 !important;
-  color: #fff !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
-}
-
-.mmd-content button[style*="background: #19a2a8"]:hover:not(:disabled),
-.mmd-content button[style*="background: \"#19a2a8\""]:hover:not(:disabled) {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2) !important;
-}
-
-/* Fix white background buttons */
-.mmd-content button[style*="background: #fff"],
-.mmd-content button[style*="background: \"#fff\""] {
-  background: #f8fafc !important;
-  border-color: #e2e8f0 !important;
-  color: #475569 !important;
-}
-
-.mmd-content button[style*="background: #fff"]:hover:not(:disabled),
-.mmd-content button[style*="background: \"#fff\""]:hover:not(:disabled) {
-  background: #e2e8f0 !important;
-  border-color: #cbd5e1 !important;
-  color: #334155 !important;
-}
-
-/* Fix grid info boxes in secretaires view modal */
-.mmd-content div[style*="border: 2px solid #0b0b0b"][style*="padding: 12"] {
-  border: 1px solid #e5e7eb !important;
-  border-radius: 12px !important;
-  padding: 16px !important;
-  background: #f8fafc !important;
-  font-weight: 500 !important;
-}
-
-.mmd-content div[style*="border: 2px solid #0b0b0b"][style*="padding: 12"] > div:first-child {
-  color: #64748b !important;
-  font-weight: 600 !important;
-  font-size: 0.875rem !important;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 8px;
-  opacity: 1 !important;
-}
-
-.mmd-content div[style*="border: 2px solid #0b0b0b"][style*="padding: 12"] > div:last-child {
-  color: #1e293b !important;
-  font-weight: 600 !important;
-  font-size: 1rem !important;
-}
-
-/* Fix labels in forms */
-.mmd-content label[style*="fontWeight: 900"] {
-  font-weight: 600 !important;
-  color: #475569 !important;
-  margin-bottom: 8px !important;
-  font-size: 0.875rem !important;
-}
-
-/* Fix form error messages */
-.mmd-content div[style*="color: crimson"] {
-  color: #dc2626 !important;
-  font-weight: 600 !important;
-  padding: 12px 16px;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 10px;
-  margin-top: 16px !important;
-}
-
-/* Fix modal titles */
-.mmd-content div[style*="fontWeight: 1000"][style*="fontSize: 20"] {
-  font-weight: 700 !important;
-  font-size: 1.25rem !important;
-  color: #1e293b !important;
-  line-height: 1.4 !important;
-}
-
-.mmd-content div[style*="fontWeight: 800"][style*="opacity: 0.9"] {
-  font-weight: 500 !important;
-  color: #64748b !important;
-  opacity: 1 !important;
-  margin-top: 4px !important;
-}
-
-/* Fix top action bar */
-.mmd-content div[style*="borderBottom: 2px solid #0b0b0b"],
-.mmd-content div[style*="borderBottom: \"2px solid #0b0b0b\""] {
-  border-bottom: 1px solid #e5e7eb !important;
-  padding-bottom: 20px !important;
-  margin-bottom: 24px !important;
-}
-
-/* Fix secretary cards/list items */
-.mmd-content div[style*="border: 1px solid #e8e8e8"] {
-  border: 1px solid #e5e7eb !important;
-  border-radius: 12px !important;
-  background: #ffffff !important;
-  transition: all 0.2s ease !important;
-}
-
-.mmd-content div[style*="border: 1px solid #e8e8e8"]:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
-  transform: translateY(-2px) !important;
-  border-color: #cbd5e1 !important;
-}
-
-/* Fix any remaining heavy font weights */
-.mmd-content [style*="fontWeight: 1000"] {
-  font-weight: 700 !important;
-}
-
-.mmd-content [style*="fontWeight: 950"] {
-  font-weight: 700 !important;
-}
-
-.mmd-content [style*="fontWeight: 900"] {
-  font-weight: 600 !important;
-}
-
-.mmd-content [style*="fontWeight: 800"] {
-  font-weight: 600 !important;
-}
-
-.mmd-content [style*="fontWeight: 700"] {
-  font-weight: 600 !important;
-}
-
-/* Ensure grid layouts in secretaires work well */
-.mmd-content div[style*="gridTemplateColumns"] {
-  gap: 16px !important;
-}
-
-/* Fix modal overlay backdrop */
-.mmd-content div[role="dialog"][aria-modal="true"] {
-  background: rgba(15, 23, 42, 0.5) !important;
-  backdrop-filter: blur(4px);
-}
-
-/* Fix close button in modals */
-.mmd-content div[role="dialog"] button[style*="Fermer"] {
-  background: transparent !important;
-  border: 1px solid #e5e7eb !important;
-  color: #64748b !important;
-}
-
-.mmd-content div[role="dialog"] button:hover {
-  background: #f8fafc !important;
-  border-color: #cbd5e1 !important;
-}
-
-/* ========================================
-   FIXED TOPBAR + PROFILE DROPDOWN (MedecinDashboard)
-======================================== */
-
-.mmd-topbar--fixed {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: #ffffff;
-  padding: 14px 18px;
-  border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e5e7eb;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-
-/* reserved space; kept for layout clarity if needed */
-.mmd-topbar__spacer {
-  flex: 1;
-}
-
-.mmd-topbar--placeholder {
-  height: 0px;
-}
-
-/* Toggle button (topbar) - beautiful medical style */
-.mmd-topbar__toggle {
-  border: 2px solid rgba(16, 185, 129, 0.35);
-  background: #ffffff;
-  color: #0f172a;
-  border-radius: 14px;
-  padding: 10px 14px;
-  cursor: pointer;
-  font-weight: 900;
-  line-height: 1;
-  box-shadow: 0 10px 20px rgba(16, 185, 129, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
-  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease,
-    background 160ms ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 46px;
-}
-
-.mmd-topbar__toggle:hover {
-  background: rgba(16, 185, 129, 0.08);
-  border-color: rgba(16, 185, 129, 0.7);
-  transform: translateY(-1px);
-  box-shadow: 0 16px 28px rgba(16, 185, 129, 0.18), 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.mmd-topbar__toggle:active {
-  transform: translateY(0);
-  box-shadow: 0 10px 18px rgba(16, 185, 129, 0.14), 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-/* ========================================
-   SIDEBAR COLLAPSE (MedecinDashboard)
-======================================== */
-
-.mmd-sidebar--collapsed {
-  width: 72px;
-  min-width: 72px;
-}
-
-.mmd-sidebar--collapsed .mmd-brand__text {
-  display: none;
-}
-
-.mmd-sidebar__toggle {
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
-  border-radius: 10px;
-  padding: 6px 8px;
-  cursor: pointer;
-  line-height: 1;
-  font-weight: 800;
-}
-
-.mmd-sidebar--collapsed .mmd-sidebar__toggle {
-  /* keep visible even when collapsed */
-}
-
-.mmd-sidebar--collapsed .mmd-navbtn {
-  justify-content: center;
-  padding: 14px 12px !important;
-}
-
-.mmd-sidebar:not(.mmd-sidebar--collapsed) .mmd-navbtn {
-  justify-content: flex-start;
-  text-align: left;
-}
-
-.mmd-sidebar--collapsed .mmd-navbtn__label {
-  display: none;
-}
-
-.mmd-sidebar--collapsed .mmd-navbtn__icon {
-  font-size: 18px;
-  width: 100%;
-  margin-right: 0;
-  justify-content: center;
-}
-
-.mmd-sidebar--collapsed .mmd-sidebar__logout .mmd-navbtn__label {
-  display: none;
-}
-
-.mmd-sidebar--collapsed .mmd-sidebar__logout .mmd-navbtn__icon {
-  margin-right: 0;
-}
-
-/* optional: slightly adjust active indicator when labels hidden */
-.mmd-sidebar--collapsed .mmd-navbtn--active::before {
-  left: auto;
-  right: 0;
-  width: 3px;
-  border-radius: 4px 0 0 4px;
-}
-
-/* Profile dropdown */
-.mmd-profile {
-  position: relative;
-  margin-left: auto;
-}
-
-.mmd-profile__button {
-  border: 1px solid #e5e7eb;
-  background: #f8fafc;
-  border-radius: 12px;
-  padding: 10px 12px;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 800;
-  color: #0f172a;
-  cursor: pointer;
-}
-
-.mmd-profile__button:hover {
-  background: #eef2ff;
-  border-color: #c7d2fe;
-}
-
-.mmd-profile__label {
-  white-space: nowrap;
-}
-
-.mmd-profile__chevron {
-  font-size: 12px;
-  opacity: 0.8;
-}
-
-.mmd-profile__menu {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 8px);
-  min-width: 220px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 14px;
-  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
-  padding: 8px;
-  z-index: 200;
-}
-
-.mmd-profile__item {
-  width: 100%;
-  text-align: left;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  font-weight: 700;
-  color: #111827;
-}
-
-.mmd-profile__item:hover {
-  background: #f3f4f6;
-}
-
-.mmd-profile__divider {
-  height: 1px;
-  background: #e5e7eb;
-  margin: 6px 2px;
-}
-
-.mmd-profile__item--logout {
-  color: #dc2626;
-  font-weight: 800;
 }

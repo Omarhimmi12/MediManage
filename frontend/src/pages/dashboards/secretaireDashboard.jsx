@@ -100,16 +100,17 @@ const SecretaireDashboard = () => {
         </button>
       </div>
 
+      <button
+        type="button"
+        className="mmd-sidebar-toggle"
+        aria-label="Toggle sidebar"
+        onClick={() => setIsSidebarCollapsed((v) => !v)}
+      >
+        {isSidebarCollapsed ? "»" : "«"}
+      </button>
+
       <div className="mmd-content">
         <div className="mmd-topbar mmd-topbar--fixed">
-          <button
-            type="button"
-            className="mmd-topbar__toggle"
-            aria-label="Toggle sidebar"
-            onClick={() => setIsSidebarCollapsed((v) => !v)}
-          >
-            {isSidebarCollapsed ? "»" : "«"}
-          </button>
           <div className="mmd-topbar__spacer" />
 
           <div className="mmd-profile">
@@ -210,4 +211,3 @@ const SecretaireDashboard = () => {
 };
 
 export default SecretaireDashboard;
-

@@ -1,8 +1,60 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Stethoscope, UserRound } from "lucide-react";
 import { AuthContext } from "../../context/authContext";
 import "./register.css";
+
+const getStrength = (pw) => {
+  if (!pw) return 0;
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  return score;
+};
+
+const strengthConfig = {
+  1: { label: "Très faible", color: "#FF6B6B" },
+  2: { label: "Faible", color: "#FFB347" },
+  3: { label: "Bon", color: "#87CEEB" },
+  4: { label: "Excellent", color: "#00D4AA" },
+};
+
+const EyeIcon = () => (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+
+const EyeOffIcon = () => (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94" />
+    <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19" />
+    <line x1="1" y1="1" x2="23" y2="23" />
+    <path d="M14.12 14.12a3 3 0 11-4.24-4.24" />
+  </svg>
+);
 
 const Register = () => {
   const { register } = useContext(AuthContext);
@@ -21,26 +73,39 @@ const Register = () => {
     adresse: "",
     sexe: "",
   });
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [focusedField, setFocusedField] = useState(null);
+
+  useEffect(() => {
+    const t = setTimeout(() => setIsLoaded(true), 100);
+    return () => clearTimeout(t);
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (error) setError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setLoading(true);
 
     if (formData.password !== formData.password_confirmation) {
-      setError("Les mots de passe ne correspondent pas");
-      setLoading(false);
+      setError("Les mots de passe ne correspondent pas.");
+      return;
+    }
+    if (!termsAccepted) {
+      setError("Veuillez accepter les conditions d'utilisation pour continuer.");
       return;
     }
 
+    setLoading(true);
     try {
       const role = await register(formData);
       if (role === "medecin") navigate("/medecin");
@@ -57,374 +122,519 @@ const Register = () => {
     }
   };
 
-  const getStrength = (pw) => {
-    let s = 0;
-    if (pw.length >= 8) s++;
-    if (/[A-Z]/.test(pw)) s++;
-    if (/[0-9]/.test(pw)) s++;
-    if (/[^A-Za-z0-9]/.test(pw)) s++;
-    return s;
-  };
+  const strength = getStrength(formData.password);
+  const strengthInfo = strengthConfig[strength];
 
-  const strength = formData.password ? getStrength(formData.password) : 0;
-  const strengthLabels = ["", "Faible", "Moyen", "Bon", "Excellent"];
-  const strengthClasses = ["", "strength-weak", "strength-medium", "strength-good", "strength-excellent"];
+  const passwordsMatch =
+    formData.password_confirmation &&
+    formData.password === formData.password_confirmation;
+
+  const passwordsMismatch =
+    formData.password_confirmation &&
+    formData.password !== formData.password_confirmation;
+
+  const isFieldActive = (field) =>
+    focusedField === field || formData[field] !== "";
 
   return (
-    <div className="auth-container">
-      {/* Left Panel */}
-      <div className="auth-form-panel">
-        <div className="auth-form-wrapper auth-form-wrapper-register">
-          <Link to="/" className="auth-mobile-logo brand-home-link" aria-label="Aller à l'accueil">
-            <div className="brand-logo-icon brand-logo-icon-mobile">
-              <img src="/images/brand.png" alt="MediManage" className="brand-logo-image" />
-            </div>
-            <span className="brand-logo-text-dark">MediManage</span>
+    <div className="register-page">
+      {/* ── Background ── */}
+      <div className="register-bg">
+        <div className="register-bg-image"></div>
+        <div className="register-bg-overlay"></div>
+      </div>
+
+      {/* ── Main Container ── */}
+      <div className={`register-container ${isLoaded ? "loaded" : ""}`}>
+        <div className="register-card">
+          <div className="r-card-shine"></div>
+
+          {/* ── Logo ── */}
+          <Link to="/" className="register-logo-area" aria-label="Aller à l'accueil">
+            <img src="/images/brand.png" alt="MediManage" className="register-brand-img" />
+            <span className="r-logo-text">MediManage</span>
           </Link>
 
-          <div className="auth-header">
-            <h2 className="auth-title">Créer un compte</h2>
-            <p className="auth-subtitle">Essai gratuit</p>
+          {/* ── Header ── */}
+          <div className="register-header">
+            <h1 className="register-title">Créer un compte</h1>
+            <p className="register-subtitle">
+              Rejoignez les professionnels de santé qui nous font confiance
+            </p>
           </div>
 
+          {/* ── Error Alert ── */}
           {error && (
-            <div className="auth-error">
+            <div className="register-error" role="alert">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
               </svg>
               <span>{error}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="auth-form">
-            {/* Role Selection */}
-            <div className="form-group">
-              <label className="form-label">Type de compte</label>
-              <div className="role-selector">
-                <label className={`role-option ${formData.role === "medecin" ? "role-option-selected" : ""}`}>
-                  <input type="radio" name="role"
-                    value="medecin" checked={formData.role === "medecin"}
-                    onChange={handleChange}/>
+          {/* ── Form ── */}
+          <form className="register-form" onSubmit={handleSubmit} noValidate>
+
+            {/* ── Role Selector ── */}
+            <div className="role-selector-group">
+              <span className="role-selector-label">Type de compte</span>
+              <div className="role-selector" role="radiogroup">
+                <label className={`role-option ${formData.role === "medecin" ? "role-option--active" : ""}`}>
+                  <input
+                    type="radio"
+                    name="role"
+                    value="medecin"
+                    checked={formData.role === "medecin"}
+                    onChange={handleChange}
+                    className="role-radio-hidden"
+                  />
+                  <div className="role-option-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M4.8 2.3A.3.3 0 105 2H4a2 2 0 00-2 2v5a6 6 0 006 6v0a6 6 0 006-6V4a2 2 0 00-2-2h-1a.2.2 0 10.3.3" />
+                      <path d="M8 15v1a6 6 0 006 6v0a6 6 0 006-6v-4" />
+                      <circle cx="20" cy="10" r="2" />
+                    </svg>
+                  </div>
+                  <div className="role-option-info">
+                    <span className="role-option-title">Médecin</span>
+                    <span className="role-option-desc">Gérer mon cabinet</span>
+                  </div>
                   {formData.role === "medecin" && (
-                    <div className="role-check">
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="20 6 9 17 4 12"></polyline>
+                    <div className="role-option-check">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
                       </svg>
                     </div>
                   )}
-                  <div className="role-option-icon role-option-icon-medecin" aria-hidden="true">
-                    <Stethoscope size={22} strokeWidth={2.2} />
-                  </div>
-                  <span className="role-label">Médecin</span>
-                  <span className="role-sublabel">Gérer mon cabinet</span>
                 </label>
-                <label className={`role-option ${formData.role === "patient" ? "role-option-selected" : ""}`}>
-                  <input type="radio" name="role"
-                    value="patient" checked={formData.role === "patient"}
-                    onChange={handleChange}/>
 
+                <label className={`role-option ${formData.role === "patient" ? "role-option--active" : ""}`}>
+                  <input
+                    type="radio"
+                    name="role"
+                    value="patient"
+                    checked={formData.role === "patient"}
+                    onChange={handleChange}
+                    className="role-radio-hidden"
+                  />
+                  <div className="role-option-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                  </div>
+                  <div className="role-option-info">
+                    <span className="role-option-title">Patient</span>
+                    <span className="role-option-desc">Suivre ma santé</span>
+                  </div>
                   {formData.role === "patient" && (
-                    <div className="role-check">
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="20 6 9 17 4 12"></polyline>
+                    <div className="role-option-check">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
                       </svg>
                     </div>
                   )}
-                  <div className="role-option-icon role-option-icon-patient" aria-hidden="true">
-                    <UserRound size={22} strokeWidth={2.2} />
-                  </div>
-                  <span className="role-label">Patient</span>
-                  <span className="role-sublabel">Suivre ma santé</span>
                 </label>
               </div>
             </div>
 
-            {/* Name Row */}
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="nom" className="form-label">Nom</label>
-                <input type="text" id="nom" name="nom" 
-                  value={formData.nom} onChange={handleChange}
-                  placeholder="Mohamed" className="form-input" required
-                />
+            {/* ── Name Row ── */}
+            <div className="register-form-row">
+              <div className={`r-input-group ${isFieldActive("nom") ? "focused" : ""} ${focusedField === "nom" ? "active" : ""}`}>
+                <div className="r-input-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
+                <div className="r-input-wrapper">
+                  <input
+                    type="text"
+                    id="nom"
+                    name="nom"
+                    value={formData.nom}
+                    onChange={handleChange}
+                    onFocus={() => setFocusedField("nom")}
+                    onBlur={() => setFocusedField(null)}
+                    required
+                    autoComplete="family-name"
+                  />
+                  <label htmlFor="nom" className="r-floating-label">Nom</label>
+                  <div className="r-input-border-effect"></div>
+                </div>
               </div>
-              <div className="form-group">
-                <label htmlFor="prenom" className="form-label">Prénom</label>
-                <input type="text" id="prenom" name="prenom"
-                  value={formData.prenom} onChange={handleChange} placeholder="Youssef" className="form-input"
-                />
+
+              <div className={`r-input-group ${isFieldActive("prenom") ? "focused" : ""} ${focusedField === "prenom" ? "active" : ""}`}>
+                <div className="r-input-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
+                <div className="r-input-wrapper">
+                  <input
+                    type="text"
+                    id="prenom"
+                    name="prenom"
+                    value={formData.prenom}
+                    onChange={handleChange}
+                    onFocus={() => setFocusedField("prenom")}
+                    onBlur={() => setFocusedField(null)}
+                    autoComplete="given-name"
+                  />
+                  <label htmlFor="prenom" className="r-floating-label">Prénom</label>
+                  <div className="r-input-border-effect"></div>
+                </div>
               </div>
             </div>
 
-            {/* Email */}
-            <div className="form-group">
-              <label htmlFor="email" className="form-label">Adresse email</label>
-              <input type="email" id="email" name="email"
-                value={formData.email} onChange={handleChange} placeholder="nom@cabinet.com"
-                required autoComplete="email" className="form-input"/>
+            {/* ── Email ── */}
+            <div className={`r-input-group ${isFieldActive("email") ? "focused" : ""} ${focusedField === "email" ? "active" : ""}`}>
+              <div className="r-input-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="4" width="20" height="16" rx="3" />
+                  <path d="M22 7L13.03 12.7a1.94 1.94 0 01-2.06 0L2 7" />
+                </svg>
+              </div>
+              <div className="r-input-wrapper">
+                <input
+                  type="email"
+                  id="regEmail"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  onFocus={() => setFocusedField("email")}
+                  onBlur={() => setFocusedField(null)}
+                  required
+                  autoComplete="email"
+                />
+                <label htmlFor="regEmail" className="r-floating-label">Adresse email</label>
+                <div className="r-input-border-effect"></div>
+              </div>
             </div>
 
-            {/* Phone */}
-            <div className="form-group">
-              <label htmlFor="telephone" className="form-label">Téléphone</label>
-              <input type="tel" id="telephone" name="telephone"
-                value={formData.telephone} onChange={handleChange} placeholder="+212 6 00 00 00 00"
-                className="form-input" required />
+            {/* ── Phone ── */}
+            <div className={`r-input-group ${isFieldActive("telephone") ? "focused" : ""} ${focusedField === "telephone" ? "active" : ""}`}>
+              <div className="r-input-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.69 12a19.79 19.79 0 01-3.07-8.67A2 2 0 013.59 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.91 8.56a16 16 0 006.53 6.53l.88-.88a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" />
+                </svg>
+              </div>
+              <div className="r-input-wrapper">
+                <input
+                  type="tel"
+                  id="telephone"
+                  name="telephone"
+                  value={formData.telephone}
+                  onChange={handleChange}
+                  onFocus={() => setFocusedField("telephone")}
+                  onBlur={() => setFocusedField(null)}
+                  required
+                  autoComplete="tel"
+                />
+                <label htmlFor="telephone" className="r-floating-label">Téléphone</label>
+                <div className="r-input-border-effect"></div>
+              </div>
             </div>
 
-            {/* Medecin-specific */}
+            {/* ── Médecin: Specialty ── */}
             {formData.role === "medecin" && (
-              <div className="form-group">
-                <label htmlFor="specialite" className="form-label">Spécialité médicale</label>
-                <input type="text" id="specialite" name="specialite"
-                  value={formData.specialite} onChange={handleChange}
-                  placeholder="Cardiologue, Pédiatre…" className="form-input" required
-                />
+              <div className={`r-input-group r-input-group--animated ${isFieldActive("specialite") ? "focused" : ""} ${focusedField === "specialite" ? "active" : ""}`}>
+                <div className="r-input-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                  </svg>
+                </div>
+                <div className="r-input-wrapper">
+                  <input
+                    type="text"
+                    id="specialite"
+                    name="specialite"
+                    value={formData.specialite}
+                    onChange={handleChange}
+                    onFocus={() => setFocusedField("specialite")}
+                    onBlur={() => setFocusedField(null)}
+                    required
+                  />
+                  <label htmlFor="specialite" className="r-floating-label">Spécialité médicale</label>
+                  <div className="r-input-border-effect"></div>
+                </div>
               </div>
             )}
 
-            {/* Patient-specific */}
+            {/* ── Patient: DOB + Gender ── */}
             {formData.role === "patient" && (
               <>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="date_naissance" className="form-label">Date de naissance</label>
-                    <input
-                      type="date"
-                      id="date_naissance"
-                      name="date_naissance"
-                      value={formData.date_naissance}
-                      onChange={handleChange}
-                      required
-                      className="form-input"
-                    />
+                <div className="register-form-row r-input-group--animated">
+                  <div className={`r-input-group ${isFieldActive("date_naissance") ? "focused" : ""} ${focusedField === "date_naissance" ? "active" : ""}`}>
+                    <div className="r-input-icon">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                        <line x1="16" y1="2" x2="16" y2="6" />
+                        <line x1="8" y1="2" x2="8" y2="6" />
+                        <line x1="3" y1="10" x2="21" y2="10" />
+                      </svg>
+                    </div>
+                    <div className="r-input-wrapper">
+                      <input
+                        type="date"
+                        id="date_naissance"
+                        name="date_naissance"
+                        value={formData.date_naissance}
+                        onChange={handleChange}
+                        onFocus={() => setFocusedField("date_naissance")}
+                        onBlur={() => setFocusedField(null)}
+                        required
+                      />
+                      <label htmlFor="date_naissance" className="r-floating-label r-floating-label--always">Date de naissance</label>
+                      <div className="r-input-border-effect"></div>
+                    </div>
                   </div>
-                  <div className="form-group">
-                    <label htmlFor="sexe" className="form-label">Sexe</label>
-                    <div className="form-select-wrapper">
+
+                  <div className={`r-input-group ${isFieldActive("sexe") ? "focused" : ""} ${focusedField === "sexe" ? "active" : ""}`}>
+                    <div className="r-input-icon">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="8" r="5" />
+                        <path d="M20 21a8 8 0 00-16 0" />
+                      </svg>
+                    </div>
+                    <div className="r-input-wrapper r-select-wrapper">
                       <select
                         id="sexe"
                         name="sexe"
                         value={formData.sexe}
                         onChange={handleChange}
+                        onFocus={() => setFocusedField("sexe")}
+                        onBlur={() => setFocusedField(null)}
                         required
-                        className="form-select"
+                        className={formData.sexe ? "has-value" : ""}
                       >
-                        <option value="">Sélectionner</option>
+                        <option value="" disabled hidden></option>
                         <option value="male">Homme</option>
                         <option value="female">Femme</option>
                       </select>
-                      <div className="form-select-icon">
-                        <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
-                          <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      <label htmlFor="sexe" className="r-floating-label">Sexe</label>
+                      <div className="r-input-border-effect"></div>
+                      <div className="r-select-arrow">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="6 9 12 15 18 9" />
                         </svg>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div className="form-group">
-                  <label htmlFor="adresse" className="form-label">Adresse</label>
-                  <input
-                    type="text"
-                    id="adresse"
-                    name="adresse"
-                    value={formData.adresse}
-                    onChange={handleChange}
-                    placeholder="12 Rue de la Santé, Paris"
-                    required
-                    className="form-input"
-                  />
+
+                <div className={`r-input-group r-input-group--animated ${isFieldActive("adresse") ? "focused" : ""} ${focusedField === "adresse" ? "active" : ""}`}>
+                  <div className="r-input-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                      <circle cx="12" cy="10" r="3" />
+                    </svg>
+                  </div>
+                  <div className="r-input-wrapper">
+                    <input
+                      type="text"
+                      id="adresse"
+                      name="adresse"
+                      value={formData.adresse}
+                      onChange={handleChange}
+                      onFocus={() => setFocusedField("adresse")}
+                      onBlur={() => setFocusedField(null)}
+                      required
+                      autoComplete="street-address"
+                    />
+                    <label htmlFor="adresse" className="r-floating-label">Adresse</label>
+                    <div className="r-input-border-effect"></div>
+                  </div>
                 </div>
               </>
             )}
 
-            {/* Password */}
-            <div className="form-group">
-              <label htmlFor="password" className="form-label">Mot de passe</label>
-              <div className="form-input-wrapper">
+            {/* ── Password ── */}
+            <div className={`r-input-group ${isFieldActive("password") ? "focused" : ""} ${focusedField === "password" ? "active" : ""}`}>
+              <div className="r-input-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="3" />
+                  <path d="M7 11V7a5 5 0 0110 0v4" />
+                  <circle cx="12" cy="16.5" r="1.5" />
+                </svg>
+              </div>
+              <div className="r-input-wrapper">
                 <input
                   type={showPassword ? "text" : "password"}
                   id="password"
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder="8 caractères minimum"
+                  onFocus={() => setFocusedField("password")}
+                  onBlur={() => setFocusedField(null)}
                   required
                   autoComplete="new-password"
-                  className="form-input form-input-password"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="form-password-toggle"
-                  tabIndex={-1}
-                >
-                  {showPassword ? (
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                      <line x1="1" y1="1" x2="23" y2="23"></line>
-                    </svg>
-                  ) : (
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                      <circle cx="12" cy="12" r="3"></circle>
-                    </svg>
-                  )}
-                </button>
+                <label htmlFor="password" className="r-floating-label">Mot de passe</label>
+                <div className="r-input-border-effect"></div>
               </div>
-              {formData.password && (
-                <div className="password-strength">
-                  <div className="password-strength-bars">
-                    {[0, 1, 2, 3].map((i) => (
-                      <div
-                        key={i}
-                        className={`password-strength-bar ${i < strength ? strengthClasses[strength] : ""}`}
-                      ></div>
-                    ))}
-                  </div>
-                  <span className="password-strength-label">{strengthLabels[strength]}</span>
-                </div>
-              )}
+              <button
+                type="button"
+                className="r-password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+              </button>
             </div>
 
-            {/* Confirm Password */}
-            <div className="form-group">
-              <label htmlFor="password_confirmation" className="form-label">Confirmer le mot de passe</label>
-              <div className="form-input-wrapper">
+            {/* ── Password Strength ── */}
+            {formData.password && (
+              <div className="password-strength-area">
+                <div className="strength-bars">
+                  {[1, 2, 3, 4].map((level) => (
+                    <div
+                      key={level}
+                      className={`strength-bar ${strength >= level ? "filled" : ""}`}
+                      style={{
+                        backgroundColor: strength >= level ? strengthInfo?.color : "rgba(255,255,255,0.08)",
+                      }}
+                    ></div>
+                  ))}
+                </div>
+                <span className="strength-label" style={{ color: strengthInfo?.color }}>
+                  {strengthInfo?.label}
+                </span>
+              </div>
+            )}
+
+            {formData.password && (
+              <div className="strength-hint">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 16v-4M12 8h.01" />
+                </svg>
+                <span>Utilisez majuscules, chiffres et symboles</span>
+              </div>
+            )}
+
+            {/* ── Confirm Password ── */}
+            <div className={`r-input-group ${isFieldActive("password_confirmation") ? "focused" : ""} ${focusedField === "confirm" ? "active" : ""} ${passwordsMatch ? "r-input-group--success" : ""} ${passwordsMismatch ? "r-input-group--error" : ""}`}>
+              <div className="r-input-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  <polyline points="9 12 11 14 15 10" />
+                </svg>
+              </div>
+              <div className="r-input-wrapper">
                 <input
                   type={showConfirm ? "text" : "password"}
                   id="password_confirmation"
                   name="password_confirmation"
                   value={formData.password_confirmation}
                   onChange={handleChange}
-                  placeholder="Répétez votre mot de passe"
+                  onFocus={() => setFocusedField("confirm")}
+                  onBlur={() => setFocusedField(null)}
                   required
                   autoComplete="new-password"
-                  className="form-input form-input-password"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirm(!showConfirm)}
-                  className="form-password-toggle"
-                  tabIndex={-1}
-                >
-                  {showConfirm ? (
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                      <line x1="1" y1="1" x2="23" y2="23"></line>
-                    </svg>
-                  ) : (
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                      <circle cx="12" cy="12" r="3"></circle>
-                    </svg>
-                  )}
-                </button>
+                <label htmlFor="password_confirmation" className="r-floating-label">Confirmer le mot de passe</label>
+                <div className="r-input-border-effect"></div>
               </div>
+              <button
+                type="button"
+                className="r-password-toggle"
+                onClick={() => setShowConfirm(!showConfirm)}
+                aria-label={showConfirm ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                tabIndex={-1}
+              >
+                {showConfirm ? <EyeOffIcon /> : <EyeIcon />}
+              </button>
+              {passwordsMatch && (
+                <div className="r-match-indicator">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+              )}
             </div>
 
-            {/* Submit */}
-            <button type="submit" disabled={loading} className="form-submit">
-              {loading ? (
-                <>
-                  <svg className="form-spinner" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
-                  </svg>
-                  <span>Création en cours…</span>
-                </>
-              ) : (
-                "Créer mon compte"
-              )}
-            </button>
+            {/* ── Password Mismatch Warning ── */}
+            {passwordsMismatch && (
+              <div className="password-mismatch">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="15" y1="9" x2="9" y2="15" />
+                  <line x1="9" y1="9" x2="15" y2="15" />
+                </svg>
+                <span>Les mots de passe ne correspondent pas</span>
+              </div>
+            )}
 
-            {/* Terms */}
-            <p className="form-terms">
-              En créant un compte, vous acceptez les{" "}
-              <a href="#">conditions d'utilisation</a> et la{" "}
-              <a href="#">politique de confidentialité</a>.
-            </p>
+            {/* ── Terms Checkbox ── */}
+            <label className="r-terms">
+              <input
+                type="checkbox"
+                checked={termsAccepted}
+                onChange={(e) => setTermsAccepted(e.target.checked)}
+              />
+              <span className="r-checkmark">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </span>
+              <span className="r-terms-text">
+                J'accepte les{" "}
+                <a href="#terms">conditions d'utilisation</a>
+                {" "}et la{" "}
+                <a href="#privacy">politique de confidentialité</a>
+                {" "}de MediManage.
+              </span>
+            </label>
+
+            {/* ── Submit Button ── */}
+            <button
+              type="submit"
+              className={`register-btn ${loading ? "submitting" : ""}`}
+              disabled={loading || passwordsMismatch}
+            >
+              <span className="r-btn-content">
+                {loading ? (
+                  <>
+                    <div className="r-spinner"></div>
+                    <span>Création en cours…</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Créer mon compte</span>
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="r-btn-arrow"
+                    >
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                  </>
+                )}
+              </span>
+              <div className="r-btn-glow"></div>
+            </button>
           </form>
 
-          <div className="auth-footer">
+          {/* ── Footer ── */}
+          <div className="register-footer">
             <p>
               Déjà inscrit ?{" "}
-              <Link to="/login" className="auth-footer-link">
+              <Link to="/login" className="signin-link">
                 Se connecter
               </Link>
             </p>
-          </div>
-        </div>
-      </div>
-
-
-            <div className="auth-brand-panel">
-        <div className="brand-bg-circle brand-bg-circle-1"></div>
-        <div className="brand-bg-circle brand-bg-circle-2"></div>
-        <div className="brand-bg-circle brand-bg-circle-3"></div>
-
-        <div className="brand-content">
-          <Link to="/" className="brand-logo brand-home-link" aria-label="Aller à l'accueil">
-            <div className="brand-logo-icon">
-              <img src="/images/brand.png" alt="MediManage" className="brand-logo-image" />
-            </div>
-            <span className="brand-logo-text">MediManage</span>
-          </Link>
-
-          <div className="brand-hero">
-            <h1 className="brand-title">
-              Rejoignez les
-              <br />
-              professionnels qui
-              <br />
-              <span className="brand-title-accent">nous font confiance.</span>
-            </h1>
-
-            <p className="brand-description">
-              Créez votre compte en quelques minutes et commencez à gérer
-              votre activité médicale avec sérénité.
-            </p>
-
-            <div className="brand-checklist">
-              {[
-                "Configuration en moins de 5 minutes",
-                "Données hébergées en France, conformité RGPD",
-                "Assistance dédiée par des experts santé",
-                "Sans engagement, résiliable à tout moment",
-              ].map((item) => (
-                <div key={item} className="brand-checklist-item">
-                  <div className="brand-checklist-icon">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                  </div>
-                  <span>{item}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="brand-testimonial">
-              <p className="brand-testimonial-text">
-                "MediManage a transformé la gestion de mon cabinet. L'interface
-                est d'une clarté remarquable."
-              </p>
-              <div className="brand-testimonial-author">
-                <div className="brand-testimonial-avatar">ML</div>
-                <div className="brand-testimonial-info">
-                  <div className="brand-testimonial-name">Dr. Lahlou Mohamed</div>
-                  <div className="brand-testimonial-role">Cardiologue · Rabat</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="brand-footer">
-            <span>© 2026 MediManage</span>
-            <span className="brand-footer-dot">·</span>
-            <a href="#">Confidentialité</a>
-            <span className="brand-footer-dot">·</span>
-            <a href="#">Conditions</a>
           </div>
         </div>
       </div>

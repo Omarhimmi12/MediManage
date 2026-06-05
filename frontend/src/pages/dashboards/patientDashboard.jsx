@@ -562,6 +562,7 @@ const PatientDashboard = () => {
         className={`mmd-sidebar ${isSidebarCollapsed ? "mmd-sidebar--collapsed" : ""}`}
       >
         <div className="mmd-brand">
+          <img className="mmd-brand__img" src="/images/brand.png" alt="MediManage" />
           <span className="mmd-brand__text">MediManage</span>
         </div>
 
@@ -602,9 +603,17 @@ const PatientDashboard = () => {
         </button>
       </div>
 
+      <button
+        type="button"
+        className="mmd-sidebar-toggle"
+        aria-label="Toggle sidebar"
+        onClick={() => setIsSidebarCollapsed((v) => !v)}
+      >
+        {isSidebarCollapsed ? "»" : "«"}
+      </button>
+
         <div className="mmd-content">
         <div className="mmd-topbar mmd-topbar--fixed">
-
           <div className="mmd-topbar__spacer" />
 
           <div className="mmd-profile">

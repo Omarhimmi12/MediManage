@@ -220,6 +220,39 @@
   border-color: rgba(255, 255, 255, 0.35);
 }
 
+/* Floating circle toggle */
+.mmd-sidebar-toggle {
+  position: fixed;
+  top: 50px;
+  left: 244px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #e5e7eb;
+  background: #ffffff;
+  color: #1e293b;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+  transition: left 200ms ease, background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  padding: 0;
+}
+
+.mmd-sidebar-toggle:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+}
+
+.mmd-sidebar--collapsed ~ .mmd-sidebar-toggle {
+  left: 56px;
+}
+
 /* ========================================
    PROFILE DROPDOWN
 ======================================== */
@@ -347,8 +380,22 @@
   min-width: 72px;
 }
 
+.mmd-sidebar--collapsed .mmd-brand {
+  background: transparent;
+  border: none;
+  padding: 8px 0;
+  margin-bottom: 24px;
+  justify-content: center;
+}
+
 .mmd-sidebar--collapsed .mmd-brand__text {
   display: none;
+}
+
+.mmd-sidebar--collapsed .mmd-brand__img {
+  margin-left: 0;
+  width: 28px;
+  height: 28px;
 }
 
 .mmd-sidebar__toggle {

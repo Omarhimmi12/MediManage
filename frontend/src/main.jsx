@@ -11,12 +11,8 @@ import "./index.css";
 const FIRST_LAUNCH_KEY = "mediManage_first_launch_done";
 
 function Root() {
-  const [showSplash, setShowSplash] = useState(true);
-
-  useEffect(() => {
-    const alreadyDone = window.localStorage.getItem(FIRST_LAUNCH_KEY) === "true";
-    if (alreadyDone) setShowSplash(false);
-  }, []);
+  const alreadyDone = window.localStorage.getItem(FIRST_LAUNCH_KEY) === "true";
+  const [showSplash, setShowSplash] = useState(!alreadyDone);
 
   return showSplash ? (
     <SplashScreen

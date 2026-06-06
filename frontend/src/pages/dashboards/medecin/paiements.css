@@ -1,0 +1,113 @@
+.paiements-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.paiements-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+
+.paiements-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
+}
+
+.paiements-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.paiements-table-card {
+  background: var(--bg-primary);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.paiements-table-card .mmd-table {
+  margin: 0;
+}
+
+.paiements-table-card .mmd-table thead {
+  background: var(--bg-tertiary);
+}
+
+.paiements-empty {
+  padding: 80px 40px;
+  text-align: center;
+}
+
+.paiements-empty i {
+  font-size: 64px;
+  color: var(--text-tertiary);
+  margin-bottom: 16px;
+  display: block;
+}
+
+.paiements-empty h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+}
+
+.paiements-empty p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.paiements-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 40px;
+  color: var(--text-secondary);
+}
+
+.paiements-loading > div:first-child {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.paiements-table-card .mmd-table td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+@media (max-width: 768px) {
+  .paiements-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .paiements-title {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .paiements-title {
+    font-size: 18px;
+  }
+
+  .paiements-table-card {
+    overflow-x: auto;
+  }
+
+  .paiements-table-card .mmd-table {
+    min-width: 600px;
+  }
+}

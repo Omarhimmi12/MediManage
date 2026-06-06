@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import api from "../../../api/axios";
+import "./secretaires.css";
 
 const initialForm = {
   nom: "",
@@ -17,7 +18,8 @@ const getSecretairesFromApiResponse = (resData) => {
 
   if (resData && typeof resData === "object") {
     const values = Object.values(resData);
-    if (values.length > 0 && values.every((v) => v && typeof v === "object")) return values;
+    if (values.length > 0 && values.every((v) => v && typeof v === "object"))
+      return values;
   }
 
   return [];
@@ -50,7 +52,9 @@ const SecretairesPage = () => {
       const extracted = getSecretairesFromApiResponse(res.data);
       setSecretaires(extracted);
     } catch (e) {
-      setLoadError(e?.response?.data?.message || "Impossible de charger les secrétaires.");
+      setLoadError(
+        e?.response?.data?.message || "Impossible de charger les secrétaires."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -186,44 +190,57 @@ const SecretairesPage = () => {
       fetchSecretaires();
       if (selected?.id === deleteTarget.id) closeView();
     } catch (e) {
-      setDeleteError(e?.response?.data?.message || "Impossible de supprimer.");
+      setDeleteError(
+        e?.response?.data?.message || "Impossible de supprimer."
+      );
     } finally {
       setDeleteSubmitting(false);
     }
   };
 
-  const overlayStyle = {
-    position: "fixed",
-    inset: 0,
-    zIndex: 99999,
-    backgroundColor: "rgba(15, 23, 42, 0.5)",
-    backdropFilter: "blur(4px)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    overflowY: "auto",
-    padding: "48px 16px 24px",
-  };
-
   return (
-    <div className="card shadow-sm">
-      <div className="card-header">Secrétaires</div>
-
-      <div className="card-body">
-        <div className="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
-          <div className="fw-bold text-muted">Liste des secrétaires</div>
-          <button type="button" className="btn btn-success" onClick={openAdd}>
-            + Ajouter
-          </button>
+    <div className="secretaires-container">
+      <div className="secretaires-header">
+        <div>
+          <h1 className="secretaires-title">Secrétaires</h1>
+          <p className="secretaires-subtitle">
+            {secretaires.length} secrétaire
+            {secretaires.length !== 1 ? "s" : ""} enregistrée
+            {secretaires.length !== 1 ? "s" : ""}
+          </p>
         </div>
+        <button
+          type="button"
+          className="mmd-btn mmd-btn-primary"
+          onClick={openAdd}
+        >
+          <i className="bi bi-plus-lg"></i>
+          Ajouter
+        </button>
+      </div>
 
-        {isLoading ? (
-          <div className="text-muted mt-3">Chargement...</div>
-        ) : loadError ? (
-          <div className="alert alert-danger mt-3">{loadError}</div>
-        ) : (
-          <div className="table-responsive">
-            <table className="table">
+      {isLoading ? (
+        <div className="secretaires-loading">
+          <div className="mmd-loading">
+            <i className="bi bi-hourglass-split"></i>
+          </div>
+          <p>Chargement...</p>
+        </div>
+      ) : loadError ? (
+        <div className="secretaires-alert secretaires-alert--error">
+          <i className="bi bi-exclamation-triangle-fill"></i>
+          {loadError}
+        </div>
+      ) : (
+        <div className="secretaires-table-card">
+          {secretairesSorted.length === 0 ? (
+            <div className="secretaires-empty">
+              <i className="bi bi-people"></i>
+              <h3>Aucune secrétaire enregistrée</h3>
+              <p>Ajoutez votre première secrétaire.</p>
+            </div>
+          ) : (
+            <table className="mmd-table">
               <thead>
                 <tr>
                   <th>Nom</th>
@@ -233,113 +250,122 @@ const SecretairesPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {secretairesSorted.length === 0 ? (
-                  <tr>
-                    <td colSpan={4} className="fw-bold text-center">
-                      Aucune secrétaire enregistrée.
+                {secretairesSorted.map((s) => (
+                  <tr key={s.id}>
+                    <td>{s?.user?.nom || "—"}</td>
+                    <td>{s?.user?.prenom || "—"}</td>
+                    <td>{s?.user?.telephone || "—"}</td>
+                    <td>
+                      <div className="secretaires-actions">
+                        <button
+                          type="button"
+                          className="mmd-btn mmd-btn-info mmd-btn-sm"
+                          onClick={() => openView(s)}
+                        >
+                          <i className="bi bi-eye"></i> Voir
+                        </button>
+                        <button
+                          type="button"
+                          className="mmd-btn mmd-btn-sm mmd-btn-secondary"
+                          onClick={() => openEdit(s)}
+                        >
+                          <i className="bi bi-pencil"></i> Éditer
+                        </button>
+                        <button
+                          type="button"
+                          className="mmd-btn mmd-btn-sm mmd-btn-danger"
+                          onClick={() => openDelete(s)}
+                        >
+                          <i className="bi bi-trash"></i>
+                        </button>
+                      </div>
                     </td>
                   </tr>
-                ) : (
-                  secretairesSorted.map((s) => (
-                    <tr key={s.id}>
-                      <td>{s?.user?.nom || "-"}</td>
-                      <td>{s?.user?.prenom || "-"}</td>
-                      <td>{s?.user?.telephone || "-"}</td>
-                      <td>
-                        <div className="d-flex gap-2 flex-wrap">
-                          <button type="button" className="btn btn-info btn-sm" onClick={() => openView(s)}>
-                            Voir
-                          </button>
-                          <button type="button" className="btn btn-secondary btn-sm" onClick={() => openEdit(s)}>
-                            Éditer
-                          </button>
-                          <button type="button" className="btn btn-danger btn-sm" onClick={() => openDelete(s)}>
-                            Supprimer
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
+                ))}
               </tbody>
             </table>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       {/* VIEW MODAL */}
       {isViewOpen && selected && (
         <div
+          className="secretaires-modal-overlay"
           role="dialog"
           aria-modal="true"
-          tabIndex={-1}
           onClick={closeView}
-          style={overlayStyle}
         >
-          <div
-            className="modal-content"
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: "min(920px, 100%)",
-              maxHeight: "calc(100vh - 96px)",
-              overflow: "auto",
-              borderRadius: 16,
-              border: "1px solid #e5e7eb",
-              background: "#ffffff",
-            }}
-          >
-            <div className="modal-header" style={{ borderBottom: "1px solid #e5e7eb", background: "#f8fafc" }}>
-              <h5 className="modal-title" style={{ fontWeight: 700, fontSize: "1.25rem", color: "#1e293b" }}>
-                {selected?.user?.nom || "-"} {selected?.user?.prenom || ""}
-              </h5>
-              <button type="button" className="btn-close" onClick={closeView} aria-label="Fermer" />
+          <div className="secretaires-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="secretaires-modal-header">
+              <h3 className="secretaires-modal-title">
+                {selected?.user?.nom || "—"} {selected?.user?.prenom || ""}
+              </h3>
+              <button
+                type="button"
+                className="secretaires-modal-close"
+                onClick={closeView}
+                aria-label="Fermer"
+              >
+                <i className="bi bi-x"></i>
+              </button>
             </div>
 
-            <div className="modal-body" style={{ padding: 28 }}>
-              <div className="row g-3">
-                <div className="col-md-6">
-                  <div className="border rounded p-3 bg-light">
-                    <div className="text-muted small fw-semibold text-uppercase mb-1">Téléphone</div>
-                    <div className="fw-semibold">{selected?.user?.telephone || "-"}</div>
+            <div className="secretaires-modal-body">
+              <div className="secretaires-detail-grid">
+                <div className="secretaires-detail-card">
+                  <div className="secretaires-detail-label">Téléphone</div>
+                  <div className="secretaires-detail-value">
+                    {selected?.user?.telephone || "—"}
                   </div>
                 </div>
-                <div className="col-md-6">
-                  <div className="border rounded p-3 bg-light">
-                    <div className="text-muted small fw-semibold text-uppercase mb-1">Email</div>
-                    <div className="fw-semibold">{selected?.user?.email || "-"}</div>
+                <div className="secretaires-detail-card">
+                  <div className="secretaires-detail-label">Email</div>
+                  <div className="secretaires-detail-value">
+                    {selected?.user?.email || "—"}
                   </div>
                 </div>
-                <div className="col-12">
-                  <div className="border rounded p-3 bg-light">
-                    <div className="text-muted small fw-semibold text-uppercase mb-1">Date d'embauche</div>
-                    <div className="fw-semibold">{selected?.date_embauche ? String(selected.date_embauche) : "-"}</div>
+                <div className="secretaires-detail-card secretaires-detail-full">
+                  <div className="secretaires-detail-label">
+                    Date d'embauche
+                  </div>
+                  <div className="secretaires-detail-value">
+                    {selected?.date_embauche
+                      ? new Date(selected.date_embauche).toLocaleDateString(
+                          "fr-FR"
+                        )
+                      : "—"}
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="modal-footer" style={{ borderTop: "1px solid #e5e7eb", background: "#f8fafc" }}>
+            <div className="secretaires-modal-footer">
               <button
                 type="button"
-                className="btn btn-secondary"
+                className="mmd-btn mmd-btn-secondary"
                 onClick={() => {
                   closeView();
                   openEdit(selected);
                 }}
               >
-                Éditer
+                <i className="bi bi-pencil"></i> Éditer
               </button>
               <button
                 type="button"
-                className="btn btn-danger"
+                className="mmd-btn mmd-btn-danger"
                 onClick={() => {
                   closeView();
                   openDelete(selected);
                 }}
               >
-                Supprimer
+                <i className="bi bi-trash"></i> Supprimer
               </button>
-              <button type="button" className="btn btn-outline-secondary" onClick={closeView}>
+              <button
+                type="button"
+                className="mmd-btn mmd-btn-secondary"
+                onClick={closeView}
+              >
                 Fermer
               </button>
             </div>
@@ -349,93 +375,113 @@ const SecretairesPage = () => {
 
       {/* ADD / EDIT MODAL */}
       {isFormOpen && (
-        <div role="dialog" aria-modal="true" tabIndex={-1} onClick={closeForm} style={overlayStyle}>
-          <div
-            className="modal-content"
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: "min(980px, 100%)",
-              maxHeight: "calc(100vh - 96px)",
-              overflow: "auto",
-              borderRadius: 16,
-              border: "1px solid #e5e7eb",
-              background: "#ffffff",
-            }}
-          >
-            <div className="modal-header" style={{ borderBottom: "1px solid #e5e7eb", background: "#f8fafc" }}>
-              <h5 className="modal-title" style={{ fontWeight: 700, fontSize: "1.25rem", color: "#1e293b" }}>
-                {formMode === "add" ? "Ajouter une secrétaire" : "Éditer la secrétaire"}
-              </h5>
-              <button type="button" className="btn-close" onClick={closeForm} aria-label="Fermer" />
+        <div
+          className="secretaires-modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          onClick={closeForm}
+        >
+          <div className="secretaires-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="secretaires-modal-header">
+              <h3 className="secretaires-modal-title">
+                {formMode === "add"
+                  ? "Ajouter une secrétaire"
+                  : "Éditer la secrétaire"}
+              </h3>
+              <button
+                type="button"
+                className="secretaires-modal-close"
+                onClick={closeForm}
+                aria-label="Fermer"
+              >
+                <i className="bi bi-x"></i>
+              </button>
             </div>
 
-            <div className="modal-body" style={{ padding: 28 }}>
-              <p className="text-muted small mb-3">
+            <div className="secretaires-modal-body">
+              <p className="secretaires-form-hint">
                 {formMode === "add"
                   ? "Créer un compte + fiche secrétaire"
                   : "Mettre à jour les informations de la secrétaire"}
               </p>
 
-              <div className="row g-3">
-                <div className="col-12">
-                  <label className="form-label">Nom</label>
+              <div className="secretaires-form-grid">
+                <div className="mmd-form-group">
+                  <label className="mmd-label">Nom</label>
                   <input
                     value={form.nom}
-                    onChange={(e) => setForm((f) => ({ ...f, nom: e.target.value }))}
-                    className="form-control"
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, nom: e.target.value }))
+                    }
+                    className="mmd-input"
                     placeholder="Nom"
                   />
                 </div>
 
-                <div className="col-md-6">
-                  <label className="form-label">Prénom</label>
+                <div className="mmd-form-group">
+                  <label className="mmd-label">Prénom</label>
                   <input
                     value={form.prenom}
-                    onChange={(e) => setForm((f) => ({ ...f, prenom: e.target.value }))}
-                    className="form-control"
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, prenom: e.target.value }))
+                    }
+                    className="mmd-input"
                     placeholder="Prénom"
                   />
                 </div>
 
-                <div className="col-md-6">
-                  <label className="form-label">Téléphone</label>
+                <div className="mmd-form-group">
+                  <label className="mmd-label">Téléphone</label>
                   <input
                     value={form.telephone}
-                    onChange={(e) => setForm((f) => ({ ...f, telephone: e.target.value }))}
-                    className="form-control"
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, telephone: e.target.value }))
+                    }
+                    className="mmd-input"
                     placeholder="Téléphone"
                   />
                 </div>
 
-                <div className="col-12">
-                  <label className="form-label">Email</label>
+                <div className="mmd-form-group">
+                  <label className="mmd-label">Email</label>
                   <input
                     value={form.email}
-                    onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                    className="form-control"
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, email: e.target.value }))
+                    }
+                    className="mmd-input"
                     placeholder="Email"
+                    type="email"
                   />
                 </div>
 
-                <div className="col-md-6">
-                  <label className="form-label">Date d'embauche</label>
+                <div className="mmd-form-group">
+                  <label className="mmd-label">Date d'embauche</label>
                   <input
                     type="date"
                     value={form.date_embauche}
-                    onChange={(e) => setForm((f) => ({ ...f, date_embauche: e.target.value }))}
-                    className="form-control"
+                    onChange={(e) =>
+                      setForm((f) => ({
+                        ...f,
+                        date_embauche: e.target.value,
+                      }))
+                    }
+                    className="mmd-input"
                   />
                 </div>
 
-                <div className="col-md-6">
-                  <label className="form-label">
-                    Mot de passe {formMode === "add" ? "(requis)" : "(optionnel)"}
+                <div className="mmd-form-group">
+                  <label className="mmd-label">
+                    Mot de passe{" "}
+                    {formMode === "add" ? "(requis)" : "(optionnel)"}
                   </label>
                   <input
                     type="password"
                     value={form.password}
-                    onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                    className="form-control"
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, password: e.target.value }))
+                    }
+                    className="mmd-input"
                     placeholder={
                       formMode === "add"
                         ? "Mot de passe (min 6 caractères)"
@@ -445,19 +491,34 @@ const SecretairesPage = () => {
                 </div>
               </div>
 
-              {formError && <div className="alert alert-danger mt-3 mb-0">{formError}</div>}
+              {formError && (
+                <div className="secretaires-alert secretaires-alert--error" style={{ marginTop: 16 }}>
+                  <i className="bi bi-exclamation-triangle-fill"></i>
+                  {formError}
+                </div>
+              )}
             </div>
 
-            <div className="modal-footer" style={{ borderTop: "1px solid #e5e7eb", background: "#f8fafc" }}>
-              <button type="button" className="btn btn-secondary" onClick={closeForm} disabled={formSubmitting}>
+            <div className="secretaires-modal-footer">
+              <button
+                type="button"
+                className="mmd-btn mmd-btn-secondary"
+                onClick={closeForm}
+                disabled={formSubmitting}
+              >
                 Annuler
               </button>
-              <button type="button" className="btn btn-success" onClick={submitForm} disabled={formSubmitting}>
+              <button
+                type="button"
+                className="mmd-btn mmd-btn-primary"
+                onClick={submitForm}
+                disabled={formSubmitting}
+              >
                 {formSubmitting
                   ? "Enregistrement..."
                   : formMode === "add"
-                    ? "Créer"
-                    : "Enregistrer"}
+                  ? "Créer"
+                  : "Enregistrer"}
               </button>
             </div>
           </div>
@@ -466,42 +527,59 @@ const SecretairesPage = () => {
 
       {/* DELETE CONFIRMATION MODAL */}
       {isDeleteOpen && deleteTarget && (
-        <div role="dialog" aria-modal="true" tabIndex={-1} onClick={closeDelete} style={overlayStyle}>
-          <div
-            className="modal-content"
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: "min(700px, 100%)",
-              maxHeight: "calc(100vh - 96px)",
-              overflow: "auto",
-              borderRadius: 16,
-              border: "1px solid #e5e7eb",
-              background: "#ffffff",
-            }}
-          >
-            <div className="modal-header" style={{ borderBottom: "1px solid #e5e7eb", background: "#f8fafc" }}>
-              <h5 className="modal-title" style={{ fontWeight: 700, fontSize: "1.25rem", color: "#1e293b" }}>
+        <div
+          className="secretaires-modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          onClick={closeDelete}
+        >
+          <div className="secretaires-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="secretaires-modal-header">
+              <h3 className="secretaires-modal-title">
                 Supprimer la secrétaire ?
-              </h5>
-              <button type="button" className="btn-close" onClick={closeDelete} aria-label="Fermer" />
+              </h3>
+              <button
+                type="button"
+                className="secretaires-modal-close"
+                onClick={closeDelete}
+                aria-label="Fermer"
+              >
+                <i className="bi bi-x"></i>
+              </button>
             </div>
 
-            <div className="modal-body" style={{ padding: 28 }}>
-              <p style={{ marginBottom: 0 }}>
+            <div className="secretaires-modal-body">
+              <p style={{ margin: 0 }}>
                 Êtes-vous sûr de vouloir supprimer définitivement{" "}
                 <strong>
-                  {deleteTarget?.user?.nom || ""} {deleteTarget?.user?.prenom || ""}
+                  {deleteTarget?.user?.nom || ""}{" "}
+                  {deleteTarget?.user?.prenom || ""}
                 </strong>{" "}
                 ? Cette action est irréversible.
               </p>
-              {deleteError && <div className="alert alert-danger mt-3 mb-0">{deleteError}</div>}
+              {deleteError && (
+                <div className="secretaires-alert secretaires-alert--error" style={{ marginTop: 16 }}>
+                  <i className="bi bi-exclamation-triangle-fill"></i>
+                  {deleteError}
+                </div>
+              )}
             </div>
 
-            <div className="modal-footer" style={{ borderTop: "1px solid #e5e7eb", background: "#f8fafc" }}>
-              <button type="button" className="btn btn-secondary" onClick={closeDelete} disabled={deleteSubmitting}>
+            <div className="secretaires-modal-footer">
+              <button
+                type="button"
+                className="mmd-btn mmd-btn-secondary"
+                onClick={closeDelete}
+                disabled={deleteSubmitting}
+              >
                 Annuler
               </button>
-              <button type="button" className="btn btn-danger" onClick={confirmDelete} disabled={deleteSubmitting}>
+              <button
+                type="button"
+                className="mmd-btn mmd-btn-danger"
+                onClick={confirmDelete}
+                disabled={deleteSubmitting}
+              >
                 {deleteSubmitting ? "Suppression..." : "Oui, supprimer"}
               </button>
             </div>
@@ -513,4 +591,3 @@ const SecretairesPage = () => {
 };
 
 export default SecretairesPage;
-

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../../../api/axios";
+import "./monCabinet.css";
 
 const initialFormData = {
   nom: "",
@@ -108,13 +109,10 @@ const MonCabinetPage = () => {
         ? await api.post(`/cabinet/${cabinet.id}`, payload)
         : await api.post("/cabinet", payload);
 
-      // store returns {message, cabinet}, update returns cabinet directly
       const updated = cabinet ? res?.data : res?.data?.cabinet;
 
       if (!updated || typeof updated !== "object") {
-        setUpdateError(
-          "Réponse serveur invalide (aucun cabinet renvoyé)."
-        );
+        setUpdateError("Réponse serveur invalide (aucun cabinet renvoyé).");
         return;
       }
 
@@ -130,7 +128,9 @@ const MonCabinetPage = () => {
       });
 
       setUpdateSuccess(
-        cabinet ? "Cabinet mis à jour avec succès." : "Cabinet créé avec succès."
+        cabinet
+          ? "Cabinet mis à jour avec succès."
+          : "Cabinet créé avec succès."
       );
       setEditing(false);
     } catch (err) {
@@ -223,235 +223,240 @@ const MonCabinetPage = () => {
   const submitLabel = cabinet ? "Mettre à jour" : "Créer Cabinet";
 
   return (
-    <div className="card shadow-sm p-4">
-      <h4 className="mb-4">Mon Cabinet</h4>
+    <div className="cabinet-container">
+      <div className="cabinet-header">
+        <h1 className="cabinet-title">Mon Cabinet</h1>
+        <p className="cabinet-subtitle">
+          {cabinet ? "Gérez les informations de votre cabinet" : "Aucun cabinet enregistré"}
+        </p>
+      </div>
 
-      {cabinet && !editing ? (
-        <>
-          <div style={{ marginBottom: 10 }}>
-            <p><strong>Nom:</strong> {cabinet.nom}</p>
-            <p><strong>Adresse:</strong> {cabinet.adresse}</p>
-            <p><strong>Téléphone:</strong> {cabinet.telephone}</p>
-            <p><strong>Spécialité:</strong> {cabinet.specialite}</p>
-            <p><strong>Latitude:</strong> {cabinet.latitude}</p>
-            <p><strong>Longitude:</strong> {cabinet.longitude}</p>
+      {/* View mode - cabinet exists, not editing */}
+      {cabinet && !editing && (
+        <div className="cabinet-card">
+          <div className="cabinet-detail-grid">
+            <div className="cabinet-detail-item">
+              <div className="cabinet-detail-label">Nom</div>
+              <div className="cabinet-detail-value">{cabinet.nom}</div>
+            </div>
+            <div className="cabinet-detail-item">
+              <div className="cabinet-detail-label">Spécialité</div>
+              <div className="cabinet-detail-value">{cabinet.specialite}</div>
+            </div>
+            <div className="cabinet-detail-item">
+              <div className="cabinet-detail-label">Téléphone</div>
+              <div className="cabinet-detail-value">{cabinet.telephone}</div>
+            </div>
+            <div className="cabinet-detail-item">
+              <div className="cabinet-detail-label">Adresse</div>
+              <div className="cabinet-detail-value">{cabinet.adresse}</div>
+            </div>
+            <div className="cabinet-detail-item">
+              <div className="cabinet-detail-label">Latitude</div>
+              <div className="cabinet-detail-value">{cabinet.latitude}</div>
+            </div>
+            <div className="cabinet-detail-item">
+              <div className="cabinet-detail-label">Longitude</div>
+              <div className="cabinet-detail-value">{cabinet.longitude}</div>
+            </div>
 
-            {cabinet.logo ? (
-              <p>
-                <strong>Logo:</strong>{" "}
-                <img src={`/uploads/cabinets/${cabinet.logo}`}
+            {cabinet.logo && (
+              <div className="cabinet-detail-item cabinet-detail-full">
+                <div className="cabinet-detail-label">Logo</div>
+                <img
+                  src={`/uploads/cabinets/${cabinet.logo}`}
                   alt="Logo du cabinet"
-                  style={{
-                    width: 80,
-                    height: 80,
-                    objectFit: "cover",
-                    border: "2px solid #0b0b0b",
-                  }}
+                  className="cabinet-logo"
                 />
-              </p>
-            ) : null}
+              </div>
+            )}
           </div>
 
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            <button className="btn btn-primary" onClick={startEdit}>Modifier</button>
+          <div className="cabinet-actions">
+            <button className="mmd-btn mmd-btn-primary" onClick={startEdit}>
+              <i className="bi bi-pencil"></i> Modifier
+            </button>
             <button
-              className="btn btn-danger"
+              className="mmd-btn mmd-btn-danger"
               onClick={openDelete}
               disabled={deleteDisabled}
-              title={
-                deleteDisabled
-                  ? "Aucun cabinet à supprimer"
-                  : "Supprimer le cabinet"
-              }
             >
-              Supprimer
+              <i className="bi bi-trash"></i> Supprimer
             </button>
           </div>
-        </>
-      ) : !cabinet && !editing ? (
-        <>
-          <div style={{ marginBottom: 10, fontWeight: 900 }}>
-            Tu n'as aucun cabinet.
-          </div>
+        </div>
+      )}
 
-          <button className="btn btn-success" onClick={startCreate}>
-            Ajouter mon cabinet
-          </button>
-        </>
-      ) : (
-        <>
-          <div className="mb-3">
-            <label>Nom</label>
-            <input
-              name="nom"
-              className="form-control"
-              value={formData.nom}
-              onChange={handleChange}
-            />
+      {/* Empty state - no cabinet, not editing */}
+      {!cabinet && !editing && (
+        <div className="cabinet-card">
+          <div className="cabinet-empty">
+            <div className="cabinet-empty-icon">
+              <i className="bi bi-building"></i>
+            </div>
+            <h3 className="cabinet-empty-title">Aucun cabinet enregistré</h3>
+            <p className="cabinet-empty-text">
+              Ajoutez votre cabinet pour commencer à gérer vos patients et rendez-vous.
+            </p>
+            <button className="mmd-btn mmd-btn-primary" onClick={startCreate}>
+              <i className="bi bi-plus-lg"></i> Ajouter mon cabinet
+            </button>
           </div>
+        </div>
+      )}
 
-          <div className="mb-3">
-            <label>Adresse</label>
-            <input
-              name="adresse"
-              className="form-control"
-              value={formData.adresse}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="mb-3">
-            <label>Téléphone</label>
-            <input
-              name="telephone"
-              className="form-control"
-              value={formData.telephone}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="mb-3">
-            <label>Spécialité</label>
-            <input
-              name="specialite"
-              className="form-control"
-              value={formData.specialite}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="mb-3">
-            <label>Latitude</label>
-            <input
-              name="latitude"
-              className="form-control"
-              value={formData.latitude}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="mb-3">
-            <label>Longitude</label>
-            <input
-              name="longitude"
-              className="form-control"
-              value={formData.longitude}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="mb-3">
-            <label>Logo (optionnel)</label>
-            <input
-              type="file"
-              accept="image/*"
-              className="form-control"
-              onChange={handleLogoChange}
-            />
-          </div>
-
+      {/* Edit / Create mode */}
+      {editing && (
+        <div className="cabinet-card">
           {updateError && (
-            <div
-              style={{
-                marginBottom: 12,
-                color: "crimson",
-                fontWeight: 900,
-                whiteSpace: "pre-wrap",
-              }}
-            >
+            <div className="cabinet-alert cabinet-alert--error">
+              <i className="bi bi-exclamation-triangle-fill"></i>
               {updateError}
             </div>
           )}
-
           {updateSuccess && (
-            <div
-              style={{
-                marginBottom: 12,
-                color: "seagreen",
-                fontWeight: 900,
-                whiteSpace: "pre-wrap",
-              }}
-            >
+            <div className="cabinet-alert cabinet-alert--success">
+              <i className="bi bi-check-circle-fill"></i>
               {updateSuccess}
             </div>
           )}
 
-          <button
-            className="btn btn-success me-2"
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Enregistrement..." : submitLabel}
-          </button>
+          <div className="cabinet-form-grid">
+            <div className="mmd-form-group">
+              <label className="mmd-label">Nom</label>
+              <input
+                name="nom"
+                className="mmd-input"
+                value={formData.nom}
+                onChange={handleChange}
+              />
+            </div>
 
-          <button className="btn btn-secondary" onClick={cancelEdit} disabled={isSubmitting}>
-            Annuler
-          </button>
-        </>
+            <div className="mmd-form-group">
+              <label className="mmd-label">Spécialité</label>
+              <input
+                name="specialite"
+                className="mmd-input"
+                value={formData.specialite}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="mmd-form-group">
+              <label className="mmd-label">Téléphone</label>
+              <input
+                name="telephone"
+                className="mmd-input"
+                value={formData.telephone}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="mmd-form-group">
+              <label className="mmd-label">Adresse</label>
+              <input
+                name="adresse"
+                className="mmd-input"
+                value={formData.adresse}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="mmd-form-group">
+              <label className="mmd-label">Latitude</label>
+              <input
+                name="latitude"
+                className="mmd-input"
+                value={formData.latitude}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="mmd-form-group">
+              <label className="mmd-label">Longitude</label>
+              <input
+                name="longitude"
+                className="mmd-input"
+                value={formData.longitude}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="mmd-form-group cabinet-form-full">
+              <label className="mmd-label">Logo (optionnel)</label>
+              <input
+                type="file"
+                accept="image/*"
+                className="mmd-input"
+                onChange={handleLogoChange}
+              />
+            </div>
+          </div>
+
+          <div className="cabinet-form-actions">
+            <button
+              className="mmd-btn mmd-btn-primary"
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Enregistrement..." : submitLabel}
+            </button>
+            <button
+              className="mmd-btn mmd-btn-secondary"
+              onClick={cancelEdit}
+              disabled={isSubmitting}
+            >
+              Annuler
+            </button>
+          </div>
+        </div>
       )}
 
       {/* Delete confirmation modal */}
       {isDeleteOpen && cabinet && (
         <div
+          className="cabinet-modal-overlay"
           role="dialog"
           aria-modal="true"
           onClick={closeDelete}
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.35)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 16,
-            zIndex: 9999,
-          }}
         >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: "min(560px, 100%)",
-              background: "#fff",
-              border: "3px solid #0b0b0b",
-              boxShadow: "10px 10px 0 #0b0b0b",
-              padding: 16,
-            }}
-          >
-            <div style={{ fontWeight: 1000, fontSize: 18 }}>
-              Supprimer le cabinet ?
-            </div>
-
-            <div style={{ marginTop: 10, fontWeight: 800, opacity: 0.9 }}>
-              Cette action est irréversible. Le cabinet sera supprimé
-              définitivement.
-            </div>
-
-            {deleteError && (
-              <div style={{ marginTop: 12, color: "crimson", fontWeight: 900 }}>
-                {deleteError}
-              </div>
-            )}
-
-            <div
-              style={{
-                marginTop: 16,
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: 10,
-                flexWrap: "wrap",
-              }}
-            >
+          <div className="cabinet-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="cabinet-modal-header">
+              <h3 className="cabinet-modal-title">Supprimer le cabinet ?</h3>
               <button
                 type="button"
-                className="btn btn-secondary"
+                className="cabinet-modal-close"
+                onClick={closeDelete}
+                aria-label="Fermer"
+              >
+                <i className="bi bi-x"></i>
+              </button>
+            </div>
+
+            <div className="cabinet-modal-body">
+              <p style={{ margin: 0 }}>
+                Cette action est irréversible. Le cabinet sera supprimé
+                définitivement.
+              </p>
+              {deleteError && (
+                <div className="cabinet-alert cabinet-alert--error" style={{ marginTop: 16 }}>
+                  <i className="bi bi-exclamation-triangle-fill"></i>
+                  {deleteError}
+                </div>
+              )}
+            </div>
+
+            <div className="cabinet-modal-footer">
+              <button
+                type="button"
+                className="mmd-btn mmd-btn-secondary"
                 onClick={closeDelete}
               >
                 Annuler
               </button>
-
               <button
                 type="button"
-                className="btn btn-danger"
+                className="mmd-btn mmd-btn-danger"
                 onClick={confirmDelete}
               >
                 Oui, supprimer

@@ -1,6 +1,7 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import api from "../../../api/axios";
 import { AuthContext } from "../../../context/authContext";
+import "./consultation.css";
 
 const PAGE_SIZE = 5;
 
@@ -58,7 +59,9 @@ const MedecinConsultationPage = () => {
   }, [query]);
 
   const items = useMemo(() => {
-    const visible = rdvList.filter((r) => r.statut === "confirme" || r.statut === "termine");
+    const visible = rdvList.filter(
+      (r) => r.statut === "confirme" || r.statut === "termine"
+    );
 
     return visible
       .map((r) => {
@@ -68,12 +71,14 @@ const MedecinConsultationPage = () => {
         const diagnostic = consultation?.diagnostic ?? "";
         const ordonnance = consultation?.ordonnance ?? null;
 
-        // If a consultation shell exists but diagnostic is still empty,
-        // treat it as "pending" for medecin to finalize with PUT.
         const isShellPending = hasConsultation && !String(diagnostic).trim();
 
         return {
-          kind: isShellPending ? "pending" : hasConsultation ? "existing" : "pending",
+          kind: isShellPending
+            ? "pending"
+            : hasConsultation
+            ? "existing"
+            : "pending",
           rdvId: r.id,
           consultationId: hasConsultation ? consultation.id : null,
           patient: r.patient?.user,
@@ -130,7 +135,6 @@ const MedecinConsultationPage = () => {
 
     try {
       if (createForm.consultation_id) {
-        // Finalize existing shell created by secretaire
         await api.put(`/consultations/${createForm.consultation_id}`, {
           diagnostic: createForm.diagnostic,
           ordonnance: createForm.ordonnance || null,
@@ -138,7 +142,6 @@ const MedecinConsultationPage = () => {
 
         setSuccessMsg("Consultation finalisée avec succès.");
       } else {
-        // Legacy fallback: create consultation directly
         await api.post("/consultations", {
           rendez_vous_id: Number(createForm.rendez_vous_id),
           diagnostic: createForm.diagnostic,
@@ -152,7 +155,9 @@ const MedecinConsultationPage = () => {
       await fetchRdv();
       setPage(1);
     } catch (err) {
-      setErrorMsg(err?.response?.data?.message || "Erreur lors de la création");
+      setErrorMsg(
+        err?.response?.data?.message || "Erreur lors de la création"
+      );
     }
   };
 
@@ -176,7 +181,9 @@ const MedecinConsultationPage = () => {
       await fetchRdv();
       setPage(1);
     } catch (err) {
-      setErrorMsg(err?.response?.data?.message || "Erreur lors de la suppression");
+      setErrorMsg(
+        err?.response?.data?.message || "Erreur lors de la suppression"
+      );
     }
   };
 
@@ -185,221 +192,330 @@ const MedecinConsultationPage = () => {
     setViewConsultation(null);
   };
 
-  if (loading) return <div className="p-5">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="consultation-container">
+        <div className="patients-loading">
+          <div className="mmd-loading">
+            <i className="bi bi-hourglass-split"></i>
+          </div>
+          <p>Chargement des consultations...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const pendingCount = items.filter((it) => it.kind === "pending").length;
 
   return (
-    <div className="p-0">
-      <div className="shadow-sm p-3 mb-4">
-        <div className="d-flex justify-content-between align-items-center">
-          <div>
-            <h5 className="mb-0">Consultations</h5>
-          </div>
+    <div className="consultation-container">
+      <div className="consultation-header">
+        <div>
+          <h1 className="consultation-title">Consultations</h1>
+          <p className="consultation-subtitle">
+            {items.length} consultation{items.length !== 1 ? "s" : ""} ·{" "}
+            {pendingCount} en attente
+          </p>
+        </div>
 
-          <button
-            type="button"
-            className="btn btn-primary btn-sm"
-            onClick={() => {
-              const firstPending = items.find((it) => it.kind === "pending");
-              if (firstPending) openCreate(firstPending.rdvId);
-            }}
-            disabled={items.find((it) => it.kind === "pending") == null}
-            title="Ajouter consultation (sur un RDV confirmé sans consultation)"
-          >
-            Ajouter consultation
-          </button>
+        <button
+          type="button"
+          className="mmd-btn mmd-btn-primary"
+          onClick={() => {
+            const firstPending = items.find((it) => it.kind === "pending");
+            if (firstPending) openCreate(firstPending.rdvId);
+          }}
+          disabled={pendingCount === 0}
+        >
+          <i className="bi bi-plus-lg"></i>
+          Ajouter consultation
+        </button>
+      </div>
+
+      {errorMsg && (
+        <div className="consultation-alert consultation-alert--error">
+          <i className="bi bi-exclamation-triangle-fill"></i>
+          {errorMsg}
+        </div>
+      )}
+      {successMsg && (
+        <div className="consultation-alert consultation-alert--success">
+          <i className="bi bi-check-circle-fill"></i>
+          {successMsg}
+        </div>
+      )}
+
+      <div className="consultation-filters">
+        <div className="consultation-search">
+          <i className="bi bi-search"></i>
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Rechercher un patient..."
+          />
         </div>
       </div>
 
-      {errorMsg ? <div className="alert alert-danger">{errorMsg}</div> : null}
-      {successMsg ? <div className="alert alert-success">{successMsg}</div> : null}
-
-      <div className="mb-3">
-        <input
-          className="form-control"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Rechercher un patient..."
-        />
-      </div>
-
-      <div className="card">
-        <div className="card-body p-0">
-          {paginatedItems.length === 0 ? (
-            <div className="p-4 text-center">Aucun rendez-vous trouvé.</div>
-          ) : (
-            <div className="table-responsive">
-              <table className="table align-middle mb-0">
-                <thead>
-                  <tr>
-                    <th>Patient</th>
-                    <th>Date</th>
-                    <th>Motif</th>
-                    <th>Statut paiement</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {paginatedItems.map((it) => (
-                    <tr key={it.rdvId}>
-                      <td>
-                        {it.patient?.nom} {it.patient?.prenom}
-                      </td>
-                      <td>{it.date}</td>
-                      <td>{it.motif}</td>
-                      <td>{it.kind === "existing" ? (it.statutPaiement ?? "en_attente") : "—"}</td>
-                      <td>
-                        <div className="d-flex gap-2">
-                          {it.kind === "pending" ? (
-                            <button
-                              type="button"
-                              className="btn btn-sm btn-primary"
-                              onClick={() => openCreate(it.rdvId, it.consultationId)}
-                            >
-                              {it.consultationId ? "Finaliser" : "Créer"}
-                            </button>
-                          ) : (
-                            <>
-                              <button
-                                type="button"
-                                className="btn btn-sm btn-outline-secondary"
-                                onClick={() => openView(it.consultationId)}
-                              >
-                                View
-                              </button>
-                              <button
-                                type="button"
-                                className="btn btn-sm btn-outline-danger"
-                                onClick={() => deleteConsultation(it.consultationId)}
-                              >
-                                Delete
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          <div className="border-top py-3">
-            <div className="d-flex justify-content-center align-items-center gap-3">
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page <= 1}
-              >
-                Précédent
-              </button>
-
-              <div className="fw-semibold">
-                Page {page} / {pageCount}
-              </div>
-
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
-                disabled={page >= pageCount}
-              >
-                Suivant
-              </button>
-            </div>
+      <div className="consultation-table-card">
+        {paginatedItems.length === 0 ? (
+          <div className="consultation-empty">
+            <i
+              className="bi bi-inbox"
+              style={{ fontSize: 48, display: "block", marginBottom: 12, color: "var(--text-tertiary)" }}
+            ></i>
+            Aucun rendez-vous trouvé.
           </div>
-        </div>
+        ) : (
+          <table className="mmd-table">
+            <thead>
+              <tr>
+                <th>Patient</th>
+                <th>Date</th>
+                <th>Motif</th>
+                <th>Statut paiement</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {paginatedItems.map((it) => (
+                <tr key={it.rdvId}>
+                  <td>
+                    {it.patient?.nom} {it.patient?.prenom}
+                  </td>
+                  <td>
+                    {new Date(it.date).toLocaleDateString("fr-FR")}
+                  </td>
+                  <td>{it.motif}</td>
+                  <td>
+                    {it.kind === "existing" ? (
+                      <span
+                        className={`mmd-badge ${
+                          it.statutPaiement === "paye"
+                            ? "mmd-badge-success"
+                            : "mmd-badge-warning"
+                        }`}
+                      >
+                        {it.statutPaiement === "paye" ? "Payé" : "En attente"}
+                      </span>
+                    ) : (
+                      <span className="mmd-badge mmd-badge-info">—</span>
+                    )}
+                  </td>
+                  <td>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      {it.kind === "pending" ? (
+                        <button
+                          type="button"
+                          className="mmd-btn mmd-btn-primary mmd-btn-sm"
+                          onClick={() =>
+                            openCreate(it.rdvId, it.consultationId)
+                          }
+                        >
+                          {it.consultationId ? "Finaliser" : "Créer"}
+                        </button>
+                      ) : (
+                        <>
+                          <button
+                            type="button"
+                            className="mmd-btn mmd-btn-sm"
+                            onClick={() => openView(it.consultationId)}
+                          >
+                            <i className="bi bi-eye"></i> Voir
+                          </button>
+                          <button
+                            type="button"
+                            className="mmd-btn mmd-btn-sm mmd-btn-danger"
+                            onClick={() =>
+                              deleteConsultation(it.consultationId)
+                            }
+                          >
+                            <i className="bi bi-trash"></i>
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+
+        {pageCount > 1 && (
+          <div className="consultation-pagination">
+            <button
+              type="button"
+              className="mmd-btn mmd-btn-secondary mmd-btn-sm"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+            >
+              <i className="bi bi-chevron-left"></i> Précédent
+            </button>
+
+            <span className="consultation-pagination-info">
+              Page {page} / {pageCount}
+            </span>
+
+            <button
+              type="button"
+              className="mmd-btn mmd-btn-secondary mmd-btn-sm"
+              onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+              disabled={page >= pageCount}
+            >
+              Suivant <i className="bi bi-chevron-right"></i>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Create modal */}
-      {createModal ? (
-        <div className="card mt-4">
-          <div className="card-header d-flex justify-content-between align-items-center">
-            <span>Créer consultation</span>
-            <button type="button" className="btn btn-outline-secondary btn-sm" onClick={() => setCreateModal(false)}>
-              Fermer
+      {createModal && (
+        <div className="consultation-modal-card">
+          <div className="consultation-modal-header">
+            <h3 className="consultation-modal-title">Créer consultation</h3>
+            <button
+              type="button"
+              className="consultation-modal-close"
+              onClick={() => setCreateModal(false)}
+              aria-label="Fermer"
+            >
+              <i className="bi bi-x"></i>
             </button>
           </div>
-          <div className="card-body">
+          <div className="consultation-modal-body">
             <form onSubmit={submitCreate}>
-              <div className="row g-3">
-                <div className="col-12">
-                  <label className="form-label">Diagnostic</label>
+              <div className="consultation-form-row">
+                <div className="mmd-form-group">
+                  <label className="mmd-label">Diagnostic</label>
                   <input
-                    className="form-control"
+                    className="mmd-input"
                     value={createForm.diagnostic}
-                    onChange={(e) => setCreateForm((s) => ({ ...s, diagnostic: e.target.value }))}
+                    onChange={(e) =>
+                      setCreateForm((s) => ({
+                        ...s,
+                        diagnostic: e.target.value,
+                      }))
+                    }
                     required
                   />
                 </div>
 
-                <div className="col-12">
-                  <label className="form-label">Ordonnance (optionnel)</label>
+                <div className="mmd-form-group">
+                  <label className="mmd-label">
+                    Ordonnance (optionnel)
+                  </label>
                   <textarea
-                    className="form-control"
+                    className="mmd-textarea"
                     value={createForm.ordonnance}
-                    onChange={(e) => setCreateForm((s) => ({ ...s, ordonnance: e.target.value }))}
+                    onChange={(e) =>
+                      setCreateForm((s) => ({
+                        ...s,
+                        ordonnance: e.target.value,
+                      }))
+                    }
                     rows={3}
                   />
                 </div>
+              </div>
 
-                {/* Médecin: pas de montant à saisir */}
-
-                <div className="col-12 col-md-6 d-flex align-items-end justify-content-end">
-                  <button type="submit" className="btn btn-success w-100">
-                    Effectuer consultation
-                  </button>
-                </div>
+              <div className="consultation-modal-footer">
+                <button type="submit" className="mmd-btn mmd-btn-primary">
+                  Effectuer consultation
+                </button>
               </div>
             </form>
           </div>
         </div>
-      ) : null}
+      )}
 
-      {/* View modal (simple card) */}
-      {viewModal && viewConsultation ? (
-        <div className="card mt-4">
-          <div className="card-header d-flex justify-content-between align-items-center">
-            <span>Consultation details</span>
-            <button type="button" className="btn btn-outline-secondary btn-sm" onClick={viewClose}>
-              Fermer
+      {/* View modal */}
+      {viewModal && viewConsultation && (
+        <div className="consultation-modal-card">
+          <div className="consultation-modal-header">
+            <h3 className="consultation-modal-title">
+              Détails consultation
+            </h3>
+            <button
+              type="button"
+              className="consultation-modal-close"
+              onClick={viewClose}
+              aria-label="Fermer"
+            >
+              <i className="bi bi-x"></i>
             </button>
           </div>
-          <div className="card-body">
-            <div className="mb-2">
-              <strong>Patient:</strong>{" "}
-              {viewConsultation.patient?.nom} {viewConsultation.patient?.prenom}
+          <div className="consultation-modal-body">
+            <div className="consultation-detail-row">
+              <span className="consultation-detail-label">Patient</span>
+              <span className="consultation-detail-value">
+                {viewConsultation.patient?.nom}{" "}
+                {viewConsultation.patient?.prenom}
+              </span>
             </div>
-            <div className="mb-2">
-              <strong>Date:</strong> {viewConsultation.date}
+            <div className="consultation-detail-row">
+              <span className="consultation-detail-label">Date</span>
+              <span className="consultation-detail-value">
+                {new Date(viewConsultation.date).toLocaleDateString("fr-FR")}
+              </span>
             </div>
-            <div className="mb-2">
-              <strong>Motif:</strong> {viewConsultation.motif}
+            <div className="consultation-detail-row">
+              <span className="consultation-detail-label">Motif</span>
+              <span className="consultation-detail-value">
+                {viewConsultation.motif}
+              </span>
             </div>
 
-            <hr />
+            <div className="consultation-detail-divider" />
 
-            <div className="mb-2">
-              <strong>Diagnostic:</strong> {viewConsultation.diagnostic || "—"}
+            <div className="consultation-detail-row">
+              <span className="consultation-detail-label">Diagnostic</span>
+              <span className="consultation-detail-value">
+                {viewConsultation.diagnostic || "—"}
+              </span>
             </div>
-            <div className="mb-2">
-              <strong>Ordonnance:</strong> {viewConsultation.ordonnance ? viewConsultation.ordonnance : "—"}
+            <div className="consultation-detail-row">
+              <span className="consultation-detail-label">Ordonnance</span>
+              <span className="consultation-detail-value">
+                {viewConsultation.ordonnance || "—"}
+              </span>
             </div>
-            <div className="mb-2">
-              <strong>Montant:</strong> {viewConsultation.montant ? `${viewConsultation.montant} DH` : "—"}
+            <div className="consultation-detail-row">
+              <span className="consultation-detail-label">Montant</span>
+              <span className="consultation-detail-value">
+                {viewConsultation.montant
+                  ? `${viewConsultation.montant} DH`
+                  : "—"}
+              </span>
             </div>
-            <div className="mb-2">
-              <strong>Mode paiement:</strong> {viewConsultation.modePaiement || "—"}
+            <div className="consultation-detail-row">
+              <span className="consultation-detail-label">Mode paiement</span>
+              <span className="consultation-detail-value">
+                {viewConsultation.modePaiement || "—"}
+              </span>
             </div>
-            <div className="mb-2">
-              <strong>Statut paiement:</strong>{" "}
-              {viewConsultation.statutPaiement ?? "en_attente"}
+            <div className="consultation-detail-row">
+              <span className="consultation-detail-label">
+                Statut paiement
+              </span>
+              <span className="consultation-detail-value">
+                <span
+                  className={`mmd-badge ${
+                    viewConsultation.statutPaiement === "paye"
+                      ? "mmd-badge-success"
+                      : "mmd-badge-warning"
+                  }`}
+                >
+                  {viewConsultation.statutPaiement === "paye"
+                    ? "Payé"
+                    : "En attente"}
+                </span>
+              </span>
             </div>
           </div>
         </div>
-      ) : null}
+      )}
     </div>
   );
 };

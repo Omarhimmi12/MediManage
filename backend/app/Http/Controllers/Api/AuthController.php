@@ -133,4 +133,105 @@ class AuthController extends Controller
             'data' => $user
         ]);
     }
+
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'nom' => 'required|string|min:3',
+            'prenom' => 'nullable|string|min:3',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'telephone' => 'required|string',
+            'specialite' => 'nullable|string',
+            'cabinet_nom' => 'nullable|string',
+            'cabinet_adresse' => 'nullable|string',
+            'cabinet_telephone' => 'nullable|string',
+        ]);
+
+        $user->update([
+            'nom' => $request->nom,
+            'prenom' => $request->prenom,
+            'email' => $request->email,
+            'telephone' => $request->telephone,
+        ]);
+
+        if ($user->role === 'medecin') {
+            $medecin = $user->medecin;
+            if ($medecin && $request->has('specialite')) {
+                $medecin->update(['specialite' => $request->specialite]);
+            }
+
+            $cabinet = $medecin?->cabinet;
+            if ($cabinet) {
+                $cabinet->update([
+                    'nom' => $request->cabinet_nom ?? $cabinet->nom,
+                    'adresse' => $request->cabinet_adresse ?? $cabinet->adresse,
+                    'telephone' => $request->cabinet_telephone ?? $cabinet->telephone,
+                ]);
+            }
+        }
+
+        $user->load('medecin.cabinet');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Profil mis à jour avec succès.',
+            'data' => $user
+        ]);
+    }
+
+    public function deleteAccount(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->role !== 'medecin') {
+            return response()->json(['message' => 'Action non autorisée.'], 403);
+        }
+
+        $medecin = $user->medecin;
+
+        if ($medecin) {
+            $cabinet = $medecin->cabinet;
+
+            if ($cabinet) {
+                // Delete all secretaires (and their user accounts)
+                $secretaires = \App\Models\Secretaire::where('cabinet_id', $cabinet->id)->get();
+                foreach ($secretaires as $secretaire) {
+                    if ($secretaire->user) {
+                        $secretaire->user->tokens()->delete();
+                        $secretaire->user->delete();
+                    }
+                }
+
+                // Delete all rendez-vous for this cabinet
+                $rendezVous = \App\Models\RendezVous::where('cabinet_id', $cabinet->id)->get();
+                foreach ($rendezVous as $rdv) {
+                    // Delete associated consultation and paiement
+                    if ($rdv->consultation) {
+                        if ($rdv->consultation->paiement) {
+                            $rdv->consultation->paiement->delete();
+                        }
+                        $rdv->consultation->delete();
+                    }
+                    $rdv->delete();
+                }
+
+                $cabinet->delete();
+            }
+
+            // Delete rendez-vous by medecin (without cabinet)
+            \App\Models\RendezVous::where('medecin_id', $medecin->id)->delete();
+
+            $medecin->delete();
+        }
+
+        $user->tokens()->delete();
+        $user->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Compte supprimé avec succès.'
+        ]);
+    }
 }

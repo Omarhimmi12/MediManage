@@ -90,14 +90,6 @@ const MedecinDashboard = () => {
           </div>
         </div>
 
-        <button
-          className="mmd-sidebar-toggle-floating"
-          onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-          aria-label="Toggle sidebar"
-        >
-          <i className={`bi ${isSidebarCollapsed ? "bi-chevron-right" : "bi-chevron-left"}`}></i>
-        </button>
-
         <nav className="mmd-sidebar-nav">
           {navItems.map(({ key, label, icon }) => (
             <button
@@ -130,6 +122,15 @@ const MedecinDashboard = () => {
           </button>
         </div>
       </aside>
+
+      <button
+        type="button"
+        className="mmd-sidebar-toggle"
+        aria-label="Toggle sidebar"
+        onClick={() => setIsSidebarCollapsed((v) => !v)}
+      >
+        {isSidebarCollapsed ? "»" : "«"}
+      </button>
 
       <div className="mmd-main-container">
         <header className="mmd-topbar">

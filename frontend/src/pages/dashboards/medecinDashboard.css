@@ -129,36 +129,36 @@ html, body {
 }
 
 
-.mmd-sidebar-toggle-floating {
-  position: absolute;
-  top: 40px;
-  right: 3px;
-  transform: translateY(-50%);
-  width: 36px;
-  height: 36px;
+.mmd-sidebar-toggle {
+  position: fixed;
+  top: 50px;
+  left: 264px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  border: 2px solid var(--border-color);
-  background: var(--bg-primary);
-  color: var(--text-secondary);
+  border: 2px solid #e5e7eb;
+  background: #ffffff;
+  color: #1e293b;
   cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
-  transition: var(--transition);
-  z-index: 100;
-  box-shadow: var(--shadow-md);
+  z-index: 300;
+  transition: left 200ms ease, background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  padding: 0;
 }
 
-.mmd-sidebar-toggle-floating:hover {
-  background: var(--primary-color);
-  color: white;
-  border-color: var(--primary-color);
-  box-shadow: var(--shadow-lg);
+.mmd-sidebar-toggle:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
 }
 
-.mmd-sidebar--collapsed .mmd-sidebar-toggle-floating {
-  right: -18px;
+.mmd-sidebar--collapsed ~ .mmd-sidebar-toggle {
+  left: 64px;
 }
 
 .mmd-sidebar-nav {

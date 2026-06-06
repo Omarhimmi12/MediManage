@@ -1,0 +1,289 @@
+.patients-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.patients-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+
+.patients-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
+}
+
+.patients-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.patients-filters {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.filter-search {
+  flex: 1;
+  min-width: 250px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  transition: var(--transition);
+}
+
+.filter-search:focus-within {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+}
+
+.filter-search i {
+  color: var(--text-tertiary);
+  font-size: 16px;
+}
+
+.filter-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  color: var(--text-primary);
+  outline: none;
+}
+
+.filter-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filter-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.filter-group .mmd-select {
+  min-width: 150px;
+}
+
+.patients-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 40px;
+  color: var(--text-secondary);
+}
+
+.patients-loading > div:first-child {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.patients-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 40px;
+  text-align: center;
+  background: var(--bg-primary);
+  border-radius: 12px;
+  border: 2px dashed var(--border-color);
+}
+
+.patients-empty i {
+  font-size: 64px;
+  color: var(--text-tertiary);
+  margin-bottom: 16px;
+}
+
+.patients-empty h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+}
+
+.patients-empty p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.patient-name {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.patient-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
+  color: white;
+  font-weight: 600;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.patient-subtext {
+  display: block;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  font-weight: 400;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.action-buttons .mmd-btn {
+  padding: 6px 10px;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.pagination-info {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  min-width: 120px;
+  text-align: center;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* TABLE ENHANCEMENTS */
+
+.mmd-table a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.mmd-table a:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
+.mmd-table td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+@media (max-width: 1200px) {
+  .patients-filters {
+    flex-direction: column;
+  }
+
+  .filter-search,
+  .filter-group .mmd-select {
+    width: 100%;
+  }
+
+  .mmd-table td {
+    max-width: 150px;
+  }
+}
+
+@media (max-width: 768px) {
+  .patients-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .patients-filters {
+    width: 100%;
+    gap: 12px;
+  }
+
+  .filter-search {
+    min-width: 100%;
+  }
+
+  .filter-group .mmd-select {
+    width: 100%;
+  }
+
+  .mmd-table {
+    font-size: 12px;
+  }
+
+  .mmd-table th,
+  .mmd-table td {
+    padding: 12px 8px;
+  }
+
+  .action-buttons .mmd-btn {
+    padding: 4px 8px;
+  }
+
+  .patient-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mmd-card {
+    border-radius: 8px;
+    overflow-x: auto;
+  }
+
+  .mmd-table {
+    min-width: 600px;
+  }
+
+  .patients-title {
+    font-size: 20px;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .action-buttons .mmd-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

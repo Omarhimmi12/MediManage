@@ -79,6 +79,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/paiements', [PaiementController::class, 'store']);
 
     // revenues
+    Route::get('/dashboard/charts/appointment-stats', [DashboardController::class, 'appointmentStats']);
     Route::get('/dashboard/charts/monthly-revenue', [DashboardController::class, 'monthlyRevenueChart']);
+    Route::get('/dashboard/charts/daily-revenue', [DashboardController::class, 'dailyRevenueChart']);
 
 });

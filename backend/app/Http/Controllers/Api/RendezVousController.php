@@ -201,7 +201,7 @@ class RendezVousController extends Controller
     {
         $user = $request->user();
 
-        if ($user->role !== 'secretaire') {
+        if (!in_array($user->role, ['secretaire', 'medecin'])) {
             return response()->json(['message' => 'Non autorisé'], 403);
         }
 
@@ -215,7 +215,11 @@ class RendezVousController extends Controller
             return response()->json(['message' => 'Rendez-vous introuvable'], 404);
         }
 
-        if ($rdv->cabinet_id !== $user->secretaire->cabinet_id) {
+        $cabinetId = $user->role === 'medecin'
+            ? ($user->medecin->cabinet->id ?? null)
+            : $user->secretaire->cabinet_id;
+
+        if ($rdv->cabinet_id !== $cabinetId) {
             return response()->json(['message' => 'Access denied'], 403);
         }
 

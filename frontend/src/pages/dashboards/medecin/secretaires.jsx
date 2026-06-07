@@ -262,14 +262,14 @@ const SecretairesPage = () => {
                           className="mmd-btn mmd-btn-info mmd-btn-sm"
                           onClick={() => openView(s)}
                         >
-                          <i className="bi bi-eye"></i> Voir
+                          <i className="bi bi-eye"></i> 
                         </button>
                         <button
                           type="button"
                           className="mmd-btn mmd-btn-sm mmd-btn-secondary"
                           onClick={() => openEdit(s)}
                         >
-                          <i className="bi bi-pencil"></i> Éditer
+                          <i className="bi bi-pencil"></i> 
                         </button>
                         <button
                           type="button"
@@ -349,7 +349,7 @@ const SecretairesPage = () => {
                   openEdit(selected);
                 }}
               >
-                <i className="bi bi-pencil"></i> Éditer
+                <i className="bi bi-pencil"></i>
               </button>
               <button
                 type="button"
@@ -359,15 +359,9 @@ const SecretairesPage = () => {
                   openDelete(selected);
                 }}
               >
-                <i className="bi bi-trash"></i> Supprimer
+                <i className="bi bi-trash"></i> 
               </button>
-              <button
-                type="button"
-                className="mmd-btn mmd-btn-secondary"
-                onClick={closeView}
-              >
-                Fermer
-              </button>
+             
             </div>
           </div>
         </div>
@@ -408,9 +402,7 @@ const SecretairesPage = () => {
               <div className="secretaires-form-grid">
                 <div className="mmd-form-group">
                   <label className="mmd-label">Nom</label>
-                  <input
-                    value={form.nom}
-                    onChange={(e) =>
+                  <input value={form.nom} onChange={(e) =>
                       setForm((f) => ({ ...f, nom: e.target.value }))
                     }
                     className="mmd-input"
@@ -420,9 +412,7 @@ const SecretairesPage = () => {
 
                 <div className="mmd-form-group">
                   <label className="mmd-label">Prénom</label>
-                  <input
-                    value={form.prenom}
-                    onChange={(e) =>
+                  <input value={form.prenom} onChange={(e) =>
                       setForm((f) => ({ ...f, prenom: e.target.value }))
                     }
                     className="mmd-input"
@@ -444,22 +434,17 @@ const SecretairesPage = () => {
 
                 <div className="mmd-form-group">
                   <label className="mmd-label">Email</label>
-                  <input
-                    value={form.email}
+                  <input type="email" value={form.email}
                     onChange={(e) =>
                       setForm((f) => ({ ...f, email: e.target.value }))
                     }
-                    className="mmd-input"
-                    placeholder="Email"
-                    type="email"
+                    className="mmd-input" placeholder="Email"
                   />
                 </div>
 
                 <div className="mmd-form-group">
                   <label className="mmd-label">Date d'embauche</label>
-                  <input
-                    type="date"
-                    value={form.date_embauche}
+                  <input type="date" value={form.date_embauche}
                     onChange={(e) =>
                       setForm((f) => ({
                         ...f,
@@ -500,19 +485,13 @@ const SecretairesPage = () => {
             </div>
 
             <div className="secretaires-modal-footer">
-              <button
-                type="button"
-                className="mmd-btn mmd-btn-secondary"
-                onClick={closeForm}
-                disabled={formSubmitting}
+              <button type="button" className="mmd-btn mmd-btn-secondary"
+                onClick={closeForm} disabled={formSubmitting}
               >
                 Annuler
               </button>
-              <button
-                type="button"
-                className="mmd-btn mmd-btn-primary"
-                onClick={submitForm}
-                disabled={formSubmitting}
+              <button type="button" className="mmd-btn mmd-btn-primary"
+                onClick={submitForm} disabled={formSubmitting}
               >
                 {formSubmitting
                   ? "Enregistrement..."
@@ -527,30 +506,23 @@ const SecretairesPage = () => {
 
       {/* DELETE CONFIRMATION MODAL */}
       {isDeleteOpen && deleteTarget && (
-        <div
-          className="secretaires-modal-overlay"
-          role="dialog"
-          aria-modal="true"
-          onClick={closeDelete}
+        <div className="secretaires-modal-overlay"
+          role="dialog" aria-modal="true" onClick={closeDelete}
         >
           <div className="secretaires-modal" onClick={(e) => e.stopPropagation()}>
             <div className="secretaires-modal-header">
               <h3 className="secretaires-modal-title">
                 Supprimer la secrétaire ?
               </h3>
-              <button
-                type="button"
-                className="secretaires-modal-close"
-                onClick={closeDelete}
-                aria-label="Fermer"
+              <button type="button" className="secretaires-modal-close"
+                onClick={closeDelete} aria-label="Fermer"
               >
                 <i className="bi bi-x"></i>
               </button>
             </div>
 
             <div className="secretaires-modal-body">
-              <p style={{ margin: 0 }}>
-                Êtes-vous sûr de vouloir supprimer définitivement{" "}
+              <p>Êtes-vous sûr de vouloir supprimer définitivement{" "}
                 <strong>
                   {deleteTarget?.user?.nom || ""}{" "}
                   {deleteTarget?.user?.prenom || ""}
@@ -566,19 +538,13 @@ const SecretairesPage = () => {
             </div>
 
             <div className="secretaires-modal-footer">
-              <button
-                type="button"
-                className="mmd-btn mmd-btn-secondary"
-                onClick={closeDelete}
-                disabled={deleteSubmitting}
+              <button type="button" className="mmd-btn mmd-btn-secondary"
+                onClick={closeDelete} disabled={deleteSubmitting}
               >
                 Annuler
               </button>
-              <button
-                type="button"
-                className="mmd-btn mmd-btn-danger"
-                onClick={confirmDelete}
-                disabled={deleteSubmitting}
+              <button type="button" className="mmd-btn mmd-btn-danger"
+                onClick={confirmDelete} disabled={deleteSubmitting}
               >
                 {deleteSubmitting ? "Suppression..." : "Oui, supprimer"}
               </button>

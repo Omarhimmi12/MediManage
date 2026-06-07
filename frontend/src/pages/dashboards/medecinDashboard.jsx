@@ -129,7 +129,7 @@ const MedecinDashboard = () => {
         aria-label="Toggle sidebar"
         onClick={() => setIsSidebarCollapsed((v) => !v)}
       >
-        {isSidebarCollapsed ? "»" : "«"}
+          <i className={`bi ${isSidebarCollapsed ? "bi-chevron-double-right" : "bi-chevron-double-left"}`}></i>
       </button>
 
       <div className="mmd-main-container">

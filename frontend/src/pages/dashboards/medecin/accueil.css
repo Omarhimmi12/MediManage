@@ -459,6 +459,23 @@
   transition: var(--transition);
 }
 
+.appointment-item-en_attente {
+  border-left-color: #f59e0b;
+}
+
+.appointment-item-confirme {
+  border-left-color: #06b6d4;
+}
+
+.appointment-item-termine {
+  border-left-color: #10b981;
+}
+
+.appointment-item-annule {
+  border-left-color: #ef4444;
+}
+
+
 .appointment-item:hover {
   background: var(--bg-tertiary);
 }
@@ -467,7 +484,6 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
   color: white;
   display: flex;
   align-items: center;
@@ -476,7 +492,11 @@
   font-size: 12px;
   flex-shrink: 0;
 }
-
+.gender-avatar{
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
 .appointment-details {
   flex: 1;
   min-width: 0;

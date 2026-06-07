@@ -72,7 +72,9 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 170px;
 }
+
 
 .filter-group label {
   font-size: 12px;
@@ -141,7 +143,6 @@
   width: 40px;
   height: 40px;
   border-radius: 8px;
-  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
   color: white;
   font-weight: 600;
   font-size: 13px;
@@ -150,7 +151,11 @@
   justify-content: center;
   flex-shrink: 0;
 }
-
+.patient-avatar img{
+  height: 30px;
+  width: 30px;
+  object-fit: contain;
+}
 .patient-subtext {
   display: block;
   font-size: 12px;
@@ -190,15 +195,14 @@
 }
 
 /* TABLE ENHANCEMENTS */
-
 .mmd-table a {
-  color: var(--primary-color);
+  color: var(--text-secondary);
   text-decoration: none;
   transition: var(--transition);
 }
 
 .mmd-table a:hover {
-  color: var(--primary-dark);
+  color: var(--transition);
   text-decoration: underline;
 }
 
@@ -224,7 +228,83 @@
   }
 }
 
+/* PATIENT DETAIL VIEW CARD */
+.patients-view-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.patients-view-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.patients-view-header h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.patients-view-body {
+  padding: 24px;
+}
+
+.patients-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.patients-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.patients-detail-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--text-tertiary);
+}
+
+.patients-detail-value {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.patients-view-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+  justify-content: flex-end;
+}
+
 @media (max-width: 768px) {
+  .patients-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .patients-view-actions {
+    flex-direction: column;
+  }
+
+  .patients-view-actions .mmd-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
   .patients-header {
     flex-direction: column;
     align-items: flex-start;

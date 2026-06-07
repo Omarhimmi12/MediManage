@@ -34,8 +34,8 @@ const AccueilPage = () => {
 
   const APPOINTMENT_COLORS = {
     "En attente": "#f59e0b",
-    "Confirmé": "#06b6d4",
-    "Terminé": "#10b981",
+    "Confirmé": "#10b981",
+    "Terminé": "#696e6d",
   };
 
   useEffect(() => {
@@ -257,14 +257,21 @@ const AccueilPage = () => {
               </div>
             ) : (
               upcomingAppointments.map((rdv) => (
-                <div key={rdv.id} className="appointment-item">
-                  <div className="appointment-avatar">
-                    {rdv.patient?.user?.nom?.charAt(0)}
-                    {rdv.patient?.user?.prenom?.charAt(0)}
+                <div key={rdv.id} className={`appointment-item appointment-item-${rdv.statut}` }>
+                  <div className="appointment-avatar" aria-label="Genre patient">
+                    <img
+                      src={
+                        rdv.patient?.sexe === "female"
+                          ? "/images/female.png"
+                          : "/images/male.png"
+                      }
+                      alt={rdv.patient?.sexe === "female" ? "Female" : "Male"}
+                      className="gender-avatar"
+                    />
                   </div>
                   <div className="appointment-details">
                     <p className="appointment-name">
-                      {rdv.patient?.user?.nom} {rdv.patient?.user?.prenom}
+                    {rdv.patient?.user?.nom} {rdv.patient?.user?.prenom}
                     </p>
                     <p className="appointment-time">
                       {new Date(rdv.date_rdv).toLocaleDateString("fr-FR")} à{" "}

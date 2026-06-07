@@ -1,17 +1,26 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import api from "../../../api/axios";
 import "./patients.css";
 
 const PatientsPage = () => {
   const [patients, setPatients] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterAge, setFilterAge] = useState("all");
-  const [filterGender, setFilterGender] = useState("all");
+  const [sexFilter, setSexFilter] = useState("all");
+  const [ageBucket, setAgeBucket] = useState("all");
   const [loading, setLoading] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  const [editingId, setEditingId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+
+  const [selectedPatientId, setSelectedPatientId] = useState(null);
+  const selectedPatient = useMemo(
+    () => patients.find((p) => p.id === selectedPatientId) ?? null,
+    [patients, selectedPatientId]
+  );
+
+  const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [formSubmitting, setFormSubmitting] = useState(false);
+  const [formErrors, setFormErrors] = useState([]);
 
   const [formData, setFormData] = useState({
     nom: "",
@@ -19,10 +28,8 @@ const PatientsPage = () => {
     email: "",
     telephone: "",
     date_naissance: "",
-    genre: "M",
+    sexe: "male",
     adresse: "",
-    ville: "",
-    codepostal: "",
   });
 
   useEffect(() => {
@@ -33,42 +40,78 @@ const PatientsPage = () => {
     setLoading(true);
     try {
       const response = await api.get("/patients");
-      setPatients(response.data);
+      setPatients(response.data ?? []);
     } catch (error) {
       console.error("Error fetching patients:", error);
+      setPatients([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredPatients = patients.filter((patient) => {
-    const matchesSearch =
-      `${patient.user?.nom} ${patient.user?.prenom}`
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      patient.user?.email?.toLowerCase().includes(searchQuery.toLowerCase());
+  const calculateAge = (dateNaissance) => {
+    if (!dateNaissance) return "-";
+    const today = new Date();
+    const birth = new Date(dateNaissance);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    return age;
+  };
 
-    const age = patient.date_naissance
-      ? new Date().getFullYear() - new Date(patient.date_naissance).getFullYear()
-      : 0;
-    const matchesAge =
-      filterAge === "all" ||
-      (filterAge === "child" && age < 18) ||
-      (filterAge === "adult" && age >= 18 && age < 65) ||
-      (filterAge === "elderly" && age >= 65);
+  const filteredPatients = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
 
-    const matchesGender =
-      filterGender === "all" || patient.user?.genre === filterGender;
+    const isInAgeBucket = (dateNaissance) => {
+      if (!dateNaissance || ageBucket === "all") return true;
+      const age = calculateAge(dateNaissance);
+      if (age === "-" || Number.isNaN(age)) return false;
 
-    return matchesSearch && matchesAge && matchesGender;
-  });
+      if (ageBucket === "-18") return age < 18;
+      if (ageBucket === "18-35") return age >= 18 && age <= 35;
+      if (ageBucket === "36-55") return age >= 36 && age <= 55;
+      if (ageBucket === "56+") return age >= 56;
+      return true;
+    };
+
+    const sexOk = (p) => {
+      if (sexFilter === "all") return true;
+      return p.sexe === sexFilter;
+    };
+
+    return patients.filter((p) => {
+      if (!sexOk(p)) return false;
+      if (!isInAgeBucket(p.date_naissance)) return false;
+
+      if (!q) return true;
+
+      const nom = (p.user?.nom ?? "").toLowerCase();
+      const prenom = (p.user?.prenom ?? "").toLowerCase();
+      const email = (p.user?.email ?? "").toLowerCase();
+      return nom.includes(q) || prenom.includes(q) || email.includes(q);
+    });
+  }, [patients, searchQuery, sexFilter, ageBucket]);
 
   const paginatedPatients = filteredPatients.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
   const totalPages = Math.ceil(filteredPatients.length / itemsPerPage);
+
+  const resetForm = () => {
+    setFormData({
+      nom: "",
+      prenom: "",
+      email: "",
+      telephone: "",
+      date_naissance: "",
+      sexe: "male",
+      adresse: "",
+    });
+    setFormErrors([]);
+  };
 
   const handleOpenModal = (patient = null) => {
     if (patient) {
@@ -79,24 +122,12 @@ const PatientsPage = () => {
         email: patient.user?.email || "",
         telephone: patient.user?.telephone || "",
         date_naissance: patient.date_naissance || "",
-        genre: patient.user?.genre || "M",
+        sexe: patient.sexe || "male",
         adresse: patient.adresse || "",
-        ville: patient.ville || "",
-        codepostal: patient.codepostal || "",
       });
     } else {
       setEditingId(null);
-      setFormData({
-        nom: "",
-        prenom: "",
-        email: "",
-        telephone: "",
-        date_naissance: "",
-        genre: "M",
-        adresse: "",
-        ville: "",
-        codepostal: "",
-      });
+      resetForm();
     }
     setShowModal(true);
   };
@@ -104,41 +135,52 @@ const PatientsPage = () => {
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingId(null);
+    setFormErrors([]);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting patient:", formData);
-    handleCloseModal();
-    await fetchPatients();
-  };
+    setFormSubmitting(true);
+    setFormErrors([]);
 
-  const handleDelete = async (patientId) => {
-    if (window.confirm("Êtes-vous sûr de vouloir supprimer ce patient?")) {
-      try {
-        const response = await fetch(`/api/patient/${patientId}`, {
-          method: "DELETE",
-        });
-        if (response.ok) {
-          fetchPatients();
-        }
-      } catch (error) {
-        console.error("Error deleting patient:", error);
+    try {
+      if (editingId) {
+        await api.put(`/patients/${editingId}`, formData);
+      } else {
+        await api.post("/patients", formData);
       }
+      handleCloseModal();
+      await fetchPatients();
+    } catch (err) {
+      if (err?.response?.data?.message) {
+        setFormErrors([err.response.data.message]);
+      } else if (err?.response?.data?.errors) {
+        setFormErrors(Object.values(err.response.data.errors).flat());
+      } else {
+        setFormErrors(["Erreur lors de l'enregistrement du patient."]);
+      }
+    } finally {
+      setFormSubmitting(false);
     }
   };
 
-  const calculateAge = (dateNaissance) => {
-    if (!dateNaissance) return "-";
-    const age = new Date().getFullYear() - new Date(dateNaissance).getFullYear();
-    return age;
+  const handleDelete = async (patientId) => {
+    if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce patient ?")) return;
+    try {
+      await api.delete(`/patients/${patientId}`);
+      if (selectedPatientId === patientId) setSelectedPatientId(null);
+      await fetchPatients();
+    } catch (error) {
+      alert(error?.response?.data?.message || "Erreur lors de la suppression");
+    }
   };
 
-  const getAgeGroup = (age) => {
-    if (age < 18) return "Enfant";
-    if (age < 65) return "Adulte";
-    return "Senior";
+  const handleViewPatient = (id) => {
+    setSelectedPatientId(id);
+    setShowModal(false);
   };
+
+  const handleBackToList = () => setSelectedPatientId(null);
 
   return (
     <div className="patients-container">
@@ -151,187 +193,284 @@ const PatientsPage = () => {
         </div>
         <button
           className="mmd-btn mmd-btn-primary"
-          onClick={() => handleOpenModal()}
+          onClick={() => {
+            setSelectedPatientId(null);
+            handleOpenModal();
+          }}
         >
           <i className="bi bi-plus-lg"></i>
           Ajouter un patient
         </button>
       </div>
 
-      <div className="patients-filters">
-        <div className="filter-search">
-          <i className="bi bi-search"></i>
-          <input
-            type="text"
-            placeholder="Rechercher par nom, prénom ou email..."
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="filter-input"
-          />
-        </div>
-
-        <div className="filter-group">
-          <label>Âge</label>
-          <select
-            value={filterAge}
-            onChange={(e) => {
-              setFilterAge(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="mmd-select"
-          >
-            <option value="all">Tous</option>
-            <option value="child">Enfants (&lt; 18 ans)</option>
-            <option value="adult">Adultes (18-64 ans)</option>
-            <option value="elderly">Seniors (≥ 65 ans)</option>
-          </select>
-        </div>
-
-        <div className="filter-group">
-          <label>Genre</label>
-          <select
-            value={filterGender}
-            onChange={(e) => {
-              setFilterGender(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="mmd-select"
-          >
-            <option value="all">Tous</option>
-            <option value="M">Homme</option>
-            <option value="F">Femme</option>
-          </select>
-        </div>
-      </div>
-
-      {loading ? (
-        <div className="patients-loading">
-          <div className="mmd-loading">
-            <i className="bi bi-hourglass-split"></i>
+      {/* Patient detail view */}
+      {selectedPatient ? (
+        <div className="patients-view-card">
+          <div className="patients-view-header">
+            <h3>
+              Dossier patient — {selectedPatient.user?.nom}{" "}
+              {selectedPatient.user?.prenom}
+            </h3>
+            <button
+              className="mmd-btn mmd-btn-secondary mmd-btn-sm"
+              onClick={handleBackToList}
+            >
+              <i className="bi bi-arrow-left"></i> Retour à la liste
+            </button>
           </div>
-          <p>Chargement des patients...</p>
-        </div>
-      ) : paginatedPatients.length === 0 ? (
-        <div className="patients-empty">
-          <i className="bi bi-inbox"></i>
-          <h3>Aucun patient trouvé</h3>
-          <p>Commencez par ajouter un nouveau patient</p>
-        </div>
-      ) : (
-        <div className="mmd-card">
-          <table className="mmd-table">
-            <thead>
-              <tr>
-                <th>Patient</th>
-                <th>Email</th>
-                <th>Téléphone</th>
-                <th>Âge</th>
-                <th>Genre</th>
-                <th>Ville</th>
-                <th className="text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginatedPatients.map((patient) => {
-                const age = calculateAge(patient.date_naissance);
-                return (
-                  <tr key={patient.id}>
-                    <td>
-                      <div className="patient-name">
-                        <div className="patient-avatar">
-                          {patient.user?.nom?.charAt(0)}
-                          {patient.user?.prenom?.charAt(0)}
-                        </div>
-                        <div>
-                          <strong>{patient.user?.nom} {patient.user?.prenom}</strong>
-                          {age !== "-" && (
-                            <span className="patient-subtext">
-                              {getAgeGroup(age)}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <a href={`mailto:${patient.user?.email}`}>
-                        {patient.user?.email}
-                      </a>
-                    </td>
-                    <td>
-                      <a href={`tel:${patient.user?.telephone}`}>
-                        {patient.user?.telephone || "-"}
-                      </a>
-                    </td>
-                    <td>
-                      {age !== "-" && (
-                        <span className="mmd-badge mmd-badge-info">
-                          {age} ans
-                        </span>
-                      )}
-                    </td>
-                    <td>
-                      {patient.user?.genre === "M" ? (
-                        <span>
-                          <i className="bi bi-gender-male me-1"></i>Homme
-                        </span>
-                      ) : (
-                        <span>
-                          <i className="bi bi-gender-female me-1"></i>Femme
-                        </span>
-                      )}
-                    </td>
-                    <td>{patient.ville || "-"}</td>
-                    <td className="text-center">
-                      <div className="action-buttons">
-                        <button
-                          className="mmd-btn mmd-btn-sm"
-                          onClick={() => handleOpenModal(patient)}
-                          title="Modifier"
-                        >
-                          <i className="bi bi-pencil"></i>
-                        </button>
-                        <button
-                          className="mmd-btn mmd-btn-sm mmd-btn-danger"
-                          onClick={() => handleDelete(patient.id)}
-                          title="Supprimer"
-                        >
-                          <i className="bi bi-trash"></i>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
 
-          {totalPages > 1 && (
-            <div className="pagination">
+          <div className="patients-view-body">
+            <div className="patients-detail-grid">
+              <div className="patients-detail-item">
+                <span className="patients-detail-label">Nom</span>
+                <span className="patients-detail-value">
+                  {selectedPatient.user?.nom ?? "—"}
+                </span>
+              </div>
+              <div className="patients-detail-item">
+                <span className="patients-detail-label">Prénom</span>
+                <span className="patients-detail-value">
+                  {selectedPatient.user?.prenom ?? "—"}
+                </span>
+              </div>
+              <div className="patients-detail-item">
+                <span className="patients-detail-label">Email</span>
+                <span className="patients-detail-value">
+                  {selectedPatient.user?.email ?? "—"}
+                </span>
+              </div>
+              <div className="patients-detail-item">
+                <span className="patients-detail-label">Téléphone</span>
+                <span className="patients-detail-value">
+                  {selectedPatient.user?.telephone ?? "—"}
+                </span>
+              </div>
+              <div className="patients-detail-item">
+                <span className="patients-detail-label">Date de naissance</span>
+                <span className="patients-detail-value">
+                  {selectedPatient.date_naissance ?? "—"}
+                </span>
+              </div>
+              <div className="patients-detail-item">
+                <span className="patients-detail-label">Âge</span>
+                <span className="patients-detail-value">
+                  {calculateAge(selectedPatient.date_naissance)} ans
+                </span>
+              </div>
+              <div className="patients-detail-item">
+                <span className="patients-detail-label">Genre</span>
+                <span className="patients-detail-value">
+                  {selectedPatient.sexe === "male" ? "Homme" : "Femme"}
+                </span>
+              </div>
+              <div className="patients-detail-item">
+                <span className="patients-detail-label">Adresse</span>
+                <span className="patients-detail-value">
+                  {selectedPatient.adresse ?? "—"}
+                </span>
+              </div>
+              <div className="patients-detail-item" style={{ gridColumn: "1 / -1" }}>
+                <span className="patients-detail-label">Date d'inscription</span>
+                <span className="patients-detail-value">
+                  {selectedPatient.created_at
+                    ? new Date(selectedPatient.created_at).toLocaleDateString("fr-FR")
+                    : "—"}
+                </span>
+              </div>
+            </div>
+
+            <div className="patients-view-actions">
               <button
-                className="mmd-btn mmd-btn-secondary mmd-btn-sm"
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
+                className="mmd-btn mmd-btn-primary"
+                onClick={() => handleOpenModal(selectedPatient)}
               >
-                <i className="bi bi-chevron-left"></i> Précédent
+                <i className="bi bi-pencil"></i> Modifier
               </button>
-              <span className="pagination-info">
-                Page {currentPage} / {totalPages}
-              </span>
               <button
-                className="mmd-btn mmd-btn-secondary mmd-btn-sm"
-                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage === totalPages}
+                className="mmd-btn mmd-btn-danger"
+                onClick={() => handleDelete(selectedPatient.id)}
               >
-                Suivant <i className="bi bi-chevron-right"></i>
+                <i className="bi bi-trash"></i> Supprimer
               </button>
             </div>
-          )}
+          </div>
         </div>
+      ) : (
+        <>
+          {/* Filters */}
+            <div className="patients-filters">
+              <div className="filter-search">
+                <i className="bi bi-search"></i>
+                <input
+                  type="text"
+                  placeholder="Rechercher par nom, prénom ou email..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="filter-input"
+                />
+              </div>
+
+              <div className="filter-group">
+                <label>Sexe</label>
+                <select
+                  className="mmd-select"
+                  value={sexFilter}
+                  onChange={(e) => {
+                    setSexFilter(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                >
+                  <option value="all">Tous</option>
+                  <option value="male">Homme</option>
+                  <option value="female">Femme</option>
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <label>Âge (ans)</label>
+                <select
+                  className="mmd-select"
+                  value={ageBucket}
+                  onChange={(e) => {
+                    setAgeBucket(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                >
+                  <option value="all">Tous</option>
+                  <option value="-18">-18</option>
+                  <option value="18-35">18-35</option>
+                  <option value="36-55">36-55</option>
+                  <option value="56+">56+</option>
+                </select>
+              </div>
+            </div>
+
+
+          {/* Loading state */}
+          {loading ? (
+            <div className="patients-loading">
+              <div className="mmd-loading">
+                <i className="bi bi-hourglass-split"></i>
+              </div>
+              <p>Chargement des patients...</p>
+            </div>
+          ) : paginatedPatients.length === 0 ? (
+            <div className="patients-empty">
+              <i className="bi bi-inbox"></i>
+              <h3>Aucun patient trouvé</h3>
+              <p>Commencez par ajouter un nouveau patient</p>
+            </div>
+          ) : (
+            <div className="mmd-card" style={{ padding: 0, overflow: "hidden" }}>
+              <table className="mmd-table">
+                <thead>
+                  <tr>
+                    <th>Patient</th>
+                    <th>Téléphone</th>
+                    <th>Âge</th>
+                    <th className="text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginatedPatients.map((patient) => {
+                    const age = calculateAge(patient.date_naissance);
+                    const isMale = patient.sexe === "male";
+                    return (
+                      <tr key={patient.id}>
+                        <td>
+                          <div className="patient-name">
+                            <div className="patient-avatar">
+                              <img
+                                src={isMale ? "/images/male.png" : "/images/female.png"}
+                                alt={isMale ? "Homme" : "Femme"}
+                              />
+                            </div>
+                            <div>
+                              <strong>
+                                {patient.user?.nom} {patient.user?.prenom}
+                              </strong>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          {patient.user?.telephone ? (
+                            <a href={`tel:${patient.user.telephone}`}>
+                              {patient.user.telephone}
+                            </a>
+                          ) : (
+                            "—"
+                          )}
+                        </td>
+                        <td>
+                          {age !== "-" && (
+                            <span className="mmd-badge mmd-badge-info">
+                              {age} ans
+                            </span>
+                          )}
+                        </td>
+                        <td className="text-center">
+                          <div className="action-buttons">
+                            <button
+                              className="mmd-btn mmd-btn-info mmd-btn-sm"
+                              onClick={() => handleViewPatient(patient.id)}
+                              title="Voir"
+                            >
+                              <i className="bi bi-eye"></i>
+                            </button>
+                            <button
+                              className="mmd-btn mmd-btn-sm"
+                              onClick={() => handleOpenModal(patient)}
+                              title="Modifier"
+                            >
+                              <i className="bi bi-pencil"></i>
+                            </button>
+                            <button
+                              className="mmd-btn mmd-btn-sm mmd-btn-danger"
+                              onClick={() => handleDelete(patient.id)}
+                              title="Supprimer"
+                            >
+                              <i className="bi bi-trash"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+
+              {totalPages > 1 && (
+                <div className="pagination">
+                  <button
+                    className="mmd-btn mmd-btn-secondary mmd-btn-sm"
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    <i className="bi bi-chevron-left"></i> Précédent
+                  </button>
+                  <span className="pagination-info">
+                    Page {currentPage} / {totalPages}
+                  </span>
+                  <button
+                    className="mmd-btn mmd-btn-secondary mmd-btn-sm"
+                    onClick={() =>
+                      setCurrentPage(Math.min(totalPages, currentPage + 1))
+                    }
+                    disabled={currentPage === totalPages}
+                  >
+                    Suivant <i className="bi bi-chevron-right"></i>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </>
       )}
 
+      {/* Add/Edit modal */}
       {showModal && (
         <div className="mmd-modal-overlay" onClick={handleCloseModal}>
           <div className="mmd-modal" onClick={(e) => e.stopPropagation()}>
@@ -350,6 +489,16 @@ const PatientsPage = () => {
 
             <form onSubmit={handleSubmit}>
               <div className="mmd-modal-body">
+                {formErrors.length > 0 && (
+                  <div className="mmd-alert mmd-alert-danger">
+                    <ul style={{ margin: 0, paddingLeft: 20 }}>
+                      {formErrors.map((m, idx) => (
+                        <li key={idx}>{m}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                   <div className="mmd-form-group">
                     <label className="mmd-label">Nom</label>
@@ -420,50 +569,26 @@ const PatientsPage = () => {
                     <label className="mmd-label">Genre</label>
                     <select
                       className="mmd-select"
-                      value={formData.genre}
+                      value={formData.sexe}
                       onChange={(e) =>
-                        setFormData({ ...formData, genre: e.target.value })
+                        setFormData({ ...formData, sexe: e.target.value })
                       }
                     >
-                      <option value="M">Homme</option>
-                      <option value="F">Femme</option>
+                      <option value="male">Homme</option>
+                      <option value="female">Femme</option>
                     </select>
                   </div>
                   <div className="mmd-form-group">
-                    <label className="mmd-label">Ville</label>
+                    <label className="mmd-label">Adresse</label>
                     <input
                       type="text"
                       className="mmd-input"
-                      value={formData.ville}
+                      value={formData.adresse}
                       onChange={(e) =>
-                        setFormData({ ...formData, ville: e.target.value })
+                        setFormData({ ...formData, adresse: e.target.value })
                       }
                     />
                   </div>
-                </div>
-
-                <div className="mmd-form-group">
-                  <label className="mmd-label">Adresse</label>
-                  <input
-                    type="text"
-                    className="mmd-input"
-                    value={formData.adresse}
-                    onChange={(e) =>
-                      setFormData({ ...formData, adresse: e.target.value })
-                    }
-                  />
-                </div>
-
-                <div className="mmd-form-group">
-                  <label className="mmd-label">Code Postal</label>
-                  <input
-                    type="text"
-                    className="mmd-input"
-                    value={formData.codepostal}
-                    onChange={(e) =>
-                      setFormData({ ...formData, codepostal: e.target.value })
-                    }
-                  />
                 </div>
               </div>
 
@@ -472,11 +597,20 @@ const PatientsPage = () => {
                   type="button"
                   className="mmd-btn mmd-btn-secondary"
                   onClick={handleCloseModal}
+                  disabled={formSubmitting}
                 >
                   Annuler
                 </button>
-                <button type="submit" className="mmd-btn mmd-btn-primary">
-                  {editingId ? "Modifier" : "Créer"}
+                <button
+                  type="submit"
+                  className="mmd-btn mmd-btn-primary"
+                  disabled={formSubmitting}
+                >
+                  {formSubmitting
+                    ? "Enregistrement..."
+                    : editingId
+                    ? "Modifier"
+                    : "Créer"}
                 </button>
               </div>
             </form>

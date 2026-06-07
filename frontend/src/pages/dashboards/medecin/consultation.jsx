@@ -322,7 +322,7 @@ const MedecinConsultationPage = () => {
                             className="mmd-btn mmd-btn-sm"
                             onClick={() => openView(it.consultationId)}
                           >
-                            <i className="bi bi-eye"></i> Voir
+                            <i className="bi bi-eye"></i>
                           </button>
                           <button
                             type="button"

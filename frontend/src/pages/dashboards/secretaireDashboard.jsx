@@ -2,9 +2,10 @@ import { useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 
+import "./medecinDashboard.css";
 import "./secretaireDashboard.css";
 
-import PatientsPage from "./secretaire/patients..jsx";
+import PatientsPage from "./secretaire/patients.jsx";
 import RdvPage from "./secretaire/rdv.jsx";
 import ConsultationPage from "./secretaire/consultation.jsx";
 import PaiementsPage from "./secretaire/paiements.jsx";

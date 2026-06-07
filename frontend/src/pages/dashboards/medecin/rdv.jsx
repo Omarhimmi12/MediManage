@@ -279,9 +279,12 @@ const RdvPage = () => {
             <div key={rdv.id} className="rdv-card">
               <div className="rdv-card-header">
                 <div className="rdv-patient">
-                  <div className="rdv-avatar">
-                    {rdv.patient?.user?.nom?.charAt(0)}
-                    {rdv.patient?.user?.prenom?.charAt(0)}
+                  <div className="rdv-avatar" aria-label="Genre patient">
+                    {rdv.patient?.sexe === "female" ? (
+                      <img src="/images/female.png" alt="Femme" />
+                    ) : (
+                      <img src="/images/male.png" alt="Homme" />
+                    )}
                   </div>
                   <div>
                     <div className="rdv-patient-name">

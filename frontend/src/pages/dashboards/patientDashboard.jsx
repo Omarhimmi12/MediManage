@@ -2,7 +2,7 @@ import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 import api from "../../api/axios";
-
+import ProfilPage from "./patient/profil";
 import "./patientDashboard.css";
 
 const MAROC_VILLES = [
@@ -51,18 +51,10 @@ const PatientDashboard = () => {
   const navigate = useNavigate();
   const { user, logout } = useContext(AuthContext);
 
-  // keep same UX pattern as medecinDashboard (activeSection sidebar)
   const [activeSection, setActiveSection] = useState("rdv");
-
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-
-  const userDisplayLabel = useMemo(() => {
-    const nom = user?.nom ? String(user.nom) : "";
-    const prenom = user?.prenom ? String(user.prenom) : "";
-    return [nom, prenom].filter(Boolean).join(" ");
-  }, [user?.nom, user?.prenom]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // RDV
   const [rdvList, setRdvList] = useState([]);
@@ -87,14 +79,31 @@ const PatientDashboard = () => {
     dateRdv: "",
     heureDebut: "",
     heureFin: "",
-    motif: "",
+    motif: "Consultation générale",
   });
+
+  const MOTIFS_RDV = [
+    "Consultation générale",
+    "Suivi médical",
+    "Urgence",
+    "Vaccination",
+    "Certificat médical",
+    "Autre",
+  ];
   const [rdvSubmitting, setRdvSubmitting] = useState(false);
 
+  // Consultation detail
   const [consultationViewOpen, setConsultationViewOpen] = useState(false);
   const [consultationView, setConsultationView] = useState(null);
 
   const modalCloseBtnRef = useRef(null);
+
+  const navItems = [
+    { key: "profil", label: "Profil", icon: "bi-person-circle" },
+    { key: "rdv", label: "Mes Rendez-vous", icon: "bi-calendar-check-fill" },
+    { key: "consultations", label: "Consultations", icon: "bi-heart-pulse-fill" },
+    { key: "cabinets", label: "Trouver un cabinet", icon: "bi-building-fill" },
+  ];
 
   const fetchMyRdv = async () => {
     try {
@@ -171,31 +180,24 @@ const PatientDashboard = () => {
       cabinetItem?.adresseComplete || cabinetItem?.adresse
     );
     if (!addr) return null;
-
     const found = MAROC_VILLES.find((v) => {
       const vN = normalize(v);
       return vN && addr.includes(vN);
     });
-
     return found ?? null;
   };
 
   const filteredCabinets = useMemo(() => {
     const q = normalize(cabinetQuery).trim();
     const city = selectedCity;
-
     return cabinets.filter((c) => {
       const haystack = [c.nom, c.specialite, c.medecinNom]
         .filter(Boolean)
         .join(" ");
-
       const haystackN = normalize(haystack);
-
       const matchesQuery = !q ? true : haystackN.includes(q);
-
       const matchesCity =
         city === "Toutes" ? true : detectCabinetCity(c) === city;
-
       return matchesQuery && matchesCity;
     });
   }, [cabinetQuery, cabinets, selectedCity]);
@@ -206,7 +208,7 @@ const PatientDashboard = () => {
       dateRdv: "",
       heureDebut: "",
       heureFin: "",
-      motif: "",
+      motif: MOTIFS_RDV[0],
     });
     setRdvModalOpen(true);
     setRdvSubmitting(false);
@@ -218,27 +220,59 @@ const PatientDashboard = () => {
     setRdvCabinet(null);
   };
 
+  const [messageModal, setMessageModal] = useState({
+    open: false,
+    title: "",
+    body: "",
+    variant: "info", // success | warning | danger | info
+    actionLabel: "OK",
+  });
+
+  const closeMessageModal = () => {
+    setMessageModal((p) => ({ ...p, open: false }));
+  };
+
+  const openMessageModal = ({
+    title,
+    body,
+    variant = "info",
+    actionLabel = "OK",
+  }) => {
+    setMessageModal({
+      open: true,
+      title: title ?? "Message",
+      body: body ?? "",
+      variant,
+      actionLabel,
+    });
+    setRdvSubmitting(false);
+  };
+
   const submitRdv = async () => {
     if (!rdvCabinet) return;
-
     const medecinId = rdvCabinet?.medecin_id;
     const cabinetId = rdvCabinet?.id;
-
     if (!medecinId || !cabinetId) {
-      alert("Impossible de créer le rendez-vous.");
+      openMessageModal({
+        variant: "danger",
+        title: "Erreur",
+        body: "Impossible de créer le rendez-vous.",
+      });
       return;
     }
 
     const { dateRdv, heureDebut, heureFin, motif } = rdvForm;
-
     if (!dateRdv || !heureDebut || !heureFin || !motif) {
-      alert("Veuillez remplir tous les champs.");
+      openMessageModal({
+        variant: "warning",
+        title: "Champs manquants",
+        body: "Veuillez remplir tous les champs.",
+      });
       return;
     }
 
     try {
       setRdvSubmitting(true);
-
       await api.post("/rendez-vous", {
         medecin_id: medecinId,
         cabinet_id: cabinetId,
@@ -247,8 +281,12 @@ const PatientDashboard = () => {
         heure_fin: heureFin,
         motif,
       });
-
-      alert("Rendez-vous créé avec succès ✅");
+      openMessageModal({
+        variant: "success",
+        title: "Succès",
+        body: "Rendez-vous créé avec succès ✅",
+        actionLabel: "Continuer",
+      });
       closeRdvModal();
       fetchMyRdv();
     } catch (err) {
@@ -257,23 +295,30 @@ const PatientDashboard = () => {
         err?.response?.data ||
         err?.message ||
         "Création RDV impossible.";
-      alert(typeof msg === "string" ? msg : JSON.stringify(msg));
+      openMessageModal({
+        variant: "danger",
+        title: "Erreur",
+        body: typeof msg === "string" ? msg : JSON.stringify(msg),
+      });
     } finally {
       setRdvSubmitting(false);
     }
   };
 
+
   const openGoogleMapsDirections = (cabinetItem) => {
     const destLat = cabinetItem?.latitude;
     const destLng = cabinetItem?.longitude;
-
     if (!destLat || !destLng) {
-      alert("Coordonnées du cabinet indisponibles pour le trajet.");
+      openMessageModal({
+        variant: "warning",
+        title: "Coordonnées manquantes",
+        body: "Coordonnées du cabinet indisponibles pour le trajet.",
+      });
       return;
     }
 
     const destination = `${destLat},${destLng}`;
-
     if (!navigator.geolocation) {
       window.open(
         `https://www.google.com/maps/dir/?api=1&destination=${destination}`,
@@ -281,7 +326,6 @@ const PatientDashboard = () => {
       );
       return;
     }
-
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const origin = `${pos.coords.latitude},${pos.coords.longitude}`;
@@ -302,610 +346,563 @@ const PatientDashboard = () => {
     );
   };
 
+  const renderProfilSection = () => <ProfilPage />;
+
   const renderRdvSection = () => {
-    if (loadingRdv) return <div className="p-3">Loading...</div>;
-
+    if (loadingRdv) return <div className="mmd-text-muted mmd-mt-16">Chargement...</div>;
     return (
-      <>
-        <div className="card mt-4">
-          <div className="card-header">Mes Rendez-vous</div>
-          <div className="card-body">
-            {rdvList.length === 0 ? (
-              <p>Aucun rendez-vous.</p>
-            ) : (
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Heure</th>
-                    <th>Statut</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rdvList.map((rdv) => {
-                    const statut = String(rdv?.statut ?? "").toLowerCase();
-                    const isTermine = statut.includes("termin");
-                    const isAnnule = statut.includes("annule");
-                    const canAnnuler = !isTermine && !isAnnule;
-
-                    return (
-                      <tr key={rdv.id}>
-                        <td>{rdv.date_rdv}</td>
-                        <td>{rdv.heure_debut}</td>
-                        <td>
-                          <span className="badge bg-info">{rdv.statut}</span>
-                        </td>
-                        <td>
-                          <button
-                            className="btn btn-danger btn-sm"
-                            onClick={() => {
-                              if (!canAnnuler) return;
-                              cancelRdv(rdv.id);
-                            }}
-                            disabled={!canAnnuler}
-                            style={
-                              !canAnnuler
-                                ? { opacity: 0.6, cursor: "not-allowed" }
-                                : undefined
-                            }
-                          >
-                            Annuler
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            )}
-          </div>
+      <div className="mmd-card mmd-mt-24">
+        <div className="mmd-card-header">
+          <h3 className="mmd-card-title">Mes Rendez-vous</h3>
         </div>
-      </>
-    );
-  };
-
-  const renderConsultationsSection = () => {
-    return (
-      <div className="card mt-4">
-        <div className="card-header">Mes Consultations</div>
-        <div className="card-body">
-          {consultationsError ? (
-            <div className="alert alert-warning">
-              Impossible de charger les consultations:{" "}
-              <b>{consultationsError}</b>
-            </div>
-          ) : null}
-
-          {consultationsLoading ? (
-            <div>Chargement consultations...</div>
-          ) : consultations.length === 0 ? (
-            <div>Aucune consultation.</div>
-          ) : (
-            <div style={{ overflowX: "auto" }}>
-              <table className="table table-sm">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Médecin</th>
-                    <th>Cabinet</th>
-                    <th>Montant</th>
-                    <th>Actions</th>
+        {rdvList.length === 0 ? (
+          <p className="mmd-text-muted">Aucun rendez-vous.</p>
+        ) : (
+          <table className="mmd-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Heure</th>
+                <th>Statut</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rdvList.map((rdv) => {
+                const statut = String(rdv?.statut ?? "").toLowerCase();
+                const isTermine = statut.includes("termin");
+                const isAnnule = statut.includes("annule");
+                const canAnnuler = !isTermine && !isAnnule;
+                return (
+                  <tr key={rdv.id}>
+                    <td>{rdv.date_rdv}</td>
+                    <td>{rdv.heure_debut}</td>
+                    <td>
+                      <span className="mmd-badge mmd-badge-info">{rdv.statut}</span>
+                    </td>
+                    <td>
+                      <button
+                        className="mmd-btn mmd-btn-danger mmd-btn-sm"
+                        onClick={() => {
+                          if (!canAnnuler) return;
+                          cancelRdv(rdv.id);
+                        }}
+                        disabled={!canAnnuler}
+                      >
+                        Annuler
+                      </button>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {consultations.map((cons) => {
-                    const cabinetName = cons?.cabinetNom ?? "—";
-
-                    return (
-                      <tr key={cons.id}>
-                        <td>{cons.date_consultation ?? "—"}</td>
-                        <td>{cons.medecinNom ?? "—"}</td>
-                        <td>{cabinetName}</td>
-                        <td>{cons.montant ?? "—"}</td>
-                        <td>
-                          <button
-                            type="button"
-                            className="btn btn-outline-primary btn-sm"
-                            onClick={() => {
-                              setConsultationView(cons);
-                              setConsultationViewOpen(true);
-                            }}
-                          >
-                            View
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
       </div>
     );
   };
 
-  const renderCabinetsSection = () => {
-    return (
-      <div className="card mt-4">
-        <div className="card-header">Trouver un cabinet</div>
-        <div className="card-body">
-          <div className="mb-3" style={{ fontWeight: 900 }}>
-            Cabinets: {cabinetsLoading ? "..." : cabinets.length} | Résultats
-            filtrés: {cabinetsLoading ? "..." : filteredCabinets.length}
-          </div>
+  const renderConsultationsSection = () => (
+    <div className="mmd-card mmd-mt-24">
+      <div className="mmd-card-header">
+        <h3 className="mmd-card-title">Mes Consultations</h3>
+      </div>
+      {consultationsError ? (
+        <div className="mmd-alert mmd-alert-warning">
+          Impossible de charger les consultations: <b>{consultationsError}</b>
+        </div>
+      ) : null}
+      {consultationsLoading ? (
+        <div className="mmd-text-muted">Chargement consultations...</div>
+      ) : consultations.length === 0 ? (
+        <div className="mmd-text-muted">Aucune consultation.</div>
+      ) : (
+        <div style={{ overflowX: "auto" }}>
+          <table className="mmd-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Médecin</th>
+                <th>Cabinet</th>
+                <th>Montant</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {consultations.map((cons) => (
+                <tr key={cons.id}>
+                  <td>{cons.date_consultation ?? "—"}</td>
+                  <td>{cons.medecinNom ?? "—"}</td>
+                  <td>{cons.cabinetNom ?? "—"}</td>
+                  <td>{cons.montant ?? "—"}</td>
+                  <td>
+                    <button
+                      type="button"
+                      className="mmd-btn mmd-btn-info mmd-btn-sm"
+                      onClick={() => {
+                        setConsultationView(cons);
+                        setConsultationViewOpen(true);
+                      }}
+                    >
+                      <i className="bi bi-eye-fill"></i> Voir
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
 
-          {cabinetsError ? (
-            <div className="alert alert-warning">
-              Impossible de charger les cabinets: <b>{cabinetsError}</b>
-            </div>
-          ) : null}
-
-          <div className="row g-3 align-items-end">
-            <div className="col-12 col-md-6">
-              <label className="form-label">Recherche</label>
-              <input
-                className="form-control"
-                value={cabinetQuery}
-                onChange={(e) => setCabinetQuery(e.target.value)}
-                placeholder="Nom cabinet / Spécialité / Médecin"
-              />
-            </div>
-
-            <div className="col-12 col-md-4">
-              <label className="form-label">Ville (Maroc)</label>
-              <select
-                className="form-select"
-                value={selectedCity}
-                onChange={(e) => setSelectedCity(e.target.value)}
-              >
-                <option value="Toutes">Toutes</option>
-                {MAROC_VILLES.map((v) => (
-                  <option key={v} value={v}>
-                    {v}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="col-12 col-md-2 d-grid gap-2">
-              <button
-                type="button"
-                className="btn btn-outline-secondary"
-                onClick={() => {
-                  setCabinetQuery("");
-                  setSelectedCity("Toutes");
-                }}
-              >
-                Reset
-              </button>
-            </div>
-          </div>
-
-          <div className="mt-3">
-            {cabinetsLoading ? (
-              <div>Chargement cabinets...</div>
-            ) : filteredCabinets.length === 0 ? (
-              <div>Aucun cabinet trouvé.</div>
-            ) : (
-              <div className="row g-3">
-                {filteredCabinets.map((c) => {
-                  const city = detectCabinetCity(c);
-                  return (
-                    <div key={c.id} className="col-12 col-md-6 col-lg-4">
-                      <div className="border rounded p-3 h-100">
-                        <div className="fw-bold" style={{ fontSize: 16 }}>
-                          {c.nom}
-                        </div>
-                        <div
-                          className="text-muted"
-                          style={{ fontSize: 13, marginTop: 2 }}
-                        >
-                          Dr: {c.medecinNom ?? "—"}
-                        </div>
-                        <div style={{ marginTop: 6, fontSize: 14 }}>
-                          Spécialité: {c.specialite}
-                        </div>
-                        <div style={{ marginTop: 6, fontSize: 13 }}>
-                          {c.adresse}
-                        </div>
-                        {city ? (
-                          <div
-                            style={{
-                              marginTop: 6,
-                              fontSize: 12,
-                              fontWeight: 700,
-                            }}
-                          >
-                            Ville: {city}
-                          </div>
-                        ) : null}
-
-                        <div
-                          style={{
-                            marginTop: 10,
-                            display: "flex",
-                            gap: 10,
-                            flexWrap: "wrap",
-                          }}
-                        >
-                          <button
-                            className="btn btn-success btn-sm"
-                            onClick={() => openRdvModal(c)}
-                          >
-                            Prendre un RDV
-                          </button>
-                          <button
-                            className="btn btn-primary btn-sm"
-                            onClick={() => openGoogleMapsDirections(c)}
-                          >
-                            Y aller
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+  const renderCabinetsSection = () => (
+    <div className="mmd-card mmd-mt-24">
+      <div className="mmd-card-header">
+        <h3 className="mmd-card-title">Trouver un cabinet</h3>
+      </div>
+      <div className="mmd-mb-16" style={{ fontWeight: 700 }}>
+        Cabinets: {cabinetsLoading ? "..." : cabinets.length} | Résultats filtrés:{" "}
+        {cabinetsLoading ? "..." : filteredCabinets.length}
+      </div>
+      {cabinetsError ? (
+        <div className="mmd-alert mmd-alert-warning">
+          Impossible de charger les cabinets: <b>{cabinetsError}</b>
+        </div>
+      ) : null}
+      <div className="mmd-grid mmd-grid-3 mmd-mb-16">
+        <div>
+          <label className="mmd-label">Recherche</label>
+          <input
+            className="mmd-input"
+            value={cabinetQuery}
+            onChange={(e) => setCabinetQuery(e.target.value)}
+            placeholder="Nom cabinet / Spécialité / Médecin"
+          />
+        </div>
+        <div>
+          <label className="mmd-label">Ville (Maroc)</label>
+          <select
+            className="mmd-select"
+            value={selectedCity}
+            onChange={(e) => setSelectedCity(e.target.value)}
+          >
+            <option value="Toutes">Toutes</option>
+            {MAROC_VILLES.map((v) => (
+              <option key={v} value={v}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div style={{ display: "flex", alignItems: "flex-end" }}>
+          <button
+            type="button"
+            className="mmd-btn mmd-btn-secondary"
+            onClick={() => {
+              setCabinetQuery("");
+              setSelectedCity("Toutes");
+            }}
+          >
+            Réinitialiser
+          </button>
+        </div>
+      </div>
+      {cabinetsLoading ? (
+        <div className="mmd-text-muted">Chargement cabinets...</div>
+      ) : filteredCabinets.length === 0 ? (
+        <div className="mmd-text-muted">Aucun cabinet trouvé.</div>
+      ) : (
+        <div className="mmd-grid mmd-grid-3" style={{ gap: 16 }}>
+          {filteredCabinets.map((c) => {
+            const city = detectCabinetCity(c);
+            return (
+              <div key={c.id} className="mmd-card" style={{ padding: 16 }}>
+                <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 4 }}>
+                  {c.nom}
+                </div>
+                <div className="mmd-text-muted" style={{ fontSize: 13, marginBottom: 4 }}>
+                  Dr: {c.medecinNom ?? "—"}
+                </div>
+                <div style={{ fontSize: 14, marginBottom: 4 }}>
+                  Spécialité: {c.specialite}
+                </div>
+                <div style={{ fontSize: 13, marginBottom: 4 }}>{c.adresse}</div>
+                {city ? (
+                  <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 8 }}>
+                    Ville: {city}
+                  </div>
+                ) : null}
+                <div className="mmd-flex mmd-gap-12">
+                  <button
+                    className="mmd-btn mmd-btn-primary mmd-btn-sm"
+                    onClick={() => openRdvModal(c)}
+                  >
+                    Prendre un RDV
+                  </button>
+                  <button
+                    className="mmd-btn mmd-btn-info mmd-btn-sm"
+                    onClick={() => openGoogleMapsDirections(c)}
+                  >
+                    Y aller
+                  </button>
+                </div>
               </div>
-            )}
-          </div>
+            );
+          })}
         </div>
-      </div>
-    );
-  };
+      )}
+    </div>
+  );
+
+  const userInitials = `${user?.nom?.charAt(0) || ""}${user?.prenom?.charAt(0) || ""}`.toUpperCase();
 
   return (
-    <div className="d-flex mmd-patient-dashboard">
-      <div
-        className={`mmd-sidebar ${isSidebarCollapsed ? "mmd-sidebar--collapsed" : ""}`}
-      >
-        <div className="mmd-brand">
-          <img className="mmd-brand__img" src="/images/brand.png" alt="MediManage" />
-          <span className="mmd-brand__text">MediManage</span>
+    <div className="mmd-dashboard-wrapper">
+      {/* SIDEBAR */}
+      <aside className={`mmd-sidebar ${isSidebarCollapsed ? "mmd-sidebar--collapsed" : ""}`}>
+        <div className="mmd-sidebar-header">
+          <div className="mmd-logo">
+            <div className="mmd-logo-icon">
+              <img src="/images/brand.png" alt="MediManage" style={{ width: 28, height: 28, objectFit: "contain" }} />
+            </div>
+            {!isSidebarCollapsed && <span className="mmd-logo-text">MediManage</span>}
+          </div>
         </div>
 
-        {[
-          ["rdv", "Mes Rendez-vous", "bi-calendar-check"],
-          ["consultations", "Mes Consultations", "bi-heart-pulse"],
-          ["cabinets", "Trouver un cabinet", "bi-building"],
-        ].map(([key, label, icon]) => {
-          const isActive = activeSection === key;
-          return (
+        <nav className="mmd-sidebar-nav">
+          {navItems.map(({ key, label, icon }) => (
             <button
               key={key}
-              className={`mmd-navbtn btn ${isActive ? "mmd-navbtn--active" : ""}`}
+              className={`mmd-nav-item ${activeSection === key ? "mmd-nav-item--active" : ""}`}
               onClick={() => setActiveSection(key)}
-              type="button"
+              title={label}
             >
-              <span className="mmd-navbtn__icon" aria-hidden="true">
-                <i className={`bi ${icon}`} />
+              <span className="mmd-nav-icon">
+                <i className={`bi ${icon}`}></i>
               </span>
-              <span className="mmd-navbtn__label">{label}</span>
+              {!isSidebarCollapsed && <span className="mmd-nav-label">{label}</span>}
             </button>
-          );
-        })}
+          ))}
+        </nav>
 
+        <div className="mmd-sidebar-footer">
+          <button
+            className="mmd-logout-btn"
+            onClick={async () => {
+              await logout();
+              navigate("/login");
+            }}
+            title="Déconnexion"
+          >
+            <span className="mmd-nav-icon">
+              <i className="bi bi-box-arrow-right"></i>
+            </span>
+            {!isSidebarCollapsed && <span className="mmd-nav-label">Déconnexion</span>}
+          </button>
+        </div>
+      </aside>
 
-        <button
-          className="btn btn-outline-light w-100 mt-4 mmd-sidebar__logout"
-          onClick={async () => {
-            await logout();
-            navigate("/login");
-          }}
-          type="button"
-        >
-          <span className="mmd-navbtn__icon" aria-hidden="true">
-            <i className="bi bi-box-arrow-right" />
-          </span>
-          <span className="mmd-navbtn__label">Déconnexion</span>
-        </button>
-      </div>
-
+      {/* SIDEBAR TOGGLE */}
       <button
         type="button"
         className="mmd-sidebar-toggle"
         aria-label="Toggle sidebar"
         onClick={() => setIsSidebarCollapsed((v) => !v)}
       >
-        {isSidebarCollapsed ? "»" : "«"}
+        <i className={`bi ${isSidebarCollapsed ? "bi-chevron-double-right" : "bi-chevron-double-left"}`}></i>
       </button>
 
-        <div className="mmd-content">
-        <div className="mmd-topbar mmd-topbar--fixed">
-          <div className="mmd-topbar__spacer" />
+      {/* MAIN CONTENT */}
+      <div className="mmd-main-container">
+        {/* TOPBAR */}
+        <header className="mmd-topbar">
+          <div className="mmd-topbar-left">
+            <div className="mmd-search-box">
+              <i className="bi bi-search"></i>
+              <input
+                type="text"
+                placeholder="Rechercher..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="mmd-search-input"
+              />
+            </div>
+          </div>
 
-          <div className="mmd-profile">
-            <button
-              type="button"
-              className="mmd-profile__button"
-              onClick={() => setIsProfileOpen((v) => !v)}
-            >
-              <span className="mmd-profile__label">{userDisplayLabel}</span>
-              <span className="mmd-profile__chevron" aria-hidden="true">
-                ▼
-              </span>
+          <div className="mmd-topbar-right">
+            <button className="mmd-topbar-icon-btn" aria-label="Notifications">
+              <i className="bi bi-bell"></i>
+              <span className="mmd-notification-badge">2</span>
             </button>
 
-            {isProfileOpen ? (
-              <div className="mmd-profile__menu" role="menu">
-                <button
-                  type="button"
-                  className="mmd-profile__item"
-                  onClick={() => {
-                    setActiveSection("rdv");
-                    setIsProfileOpen(false);
-                  }}
-                >
-                  <span className="mmd-profile__itemIcon" aria-hidden="true">
-                    <i className="bi bi-calendar-check" />
-                  </span>
-                  <span className="mmd-profile__itemLabel">Mes Rendez-vous</span>
-                </button>
+            <div className="mmd-profile-dropdown">
+              <button
+                className="mmd-profile-btn"
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+              >
+                <div className="mmd-user-avatar">{userInitials}</div>
+                <div className="mmd-user-info">
+                  <span className="mmd-user-name">{user?.nom} {user?.prenom}</span>
+                  <span className="mmd-user-role">Patient</span>
+                </div>
+                <i className="bi bi-chevron-down" style={{ color: "var(--text-secondary)" }}></i>
+              </button>
 
-                <button
-                  type="button"
-                  className="mmd-profile__item"
-                  onClick={() => {
-                    setActiveSection("consultations");
-                    setIsProfileOpen(false);
-                  }}
-                >
-                  <span className="mmd-profile__itemIcon" aria-hidden="true">
-                    <i className="bi bi-heart-pulse" />
-                  </span>
-                  <span className="mmd-profile__itemLabel">
-                    Mes Consultations
-                  </span>
-                </button>
+              {isProfileOpen && (
+                <div className="mmd-profile-menu">
+                  <button
+                    className="mmd-profile-menu-item"
+                    onClick={() => {
+                      setActiveSection("profil");
+                      setIsProfileOpen(false);
+                    }}
+                  >
+                    <i className="bi bi-person-circle"></i>
+                    <span>Mon Profil</span>
+                  </button>
+                  <button
+                    className="mmd-profile-menu-item"
+                    onClick={() => {
+                      setActiveSection("rdv");
+                      setIsProfileOpen(false);
+                    }}
+                  >
+                    <i className="bi bi-calendar-check-fill"></i>
+                    <span>Mes Rendez-vous</span>
+                  </button>
+                  <button
+                    className="mmd-profile-menu-item"
+                    onClick={() => {
+                      setActiveSection("consultations");
+                      setIsProfileOpen(false);
+                    }}
+                  >
+                    <i className="bi bi-heart-pulse-fill"></i>
+                    <span>Consultations</span>
+                  </button>
+                  <button
+                    className="mmd-profile-menu-item"
+                    onClick={() => {
+                      setActiveSection("cabinets");
+                      setIsProfileOpen(false);
+                    }}
+                  >
+                    <i className="bi bi-building-fill"></i>
+                    <span>Cabinets</span>
+                  </button>
+                  <div className="mmd-profile-menu-divider"></div>
+                  <button
+                    className="mmd-profile-menu-item mmd-profile-menu-item--danger"
+                    onClick={async () => {
+                      await logout();
+                      navigate("/login");
+                    }}
+                  >
+                    <i className="bi bi-box-arrow-right"></i>
+                    <span>Déconnexion</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </header>
 
-                <button
-                  type="button"
-                  className="mmd-profile__item"
-                  onClick={() => {
-                    setActiveSection("cabinets");
-                    setIsProfileOpen(false);
-                  }}
-                >
-                  <span className="mmd-profile__itemIcon" aria-hidden="true">
-                    <i className="bi bi-building" />
-                  </span>
-                  <span className="mmd-profile__itemLabel">Cabinets</span>
-                </button>
+        <main className="mmd-content-wrapper">
+          {activeSection === "profil" && renderProfilSection()}
+          {activeSection === "rdv" && renderRdvSection()}
+          {activeSection === "consultations" && renderConsultationsSection()}
+          {activeSection === "cabinets" && renderCabinetsSection()}
+        </main>
+      </div>
 
-                <div className="mmd-profile__divider" />
-
-                <button
-                  type="button"
-                  className="mmd-profile__item mmd-profile__item--logout"
-                  onClick={async () => {
-                    await logout();
-                    setIsProfileOpen(false);
-                    navigate("/login");
-                  }}
-                >
-                  Déconnexion
-                </button>
+      {/* Consultation View Modal */}
+      {consultationViewOpen && (
+        <div className="mmd-modal-overlay">
+          <div className="mmd-modal" style={{ maxWidth: 720 }}>
+            <div className="mmd-modal-header">
+              <h5 className="mmd-modal-title">Détails Consultation</h5>
+              <button
+                className="mmd-modal-close"
+                onClick={() => {
+                  setConsultationViewOpen(false);
+                  setConsultationView(null);
+                }}
+              >
+                &times;
+              </button>
+            </div>
+            <div className="mmd-modal-body">
+              <div style={{ fontWeight: 700, marginBottom: 12 }}>
+                {consultationView?.date_consultation ?? "—"}
               </div>
-            ) : null}
+              <div className="mmd-mb-16">
+                <b>Médecin:</b> {consultationView?.medecinNom ?? "—"}
+              </div>
+              <div className="mmd-mb-16">
+                <b>Cabinet:</b> {consultationView?.cabinetNom ?? "—"}
+              </div>
+              <div className="mmd-mb-16">
+                <b>Montant:</b> {consultationView?.montant ?? "—"}
+              </div>
+              <div className="mmd-mb-16">
+                <b>Mode paiement:</b> {consultationView?.mode_paiement ?? "—"}
+              </div>
+              <div className="d-flex align-items-center gap-4">
+                <b>Ordonnance:</b>
+                <p style={{ whiteSpace: "pre-wrap", marginTop: 4 }}>
+                  {consultationView?.ordonnance ?? "—"}
+                </p>
+              </div>
+            </div>
+            <div className="mmd-modal-footer">
+              <button
+                className="mmd-btn mmd-btn-secondary"
+                onClick={() => {
+                  setConsultationViewOpen(false);
+                  setConsultationView(null);
+                }}
+              >
+                Fermer
+              </button>
+            </div>
           </div>
         </div>
+      )}
 
-        <div className="mmd-topbar--placeholder" />
-
-        {/* Main content */}
-        {activeSection === "rdv" ? renderRdvSection() : null}
-        {activeSection === "consultations"
-          ? renderConsultationsSection()
-          : null}
-        {activeSection === "cabinets" ? renderCabinetsSection() : null}
-
-        {/* Consultation View Modal */}
-        {consultationViewOpen ? (
-          <div
-            className="modal show"
-            style={{
-              display: "block",
-              background: "rgba(0,0,0,0.45)",
-              position: "fixed",
-              inset: 0,
-              zIndex: 2000,
-              overflowY: "auto",
-              padding: 16,
-            }}
-            role="dialog"
-            aria-modal="true"
-          >
-            <div
-              className="modal-dialog"
-              style={{ maxWidth: 720, margin: "60px auto" }}
-            >
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h5 className="modal-title">Détails Consultation</h5>
-                  <button
-                    type="button"
-                    className="btn-close"
-                    aria-label="Close"
-                    onClick={() => {
-                      setConsultationViewOpen(false);
-                      setConsultationView(null);
-                    }}
-                  />
-                </div>
-
-                <div className="modal-body">
-                  <div style={{ fontWeight: 900, marginBottom: 8 }}>
-                    {consultationView?.date_consultation ?? "—"}
-                  </div>
-
-                  <div className="mb-2">
-                    <b>Médecin:</b> {consultationView?.medecinNom ?? "—"}
-                  </div>
-                  <div className="mb-2">
-                    <b>Cabinet:</b> {consultationView?.cabinetNom ?? "—"}
-                  </div>
-
-                  <div className="mb-2">
-                    <b>Montant:</b> {consultationView?.montant ?? "—"}
-                  </div>
-                  <div className="mb-2">
-                    <b>Mode paiement:</b>{" "}
-                    {consultationView?.mode_paiement ?? "—"}
-                  </div>
-
-                  <div className="mb-0">
-                    <b>Ordonnance:</b>{" "}
-                    <div style={{ whiteSpace: "pre-wrap" }}>
-                      {consultationView?.ordonnance ?? "—"}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-outline-secondary"
-                    onClick={() => {
-                      setConsultationViewOpen(false);
-                      setConsultationView(null);
-                    }}
-                  >
-                    Fermer
-                  </button>
-                </div>
+      {/* RDV modal */}
+      {messageModal.open && (
+        <div className="mmd-modal-overlay">
+          <div className="mmd-modal" style={{ maxWidth: 520 }}>
+            <div className="mmd-modal-header">
+              <h5 className="mmd-modal-title">{messageModal.title}</h5>
+              <button className="mmd-modal-close" onClick={closeMessageModal}>
+                &times;
+              </button>
+            </div>
+            <div className="mmd-modal-body">
+              <div
+                className={`mmd-alert ${
+                  messageModal.variant === "success"
+                    ? "mmd-alert-success"
+                    : messageModal.variant === "warning"
+                    ? "mmd-alert-warning"
+                    : messageModal.variant === "danger"
+                    ? "mmd-alert-danger"
+                    : "mmd-alert-info"
+                }`}
+                style={{ marginBottom: 0 }}
+              >
+                {messageModal.body}
               </div>
             </div>
+            <div className="mmd-modal-footer">
+              <button className="mmd-btn mmd-btn-primary" onClick={closeMessageModal}>
+                {messageModal.actionLabel}
+              </button>
+            </div>
           </div>
-        ) : null}
+        </div>
+      )}
 
-        {/* RDV modal */}
-        {rdvModalOpen ? (
-          <div
-            className="modal show"
-            style={{
-              display: "block",
-              background: "rgba(0,0,0,0.45)",
-              position: "fixed",
-              inset: 0,
-              zIndex: 1050,
-              overflowY: "auto",
-              padding: 16,
-            }}
-            role="dialog"
-            aria-modal="true"
-          >
-            <div
-              className="modal-dialog"
-              style={{ maxWidth: 560, margin: "80px auto" }}
-            >
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h5 className="modal-title">Prendre un RDV</h5>
-                  <button
-                    ref={modalCloseBtnRef}
-                    type="button"
-                    className="btn-close"
-                    aria-label="Close"
-                    onClick={closeRdvModal}
+      {rdvModalOpen && (
+        <div className="mmd-modal-overlay">
+          <div className="mmd-modal" style={{ maxWidth: 560 }}>
+
+            <div className="mmd-modal-header">
+              <h5 className="mmd-modal-title">Prendre un RDV</h5>
+              <button
+                ref={modalCloseBtnRef}
+                className="mmd-modal-close"
+                onClick={closeRdvModal}
+                disabled={rdvSubmitting}
+              >
+                &times;
+              </button>
+            </div>
+            <div className="mmd-modal-body">
+              <div style={{ fontWeight: 700, marginBottom: 12 }}>
+                {rdvCabinet?.nom}{" "}
+                <span className="mmd-text-muted">
+                  - Dr {rdvCabinet?.medecinNom ?? "—"}
+                </span>
+              </div>
+              <div className="mmd-form-group">
+                <label className="mmd-label">Date</label>
+                <input
+                  type="date"
+                  className="mmd-input"
+                  value={rdvForm.dateRdv}
+                  onChange={(e) =>
+                    setRdvForm((p) => ({ ...p, dateRdv: e.target.value }))
+                  }
+                  min={new Date().toISOString().slice(0, 10)}
+                  disabled={rdvSubmitting}
+                />
+              </div>
+              <div className="mmd-grid mmd-grid-2" style={{ gap: 16 }}>
+                <div className="mmd-form-group">
+                  <label className="mmd-label">Heure début</label>
+                  <input
+                    type="time"
+                    className="mmd-input"
+                    value={rdvForm.heureDebut}
+                    onChange={(e) =>
+                      setRdvForm((p) => ({ ...p, heureDebut: e.target.value }))
+                    }
                     disabled={rdvSubmitting}
                   />
                 </div>
-
-                <div className="modal-body">
-                  <div style={{ fontWeight: 800, marginBottom: 10 }}>
-                    {rdvCabinet?.nom}{" "}
-                    <span className="text-muted" style={{ fontWeight: 600 }}>
-                      - Dr {rdvCabinet?.medecinNom ?? "—"}
-                    </span>
-                  </div>
-
-                  <div className="mb-3">
-                    <label className="form-label">Date</label>
-                    <input
-                      type="date"
-                      className="form-control"
-                      value={rdvForm.dateRdv}
-                      onChange={(e) =>
-                        setRdvForm((p) => ({ ...p, dateRdv: e.target.value }))
-                      }
-                      min={new Date().toISOString().slice(0, 10)}
-                      disabled={rdvSubmitting}
-                    />
-                  </div>
-
-                  <div className="row g-3">
-                    <div className="col-12 col-md-6">
-                      <label className="form-label">Heure début</label>
-                      <input
-                        type="time"
-                        className="form-control"
-                        value={rdvForm.heureDebut}
-                        onChange={(e) =>
-                          setRdvForm((p) => ({
-                            ...p,
-                            heureDebut: e.target.value,
-                          }))
-                        }
-                        disabled={rdvSubmitting}
-                      />
-                    </div>
-                    <div className="col-12 col-md-6">
-                      <label className="form-label">Heure fin</label>
-                      <input
-                        type="time"
-                        className="form-control"
-                        value={rdvForm.heureFin}
-                        onChange={(e) =>
-                          setRdvForm((p) => ({
-                            ...p,
-                            heureFin: e.target.value,
-                          }))
-                        }
-                        disabled={rdvSubmitting}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="mt-3">
-                    <label className="form-label">Motif</label>
-                    <textarea
-                      className="form-control"
-                      rows={3}
-                      value={rdvForm.motif}
-                      onChange={(e) =>
-                        setRdvForm((p) => ({ ...p, motif: e.target.value }))
-                      }
-                      placeholder="Ex: Consultation générale"
-                      disabled={rdvSubmitting}
-                    />
-                  </div>
-                </div>
-
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-outline-secondary"
-                    onClick={closeRdvModal}
+                <div className="mmd-form-group">
+                  <label className="mmd-label">Heure fin</label>
+                  <input
+                    type="time"
+                    className="mmd-input"
+                    value={rdvForm.heureFin}
+                    onChange={(e) =>
+                      setRdvForm((p) => ({ ...p, heureFin: e.target.value }))
+                    }
                     disabled={rdvSubmitting}
-                  >
-                    Annuler
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-success"
-                    onClick={submitRdv}
-                    disabled={rdvSubmitting}
-                  >
-                    {rdvSubmitting ? "Envoi..." : "Confirmer"}
-                  </button>
+                  />
                 </div>
               </div>
+              <div className="mmd-form-group">
+                <label className="mmd-label">Motif</label>
+                <select
+                  className="mmd-select"
+                  value={rdvForm.motif}
+                  onChange={(e) =>
+                    setRdvForm((p) => ({ ...p, motif: e.target.value }))
+                  }
+                  disabled={rdvSubmitting}
+                >
+                  {MOTIFS_RDV.map((m) => (
+                    <option key={m} value={m}>
+                      {m}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="mmd-modal-footer">
+              <button
+                className="mmd-btn mmd-btn-secondary"
+                onClick={closeRdvModal}
+                disabled={rdvSubmitting}
+              >
+                Annuler
+              </button>
+              <button
+                className="mmd-btn mmd-btn-primary"
+                onClick={submitRdv}
+                disabled={rdvSubmitting}
+              >
+                {rdvSubmitting ? "Envoi..." : "Confirmer"}
+              </button>
             </div>
           </div>
-        ) : null}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

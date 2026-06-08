@@ -1,0 +1,200 @@
+.paiements-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.paiements-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+
+.paiements-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
+}
+
+.paiements-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.paiements-table-card {
+  background: var(--bg-primary);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.paiements-table-card .mmd-table {
+  margin: 0;
+}
+
+.paiements-table-card .mmd-table thead {
+  background: var(--bg-tertiary);
+}
+
+.paiements-empty {
+  padding: 80px 40px;
+  text-align: center;
+}
+
+.paiements-empty i {
+  font-size: 64px;
+  color: var(--text-tertiary);
+  margin-bottom: 16px;
+  display: block;
+}
+
+.paiements-empty h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+}
+
+.paiements-empty p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.paiements-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 40px;
+  color: var(--text-secondary);
+}
+
+.paiements-loading > div:first-child {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.paiements-alert {
+  padding: 16px 20px;
+  border-radius: 10px;
+  border-left: 4px solid;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.paiements-alert--error {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+  color: #7c2d12;
+}
+
+.paiements-alert--success {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: #10b981;
+  color: #065f46;
+}
+
+.paiements-filters {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.paiements-search {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  transition: var(--transition);
+}
+
+.paiements-search:focus-within {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+}
+
+.paiements-search i {
+  color: var(--text-tertiary);
+  font-size: 16px;
+}
+
+.paiements-search input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  color: var(--text-primary);
+  outline: none;
+}
+
+.paiements-search input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.paiements-filters select {
+  flex: 1;
+}
+
+.paiements-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.paiements-pagination-info {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  min-width: 120px;
+  text-align: center;
+}
+
+.paiements-table-card .mmd-table td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+@media (max-width: 768px) {
+  .paiements-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .paiements-title {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .paiements-title {
+    font-size: 18px;
+  }
+
+  .paiements-table-card {
+    overflow-x: auto;
+  }
+
+  .paiements-table-card .mmd-table {
+    min-width: 600px;
+  }
+}

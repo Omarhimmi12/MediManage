@@ -285,6 +285,10 @@
   margin-bottom: 24px;
   justify-content: center;
 }
+.mmd-brand__img{
+  height: 35px;
+  width: 35px;
+}
 
 .mmd-patient-dashboard .mmd-sidebar--collapsed .mmd-brand__text {
   display: none;

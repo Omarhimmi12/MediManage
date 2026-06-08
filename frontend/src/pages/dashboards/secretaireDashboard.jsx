@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 
 import "./medecinDashboard.css";
-import "./secretaireDashboard.css";
 
 import PatientsPage from "./secretaire/patients.jsx";
 import RdvPage from "./secretaire/rdv.jsx";
@@ -15,29 +14,30 @@ const SecretaireDashboard = () => {
   const location = useLocation();
   const { user, logout } = useContext(AuthContext);
 
-  const [activeSection, setActiveSection] = useState("rdv");
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-
-  const userDisplayName = useMemo(() => {
-    const nom = user?.nom ? String(user.nom) : "";
-    const prenom = user?.prenom ? String(user.prenom) : "";
-    return [nom, prenom].filter(Boolean).join(" ");
-  }, [user?.nom, user?.prenom]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const initialSection = useMemo(() => {
     const section = location?.state?.section;
     const allowed = new Set(["patients", "rdv", "consultation", "paiements"]);
-    return typeof section === "string" && allowed.has(section) ? section : "rdv";
+    return typeof section === "string" && allowed.has(section)
+      ? section
+      : "rdv";
   }, [location?.state?.section]);
+
+  const [activeSection, setActiveSection] = useState(initialSection);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     setActiveSection(initialSection);
   }, [initialSection]);
 
-  useEffect(() => {
-    // Keep for potential future role/state sync.
-  }, []);
+  const navItems = [
+    { key: "rdv", label: "Rendez-vous", icon: "bi-calendar-check-fill" },
+    { key: "patients", label: "Patients", icon: "bi-people-fill" },
+    { key: "consultation", label: "Consultations", icon: "bi-file-medical-fill" },
+    { key: "paiements", label: "Paiements", icon: "bi-credit-card-fill" },
+  ];
 
   const renderContent = () => {
     switch (activeSection) {
@@ -54,52 +54,52 @@ const SecretaireDashboard = () => {
     }
   };
 
+  const userInitials = `${user?.nom?.charAt(0) || ""}${user?.prenom?.charAt(0) || ""}`.toUpperCase();
+
   return (
-    <div className="d-flex mmd-secretaire-dashboard">
-      <div
-        className={`mmd-sidebar ${isSidebarCollapsed ? "mmd-sidebar--collapsed" : ""}`}
-      >
-        <div className="mmd-brand">
-          <img className="mmd-brand__img" src="/images/brand.png" alt="MediManage" />
-          <span className="mmd-brand__text">MediManage</span>
+    <div className="mmd-dashboard-wrapper">
+      <aside className={`mmd-sidebar ${isSidebarCollapsed ? "mmd-sidebar--collapsed" : ""}`}>
+        <div className="mmd-sidebar-header">
+          <div className="mmd-logo">
+            <div className="mmd-logo-icon">
+              <img src="/images/brand.png" alt="MediManage" style={{ width: 28, height: 28, objectFit: "contain" }} />
+            </div>
+            {!isSidebarCollapsed && <span className="mmd-logo-text">MediManage</span>}
+          </div>
         </div>
 
-        {[
-          ["patients", "Patients", "bi-people"],
-          ["rdv", "Rendez-Vous", "bi-calendar-check"],
-          ["consultation", "Consultation", "bi-heart-pulse"],
-          ["paiements", "Paiements", "bi-credit-card-2-front"],
-        ].map(([key, label, icon]) => {
-          const isActive = activeSection === key;
-          return (
+        <nav className="mmd-sidebar-nav">
+          {navItems.map(({ key, label, icon }) => (
             <button
               key={key}
-              className={`mmd-navbtn btn ${isActive ? "mmd-navbtn--active" : ""}`}
+              className={`mmd-nav-item ${activeSection === key ? "mmd-nav-item--active" : ""}`}
               onClick={() => setActiveSection(key)}
-              type="button"
+              title={label}
             >
-              <span className="mmd-navbtn__icon" aria-hidden="true">
-                <i className={`bi ${icon}`} />
+              <span className="mmd-nav-icon">
+                <i className={`bi ${icon}`}></i>
               </span>
-              <span className="mmd-navbtn__label">{label}</span>
+              {!isSidebarCollapsed && <span className="mmd-nav-label">{label}</span>}
             </button>
-          );
-        })}
+          ))}
+        </nav>
 
-        <button
-          className="btn btn-outline-light w-100 mt-4 mmd-sidebar__logout"
-          onClick={async () => {
-            await logout();
-            navigate("/login");
-          }}
-          type="button"
-        >
-          <span className="mmd-navbtn__icon" aria-hidden="true">
-            <i className="bi bi-box-arrow-right" />
-          </span>
-          <span className="mmd-navbtn__label">Déconnexion</span>
-        </button>
-      </div>
+        <div className="mmd-sidebar-footer">
+          <button
+            className="mmd-logout-btn"
+            onClick={async () => {
+              await logout();
+              navigate("/login");
+            }}
+            title="Déconnexion"
+          >
+            <span className="mmd-nav-icon">
+              <i className="bi bi-box-arrow-right"></i>
+            </span>
+            {!isSidebarCollapsed && <span className="mmd-nav-label">Déconnexion</span>}
+          </button>
+        </div>
+      </aside>
 
       <button
         type="button"
@@ -107,105 +107,103 @@ const SecretaireDashboard = () => {
         aria-label="Toggle sidebar"
         onClick={() => setIsSidebarCollapsed((v) => !v)}
       >
-        {isSidebarCollapsed ? "»" : "«"}
+        <i className={`bi ${isSidebarCollapsed ? "bi-chevron-double-right" : "bi-chevron-double-left"}`}></i>
       </button>
 
-      <div className="mmd-content">
-        <div className="mmd-topbar mmd-topbar--fixed">
-          <div className="mmd-topbar__spacer" />
+      <div className="mmd-main-container">
+        <header className="mmd-topbar">
+          <div className="mmd-topbar-left">
+            <div className="mmd-search-box">
+              <i className="bi bi-search"></i>
+              <input
+                type="text"
+                placeholder="Rechercher..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="mmd-search-input"
+              />
+            </div>
+          </div>
 
-          <div className="mmd-profile">
-            <button
-              type="button"
-              className="mmd-profile__button"
-              onClick={() => setIsProfileOpen((v) => !v)}
-            >
-              <span className="mmd-profile__label">{userDisplayName}</span>
-              <span className="mmd-profile__chevron" aria-hidden="true">
-                ▼
-              </span>
+          <div className="mmd-topbar-right">
+            <button className="mmd-topbar-icon-btn" aria-label="Notifications">
+              <i className="bi bi-bell"></i>
+              <span className="mmd-notification-badge">3</span>
             </button>
 
-            {isProfileOpen ? (
-              <div className="mmd-profile__menu" role="menu">
-                <button
-                  type="button"
-                  className="mmd-profile__item"
-                  onClick={() => {
-                    setActiveSection("rdv");
-                    setIsProfileOpen(false);
-                  }}
-                >
-                  <span className="mmd-profile__itemIcon" aria-hidden="true">
-                    <i className="bi bi-calendar-check" />
-                  </span>
-                  <span className="mmd-profile__itemLabel">Rendez-Vous</span>
-                </button>
+            <div className="mmd-profile-dropdown">
+              <button
+                className="mmd-profile-btn"
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+              >
+                <div className="mmd-user-avatar">{userInitials}</div>
+                <div className="mmd-user-info">
+                  <span className="mmd-user-name">{user?.nom} {user?.prenom}</span>
+                  <span className="mmd-user-role">Secrétaire</span>
+                </div>
+                <i className="bi bi-chevron-down text-light"></i>
+              </button>
 
-                <button
-                  type="button"
-                  className="mmd-profile__item"
-                  onClick={() => {
-                    setActiveSection("patients");
-                    setIsProfileOpen(false);
-                  }}
-                >
-                  <span className="mmd-profile__itemIcon" aria-hidden="true">
-                    <i className="bi bi-people" />
-                  </span>
-                  <span className="mmd-profile__itemLabel">Patients</span>
-                </button>
-
-                <button
-                  type="button"
-                  className="mmd-profile__item"
-                  onClick={() => {
-                    setActiveSection("consultation");
-                    setIsProfileOpen(false);
-                  }}
-                >
-                  <span className="mmd-profile__itemIcon" aria-hidden="true">
-                    <i className="bi bi-heart-pulse" />
-                  </span>
-                  <span className="mmd-profile__itemLabel">Consultation</span>
-                </button>
-
-                <button
-                  type="button"
-                  className="mmd-profile__item"
-                  onClick={() => {
-                    setActiveSection("paiements");
-                    setIsProfileOpen(false);
-                  }}
-                >
-                  <span className="mmd-profile__itemIcon" aria-hidden="true">
-                    <i className="bi bi-credit-card-2-front" />
-                  </span>
-                  <span className="mmd-profile__itemLabel">Paiements</span>
-                </button>
-
-                <div className="mmd-profile__divider" />
-
-                <button
-                  type="button"
-                  className="mmd-profile__item mmd-profile__item--logout"
-                  onClick={async () => {
-                    await logout();
-                    setIsProfileOpen(false);
-                    navigate("/login");
-                  }}
-                >
-                  Déconnexion
-                </button>
-              </div>
-            ) : null}
+              {isProfileOpen && (
+                <div className="mmd-profile-menu">
+                  <button
+                    className="mmd-profile-menu-item"
+                    onClick={() => {
+                      setActiveSection("rdv");
+                      setIsProfileOpen(false);
+                    }}
+                  >
+                    <i className="bi bi-calendar-check-fill"></i>
+                    <span>Rendez-vous</span>
+                  </button>
+                  <button
+                    className="mmd-profile-menu-item"
+                    onClick={() => {
+                      setActiveSection("patients");
+                      setIsProfileOpen(false);
+                    }}
+                  >
+                    <i className="bi bi-people-fill"></i>
+                    <span>Patients</span>
+                  </button>
+                  <button
+                    className="mmd-profile-menu-item"
+                    onClick={() => {
+                      setActiveSection("consultation");
+                      setIsProfileOpen(false);
+                    }}
+                  >
+                    <i className="bi bi-file-medical-fill"></i>
+                    <span>Consultations</span>
+                  </button>
+                  <button
+                    className="mmd-profile-menu-item"
+                    onClick={() => {
+                      setActiveSection("paiements");
+                      setIsProfileOpen(false);
+                    }}
+                  >
+                    <i className="bi bi-credit-card-fill"></i>
+                    <span>Paiements</span>
+                  </button>
+                  <div className="mmd-profile-menu-divider"></div>
+                  <button
+                    className="mmd-profile-menu-item mmd-profile-menu-item--danger"
+                    onClick={async () => {
+                      await logout();
+                      navigate("/login");
+                    }}
+                  >
+                    <i className="bi bi-box-arrow-right"></i>
+                    <span>Déconnexion</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        </header>
 
-        {/* Push content below fixed topbar */}
-        <div className="mmd-topbar--placeholder" />
-
-        {renderContent()}
+        <main className="mmd-content-wrapper">{renderContent()}</main>
       </div>
     </div>
   );

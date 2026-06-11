@@ -176,11 +176,7 @@
 .r-logo-text {
   font-size: 34px;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--r-primary-light), var(--r-accent));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.5px;
+  color: var(--r-primary);
   transition: filter 0.3s;
 }
 

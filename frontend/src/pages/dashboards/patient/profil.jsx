@@ -28,7 +28,6 @@ const ProfilPage = () => {
 
     try {
       setSubmitting(true);
-      // Update via the generic user update endpoint
       await api.put(`/patients/${user?.patient_id ?? user?.id}`, form);
       alert("Profil mis à jour avec succès ✅");
       setEditMode(false);

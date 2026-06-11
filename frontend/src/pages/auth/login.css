@@ -65,6 +65,10 @@
   animation: bgZoom 30s ease-in-out infinite alternate;
 }
 
+.r-logo-text{
+  color: white;
+}
+
 @keyframes bgZoom {
   0% {
     transform: scale(1);
@@ -180,13 +184,9 @@
 }
 
 .logo-text {
-  font-size: 34px;
+  font-size: 38px;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--primary-light), var(--accent));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.5px;
+  color: var(--primary);
 }
 
 /* ═══════════════════════════════════════════
@@ -204,13 +204,6 @@
   color: var(--text-primary);
   letter-spacing: -0.5px;
   margin-bottom: 8px;
-}
-
-.login-subtitle {
-  font-size: 14.5px;
-  color: var(--text-secondary);
-  line-height: 1.5;
-  font-weight: 400;
 }
 
 .login-form {
@@ -764,10 +757,6 @@
 
   .login-title {
     font-size: 23px;
-  }
-
-  .login-subtitle {
-    font-size: 13.5px;
   }
 
   .login-header {

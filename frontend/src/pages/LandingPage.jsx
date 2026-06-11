@@ -121,7 +121,6 @@ function ContactForm({ t }) {
     setShowSuccess(false);
 
     try {
-      // Simulated async submit (replace with real API later if needed)
       await new Promise((resolve) => setTimeout(resolve, 1200));
       setShowSuccess(true);
 
@@ -1049,11 +1048,11 @@ export default function LandingPage() {
 
             <div className="medi-footer-col">
               <div className="medi-footer-col-title">{t('footer.company')}</div>
-              <a href="#">{t('footer.features')}</a>
-              <a href="#">{t('nav.how')}</a>
-              <a href="#">{t('nav.whyUs')}</a>
-              <a href="#">{t('nav.reviews')}</a>
-              <a href="#">{t('footer.contact')}</a>
+                <a href="#">{t('footer.features')}</a>
+                <a href="#">{t('nav.how')}</a>
+                <a href="#">{t('nav.whyUs')}</a>
+                <a href="#">{t('nav.reviews')}</a>
+                <a href="#">{t('footer.contact')}</a>
             </div>
 
             <div className="medi-footer-subscribe">

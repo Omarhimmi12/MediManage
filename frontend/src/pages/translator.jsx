@@ -198,7 +198,7 @@ export const dict = {
     'contact.email.label': 'Email Us',
     'contact.email.value': 'support@medimanage.com',
     'contact.phone.label': 'Call Us',
-    'contact.phone.value': '+1 (234) 567-890',
+    'contact.phone.value': '+212 6 22 55 00 10',
     'contact.hours.label': 'Business Hours',
     'contact.hours.value': 'Mon-Fri: 9AM - 6PM',
 

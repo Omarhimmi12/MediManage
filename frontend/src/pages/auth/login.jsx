@@ -59,12 +59,11 @@ const Login = () => {
 
           <Link to="/" className="register-logo-area" aria-label="Aller à l'accueil">
             <img src="/images/brand.png" alt="MediManage" className="register-brand-img" />
-            <span className="r-logo-text">MediManage</span>
+            <span className="logo-text">MediManage</span>
           </Link>
 
           <div className="login-header">
-            <h1 className="login-title">Bon retour</h1>
-            <p className="login-subtitle">Se connecter</p>
+            <h1 className="login-title">Se connecter</h1>
           </div>
 
           {/* Error alert */}

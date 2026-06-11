@@ -1741,7 +1741,7 @@ font-family: "Roboto", sans-serif;
 
 .medi-footer-brand-desc {
   font-size: 14px;
-  color: rgba(255,255,255,0.4);
+  color: rgb(226, 224, 224);
   line-height: 1.7;
   margin-bottom: 20px;
 }
@@ -1777,7 +1777,7 @@ font-family: "Roboto", sans-serif;
 .medi-footer-col a {
   display: block;
   font-size: 14px;
-  color: rgba(255,255,255,0.4);
+  color: rgb(226, 224, 224);
   padding: 6px 0;
   transition: color 0.2s ease;
 }

@@ -1,6 +1,9 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
+import { NotificationContext } from "../../context/notificationContext";
+import NotificationDropdown from "../../components/NotificationDropdown";
+import MessagingPage from "../messaging/MessagingPage";
 import "./medecinDashboard.css";
 
 import AccueilPage from "./medecin/accueil";
@@ -16,6 +19,7 @@ const MedecinDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useContext(AuthContext);
+  const { unreadCount, toggleDropdown, closeDropdown, dropdownOpen } = useContext(NotificationContext);
 
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -31,6 +35,7 @@ const MedecinDashboard = () => {
       "secretaires",
       "moncabinet",
       "parametres",
+      "messages",
     ]);
     return typeof section === "string" && allowed.has(section)
       ? section
@@ -53,6 +58,7 @@ const MedecinDashboard = () => {
     { key: "secretaires", label: "Équipe", icon: "bi-person-badge-fill" },
     { key: "moncabinet", label: "Cabinet", icon: "bi-building-fill" },
     { key: "parametres", label: "Paramètres", icon: "bi-gear-fill" },
+    { key: "messages", label: "Messages", icon: "bi-chat-dots-fill" },
   ];
 
   const renderContent = () => {
@@ -71,6 +77,8 @@ const MedecinDashboard = () => {
         return <MonCabinetPage />;
       case "parametres":
         return <ParametresPage />;
+      case "messages":
+        return <MessagingPage />;
       default:
         return <AccueilPage />;
     }
@@ -102,6 +110,9 @@ const MedecinDashboard = () => {
                 <i className={`bi ${icon}`}></i>
               </span>
               {!isSidebarCollapsed && <span className="mmd-nav-label">{label}</span>}
+              {key === "messages" && !isSidebarCollapsed && unreadCount > 0 && (
+                <span className="mmd-nav-badge">{unreadCount > 99 ? "99+" : unreadCount}</span>
+              )}
             </button>
           ))}
         </nav>
@@ -148,10 +159,23 @@ const MedecinDashboard = () => {
           </div>
 
           <div className="mmd-topbar-right">
-            <button className="mmd-topbar-icon-btn" aria-label="Notifications">
-              <i className="bi bi-bell"></i>
-              <span className="mmd-notification-badge">3</span>
-            </button>
+            <div style={{ position: "relative" }}>
+              <button
+                className="mmd-topbar-icon-btn"
+                aria-label="Notifications"
+                onClick={toggleDropdown}
+              >
+                <i className="bi bi-bell"></i>
+                {unreadCount > 0 && (
+                  <span className="mmd-notification-badge">
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                )}
+              </button>
+              {dropdownOpen && (
+                <NotificationDropdown onClose={closeDropdown} />
+              )}
+            </div>
 
             <div className="mmd-profile-dropdown">
               <button
@@ -178,7 +202,6 @@ const MedecinDashboard = () => {
                     <i className="bi bi-person-circle"></i>
                     <span>Mon Profil</span>
                   </button>
-                  
                   <button
                     className="mmd-profile-menu-item"
                     onClick={() => {
@@ -199,7 +222,6 @@ const MedecinDashboard = () => {
                     <i className="bi-people-fill"></i>
                     <span>Patients</span>
                   </button>
-                  
                   <button
                     className="mmd-profile-menu-item"
                     onClick={() => {
@@ -233,6 +255,19 @@ const MedecinDashboard = () => {
                   <button
                     className="mmd-profile-menu-item"
                     onClick={() => {
+                      setActiveSection("messages");
+                      setIsProfileOpen(false);
+                    }}
+                  >
+                    <i className="bi-chat-dots-fill"></i>
+                    <span>Messages</span>
+                    {unreadCount > 0 && (
+                      <span className="mmd-profile-badge">{unreadCount}</span>
+                    )}
+                  </button>
+                  <button
+                    className="mmd-profile-menu-item"
+                    onClick={() => {
                       setActiveSection("secretaires");
                       setIsProfileOpen(false);
                     }}
@@ -240,9 +275,7 @@ const MedecinDashboard = () => {
                     <i className="bi-person-badge-fill"></i>
                     <span>Equipes</span>
                   </button>
-                  
-                  
-                 <button
+                  <button
                     className="mmd-profile-menu-item"
                     onClick={() => {
                       setActiveSection("moncabinet");
@@ -252,8 +285,6 @@ const MedecinDashboard = () => {
                     <i className="bi-building-fill"></i>
                     <span>Mon Cabinet</span>
                   </button>
-                  
-                  
                   <div className="mmd-profile-menu-divider"></div>
                   <button
                     className="mmd-profile-menu-item mmd-profile-menu-item--danger"

@@ -1,7 +1,9 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
-
+import { NotificationContext } from "../../context/notificationContext";
+import NotificationDropdown from "../../components/NotificationDropdown";
+import MessagingPage from "../messaging/MessagingPage";
 import "./medecinDashboard.css";
 
 import PatientsPage from "./secretaire/patients.jsx";
@@ -13,13 +15,14 @@ const SecretaireDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useContext(AuthContext);
+  const { unreadCount, toggleDropdown, closeDropdown, dropdownOpen } = useContext(NotificationContext);
 
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   const initialSection = useMemo(() => {
     const section = location?.state?.section;
-    const allowed = new Set(["patients", "rdv", "consultation", "paiements"]);
+    const allowed = new Set(["patients", "rdv", "consultation", "paiements", "messages"]);
     return typeof section === "string" && allowed.has(section)
       ? section
       : "rdv";
@@ -37,6 +40,7 @@ const SecretaireDashboard = () => {
     { key: "patients", label: "Patients", icon: "bi-people-fill" },
     { key: "consultation", label: "Consultations", icon: "bi-file-medical-fill" },
     { key: "paiements", label: "Paiements", icon: "bi-credit-card-fill" },
+    { key: "messages", label: "Messages", icon: "bi-chat-dots-fill" },
   ];
 
   const renderContent = () => {
@@ -49,6 +53,8 @@ const SecretaireDashboard = () => {
         return <ConsultationPage />;
       case "paiements":
         return <PaiementsPage />;
+      case "messages":
+        return <MessagingPage />;
       default:
         return <RdvPage />;
     }
@@ -80,6 +86,9 @@ const SecretaireDashboard = () => {
                 <i className={`bi ${icon}`}></i>
               </span>
               {!isSidebarCollapsed && <span className="mmd-nav-label">{label}</span>}
+              {key === "messages" && !isSidebarCollapsed && unreadCount > 0 && (
+                <span className="mmd-nav-badge">{unreadCount > 99 ? "99+" : unreadCount}</span>
+              )}
             </button>
           ))}
         </nav>
@@ -126,10 +135,23 @@ const SecretaireDashboard = () => {
           </div>
 
           <div className="mmd-topbar-right">
-            <button className="mmd-topbar-icon-btn" aria-label="Notifications">
-              <i className="bi bi-bell"></i>
-              <span className="mmd-notification-badge">3</span>
-            </button>
+            <div style={{ position: "relative" }}>
+              <button
+                className="mmd-topbar-icon-btn"
+                aria-label="Notifications"
+                onClick={toggleDropdown}
+              >
+                <i className="bi bi-bell"></i>
+                {unreadCount > 0 && (
+                  <span className="mmd-notification-badge">
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                )}
+              </button>
+              {dropdownOpen && (
+                <NotificationDropdown onClose={closeDropdown} />
+              )}
+            </div>
 
             <div className="mmd-profile-dropdown">
               <button
@@ -153,7 +175,7 @@ const SecretaireDashboard = () => {
                       setIsProfileOpen(false);
                     }}
                   >
-                    <i className="bi bi-calendar-check-fill"></i>
+                    <i className="bi-calendar-check-fill"></i>
                     <span>Rendez-vous</span>
                   </button>
                   <button
@@ -163,7 +185,7 @@ const SecretaireDashboard = () => {
                       setIsProfileOpen(false);
                     }}
                   >
-                    <i className="bi bi-people-fill"></i>
+                    <i className="bi-people-fill"></i>
                     <span>Patients</span>
                   </button>
                   <button
@@ -173,7 +195,7 @@ const SecretaireDashboard = () => {
                       setIsProfileOpen(false);
                     }}
                   >
-                    <i className="bi bi-file-medical-fill"></i>
+                    <i className="bi-file-medical-fill"></i>
                     <span>Consultations</span>
                   </button>
                   <button
@@ -183,8 +205,21 @@ const SecretaireDashboard = () => {
                       setIsProfileOpen(false);
                     }}
                   >
-                    <i className="bi bi-credit-card-fill"></i>
+                    <i className="bi-credit-card-fill"></i>
                     <span>Paiements</span>
+                  </button>
+                  <button
+                    className="mmd-profile-menu-item"
+                    onClick={() => {
+                      setActiveSection("messages");
+                      setIsProfileOpen(false);
+                    }}
+                  >
+                    <i className="bi-chat-dots-fill"></i>
+                    <span>Messages</span>
+                    {unreadCount > 0 && (
+                      <span className="mmd-profile-badge">{unreadCount}</span>
+                    )}
                   </button>
                   <div className="mmd-profile-menu-divider"></div>
                   <button

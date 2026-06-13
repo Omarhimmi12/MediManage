@@ -340,9 +340,9 @@ html, body {
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  border: 1px solid var(--border-color);
-  background: transparent;
-  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.85);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -353,9 +353,9 @@ html, body {
 }
 
 .mmd-topbar-icon-btn:hover {
-  background: var(--bg-tertiary);
-  border-color: var(--primary-color);
-  color: var(--primary-color);
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #ffffff;
 }
 
 .mmd-notification-badge {

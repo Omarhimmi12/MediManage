@@ -10,6 +10,8 @@ use App\Http\Controllers\Api\ConsultationController;
 use App\Http\Controllers\Api\PaiementController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\PatientUpdateController;
+use App\Http\Controllers\Api\ConversationController;
+use App\Http\Controllers\Api\MessageController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -82,5 +84,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dashboard/charts/appointment-stats', [DashboardController::class, 'appointmentStats']);
     Route::get('/dashboard/charts/monthly-revenue', [DashboardController::class, 'monthlyRevenueChart']);
     Route::get('/dashboard/charts/daily-revenue', [DashboardController::class, 'dailyRevenueChart']);
+
+    // Conversations & Messages
+    Route::get('/conversations', [ConversationController::class, 'index']);
+    Route::post('/conversations/seed', [ConversationController::class, 'seed']);
+    Route::post('/conversations', [ConversationController::class, 'store']);
+    Route::get('/conversations/{id}', [ConversationController::class, 'show']);
+    Route::post('/messages', [MessageController::class, 'store']);
+    Route::get('/messages/unread-count', [MessageController::class, 'unreadCount']);
+    Route::get('/messages/notifications', [MessageController::class, 'notifications']);
+    Route::put('/messages/{id}/read', [MessageController::class, 'markAsRead']);
+    Route::put('/conversations/{conversationId}/read', [MessageController::class, 'markConversationAsRead']);
 
 });

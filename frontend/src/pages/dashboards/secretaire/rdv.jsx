@@ -1,6 +1,7 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import api from "../../../api/axios";
 import { AuthContext } from "../../../context/authContext";
+import ConfirmModal from "../../../components/ConfirmModal";
 import "./rdv.css";
 
 const PAGE_SIZE = 8;
@@ -32,6 +33,7 @@ const SecretaireRdvPage = () => {
   const [editingId, setEditingId] = useState(null);
   const [formErrors, setFormErrors] = useState([]);
   const [formSubmitting, setFormSubmitting] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
 
   const cabinetId = user?.secretaire?.cabinet?.id ?? "";
   const medecinId = user?.secretaire?.cabinet?.medecin_id ?? "";
@@ -186,13 +188,19 @@ const SecretaireRdvPage = () => {
     }
   };
 
-  const handleDelete = async (rdvId) => {
-    if (!window.confirm("Supprimer ce rendez-vous ?")) return;
+  const confirmDelete = (rdvId) => {
+    setDeleteConfirm(rdvId);
+  };
+
+  const handleDelete = async () => {
+    if (!deleteConfirm) return;
     try {
-      await api.delete(`/rendez-vous/${rdvId}`);
+      await api.delete(`/rendez-vous/${deleteConfirm}`);
+      setDeleteConfirm(null);
       fetchData();
     } catch (err) {
       console.error("Error deleting RDV:", err);
+      setDeleteConfirm(null);
     }
   };
 
@@ -328,7 +336,7 @@ const SecretaireRdvPage = () => {
                 </div>
                 <button
                   className="secretaire-rdv-delete-btn"
-                  onClick={() => handleDelete(rdv.id)}
+                  onClick={() => confirmDelete(rdv.id)}
                   title="Supprimer"
                 >
                   <i className="bi bi-trash"></i>
@@ -426,6 +434,17 @@ const SecretaireRdvPage = () => {
           </button>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={deleteConfirm !== null}
+        title="Confirmer la suppression"
+        message="Êtes-vous sûr de vouloir supprimer ce rendez-vous ? Cette action est irréversible."
+        confirmLabel="Supprimer"
+        cancelLabel="Annuler"
+        variant="danger"
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteConfirm(null)}
+      />
 
       {showModal && (
         <div className="mmd-modal-overlay" onClick={handleCloseModal}>

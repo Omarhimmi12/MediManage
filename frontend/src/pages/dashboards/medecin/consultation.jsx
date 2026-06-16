@@ -1,4 +1,5 @@
 import { useContext, useEffect, useMemo, useState } from "react";
+import ConfirmModal from "../../../components/ConfirmModal";
 import api from "../../../api/axios";
 import { AuthContext } from "../../../context/authContext";
 import "./consultation.css";
@@ -27,6 +28,7 @@ const MedecinConsultationPage = () => {
 
   const [viewModal, setViewModal] = useState(false);
   const [viewConsultation, setViewConsultation] = useState(null);
+  const [confirmDeleteCons, setConfirmDeleteCons] = useState(null);
 
   const fetchRdv = async () => {
     try {
@@ -170,17 +172,17 @@ const MedecinConsultationPage = () => {
   };
 
   const deleteConsultation = async (consultationId) => {
-    if (!window.confirm("Supprimer cette consultation ?")) return;
-
     try {
       setErrorMsg("");
       setSuccessMsg("");
       await api.delete(`/consultations/${consultationId}`);
       setSuccessMsg("Consultation supprimée.");
       setViewModal(false);
+      setConfirmDeleteCons(null);
       await fetchRdv();
       setPage(1);
     } catch (err) {
+      setConfirmDeleteCons(null);
       setErrorMsg(
         err?.response?.data?.message || "Erreur lors de la suppression"
       );
@@ -327,9 +329,7 @@ const MedecinConsultationPage = () => {
                           <button
                             type="button"
                             className="mmd-btn mmd-btn-sm mmd-btn-danger"
-                            onClick={() =>
-                              deleteConsultation(it.consultationId)
-                            }
+                            onClick={() => setConfirmDeleteCons(it.consultationId)}
                           >
                             <i className="bi bi-trash"></i>
                           </button>
@@ -516,6 +516,15 @@ const MedecinConsultationPage = () => {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={!!confirmDeleteCons}
+        title="Confirmer la suppression"
+        message="Supprimer cette consultation ?"
+        onConfirm={() => deleteConsultation(confirmDeleteCons)}
+        onCancel={() => setConfirmDeleteCons(null)}
+        confirmLabel="Supprimer"
+      />
     </div>
   );
 };

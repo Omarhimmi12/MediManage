@@ -1,11 +1,11 @@
-import { useState, useEffect, useContext } from "react";
-import api from "../../api/axios";
+import { useContext } from "react";
 import { AuthContext } from "../../context/authContext";
 
 const ROLE_LABELS = {
   medecin: "Dr.",
   secretaire: "Sec.",
   patient: "",
+  admin: "",
 };
 
 const ConversationList = ({
@@ -15,6 +15,7 @@ const ConversationList = ({
   searchQuery,
   onSearchChange,
   loading,
+  onGoBack,
 }) => {
   const { user } = useContext(AuthContext);
 
@@ -37,7 +38,14 @@ const ConversationList = ({
   return (
     <div className="mmd-conversation-list">
       <div className="mmd-conv-list-header">
-        <h3>Messages</h3>
+        <div className="mmd-conv-list-header-left">
+          {onGoBack && (
+            <button className="mmd-conv-back-btn" onClick={onGoBack} title="Retour">
+              <i className="bi bi-arrow-left"></i>
+            </button>
+          )}
+          <h3>Messages</h3>
+        </div>
         {conversations.length > 0 && (
           <span className="mmd-conv-list-header-badge">{conversations.length} conversation{conversations.length !== 1 ? "s" : ""}</span>
         )}
@@ -58,7 +66,7 @@ const ConversationList = ({
         {loading ? (
           <div className="mmd-conv-loading">
             <div className="mmd-loading-spinner" />
-            <p>Chargement...</p>
+            <p className="text-light">Chargement...</p>
           </div>
         ) : conversations.length === 0 ? (
           <div className="mmd-conv-empty">
@@ -86,7 +94,7 @@ const ConversationList = ({
                     </div>
                 <div className="mmd-conv-info">
                   <div className="mmd-conv-name-row">
-                    <span className="mmd-conv-name">
+                    <span className={`mmd-conv-name${otherUser?.user_type === 'admin' ? ' mmd-conv-name--admin' : ''}`}>
                       {prefix ? `${prefix} ` : ""}
                       {otherUser?.prenom || ""} {otherUser?.nom || ""}
                     </span>

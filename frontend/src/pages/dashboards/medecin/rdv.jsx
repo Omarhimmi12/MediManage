@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import api from "../../../api/axios";
+import ConfirmModal from '../../../components/ConfirmModal';
+import AlertModal from '../../../components/AlertModal';
 import "./rdv.css";
 
 const RdvPage = () => {
@@ -13,6 +15,8 @@ const RdvPage = () => {
   const [editingId, setEditingId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
+  const [confirmDelete, setConfirmDelete] = useState(null);
+  const [alertInfo, setAlertInfo] = useState(null);
 
   const [formData, setFormData] = useState({
     patient_id: "",
@@ -124,7 +128,7 @@ const RdvPage = () => {
       await fetchData();
     } catch (error) {
       console.error("Error saving RDV:", error);
-      alert(error?.response?.data?.message || "Erreur lors de l'enregistrement");
+      setAlertInfo({ title: "Erreur", message: error?.response?.data?.message || "Erreur lors de l'enregistrement", variant: "danger" });
     }
   };
 
@@ -138,13 +142,13 @@ const RdvPage = () => {
   };
 
   const handleDelete = async (rdvId) => {
-    if (window.confirm("Êtes-vous sûr de vouloir supprimer ce RDV?")) {
-      try {
-        await api.delete(`/rendez-vous/${rdvId}`);
-        fetchData();
-      } catch (error) {
-        console.error("Error deleting RDV:", error);
-      }
+    try {
+      await api.delete(`/rendez-vous/${rdvId}`);
+      fetchData();
+      setConfirmDelete(null);
+    } catch (error) {
+      setConfirmDelete(null);
+      console.error("Error deleting RDV:", error);
     }
   };
 
@@ -297,7 +301,7 @@ const RdvPage = () => {
                 </div>
                 <button
                   className="rdv-delete-btn"
-                  onClick={() => handleDelete(rdv.id)}
+                  onClick={() => setConfirmDelete(rdv.id)}
                   title="Supprimer"
                 >
                   <i className="bi bi-trash"></i>
@@ -508,6 +512,22 @@ const RdvPage = () => {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={!!confirmDelete}
+        title="Confirmer la suppression"
+        message="Êtes-vous sûr de vouloir supprimer ce RDV ?"
+        onConfirm={() => handleDelete(confirmDelete)}
+        onCancel={() => setConfirmDelete(null)}
+        confirmLabel="Supprimer"
+      />
+      <AlertModal
+        isOpen={!!alertInfo}
+        title={alertInfo?.title}
+        message={alertInfo?.message}
+        variant={alertInfo?.variant || "danger"}
+        onClose={() => setAlertInfo(null)}
+      />
     </div>
   );
 };

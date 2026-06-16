@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import api from "../../../api/axios";
+import ConfirmModal from '../../../components/ConfirmModal';
+import AlertModal from '../../../components/AlertModal';
 import "./patients.css";
 
 const PatientsPage = () => {
@@ -19,6 +21,8 @@ const PatientsPage = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState(null);
+  const [alertInfo, setAlertInfo] = useState(null);
   const [formSubmitting, setFormSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState([]);
 
@@ -165,13 +169,14 @@ const PatientsPage = () => {
   };
 
   const handleDelete = async (patientId) => {
-    if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce patient ?")) return;
     try {
       await api.delete(`/patients/${patientId}`);
       if (selectedPatientId === patientId) setSelectedPatientId(null);
       await fetchPatients();
+      setConfirmDelete(null);
     } catch (error) {
-      alert(error?.response?.data?.message || "Erreur lors de la suppression");
+      setConfirmDelete(null);
+      setAlertInfo({ title: "Erreur", message: error?.response?.data?.message || "Erreur lors de la suppression", variant: "danger" });
     }
   };
 
@@ -288,7 +293,7 @@ const PatientsPage = () => {
               </button>
               <button
                 className="mmd-btn mmd-btn-danger"
-                onClick={() => handleDelete(selectedPatient.id)}
+                onClick={() => setConfirmDelete(selectedPatient.id)}
               >
                 <i className="bi bi-trash"></i> Supprimer
               </button>
@@ -429,7 +434,7 @@ const PatientsPage = () => {
                             </button>
                             <button
                               className="mmd-btn mmd-btn-sm mmd-btn-danger"
-                              onClick={() => handleDelete(patient.id)}
+                              onClick={() => setConfirmDelete(patient.id)}
                               title="Supprimer"
                             >
                               <i className="bi bi-trash"></i>
@@ -469,6 +474,22 @@ const PatientsPage = () => {
           )}
         </>
       )}
+
+      <ConfirmModal
+        isOpen={!!confirmDelete}
+        title="Confirmer la suppression"
+        message={`Êtes-vous sûr de vouloir supprimer ce patient ?`}
+        onConfirm={() => handleDelete(confirmDelete)}
+        onCancel={() => setConfirmDelete(null)}
+        confirmLabel="Supprimer"
+      />
+      <AlertModal
+        isOpen={!!alertInfo}
+        title={alertInfo?.title}
+        message={alertInfo?.message}
+        variant={alertInfo?.variant || "danger"}
+        onClose={() => setAlertInfo(null)}
+      />
 
       {/* Add/Edit modal */}
       {showModal && (

@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../context/authContext";
 import api from "../../../api/axios";
+import AlertModal from "../../../components/AlertModal";
 import "./parametres.css";
 
 const ParametresPage = () => {
@@ -90,11 +91,13 @@ const ParametresPage = () => {
         </p>
       </div>
 
-      {alert && (
-        <div className={`parametres-alert parametres-alert--${alert.type}`}>
-          {alert.type === "success" ? "✅" : "⚠️"} {alert.message}
-        </div>
-      )}
+      <AlertModal
+        isOpen={alert !== null}
+        title={alert?.type === "success" ? "Succès" : "Erreur"}
+        message={alert?.message || ""}
+        variant={alert?.type === "success" ? "success" : "danger"}
+        onClose={() => setAlert(null)}
+      />
 
       <div className="parametres-card">
         <h2 className="parametres-section-title">Profil médecin</h2>
@@ -194,7 +197,6 @@ const ParametresPage = () => {
         )}
       </div>
 
-      {/* ---- DELETE CONFIRMATION MODAL ---- */}
       {showDeleteConfirm && (
         <div className="parametres-modal-overlay" onClick={() => setShowDeleteConfirm(false)}>
           <div className="parametres-modal" onClick={(e) => e.stopPropagation()}>

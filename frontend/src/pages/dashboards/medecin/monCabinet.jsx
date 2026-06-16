@@ -433,7 +433,7 @@ const MonCabinetPage = () => {
               </button>
             </div>
 
-            <div className="cabinet-modal-body">
+            <div className="cabinet-modal-body text-light">
               <p style={{ margin: 0 }}>
                 Cette action est irréversible. Le cabinet sera supprimé
                 définitivement.

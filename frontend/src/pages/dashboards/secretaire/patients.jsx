@@ -1,6 +1,8 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { AuthContext } from "../../../context/authContext";
 import api from "../../../api/axios";
+import ConfirmModal from "../../../components/ConfirmModal";
+import AlertModal from "../../../components/AlertModal";
 import "./patients.css";
 
 const SecretairePatients = () => {
@@ -51,6 +53,10 @@ const SecretairePatients = () => {
     allergies: "",
     notes_generales: "",
   });
+
+  // confirmation & alert modals
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+  const [alertInfo, setAlertInfo] = useState(null);
 
   useEffect(() => {
     fetchPatients();
@@ -193,14 +199,19 @@ const SecretairePatients = () => {
     }
   };
 
-  const handleDelete = async (patientId) => {
-    if (!window.confirm("Supprimer ce patient ?")) return;
+  const handleDeleteConfirm = async () => {
+    if (!deleteConfirmId) return;
     try {
-      await api.delete(`/patients/${patientId}`);
-      if (selectedPatientId === patientId) setSelectedPatientId(null);
+      await api.delete(`/patients/${deleteConfirmId}`);
+      if (selectedPatientId === deleteConfirmId) setSelectedPatientId(null);
+      setDeleteConfirmId(null);
       await fetchPatients();
     } catch (err) {
-      alert(err?.response?.data?.message || "Erreur suppression patient");
+      setDeleteConfirmId(null);
+      setAlertInfo({
+        variant: "danger",
+        message: err?.response?.data?.message || "Erreur suppression patient",
+      });
     }
   };
 
@@ -616,7 +627,7 @@ const SecretairePatients = () => {
                             </button>
                             <button
                               className="mmd-btn mmd-btn-sm mmd-btn-danger"
-                              onClick={() => handleDelete(p.id)}
+                              onClick={() => setDeleteConfirmId(p.id)}
                               title="Supprimer"
                             >
                               <i className="bi bi-trash"></i>
@@ -654,6 +665,25 @@ const SecretairePatients = () => {
           </div>
         </>
       )}
+
+      <ConfirmModal
+        isOpen={deleteConfirmId !== null}
+        title="Confirmer la suppression"
+        message="Êtes-vous sûr de vouloir supprimer ce patient ? Cette action est irréversible."
+        confirmLabel="Supprimer"
+        cancelLabel="Annuler"
+        variant="danger"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setDeleteConfirmId(null)}
+      />
+
+      <AlertModal
+        isOpen={alertInfo !== null}
+        title="Erreur"
+        message={alertInfo?.message || ""}
+        variant="danger"
+        onClose={() => setAlertInfo(null)}
+      />
     </div>
   );
 };

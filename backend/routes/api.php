@@ -97,3 +97,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/conversations/{conversationId}/read', [MessageController::class, 'markConversationAsRead']);
 
 });
+
+// Admin routes
+Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
+    Route::get('/stats', [App\Http\Controllers\Api\AdminController::class, 'stats']);
+    Route::get('/users', [App\Http\Controllers\Api\AdminController::class, 'users']);
+    Route::get('/users/{id}', [App\Http\Controllers\Api\AdminController::class, 'showUser']);
+    Route::put('/users/{id}', [App\Http\Controllers\Api\AdminController::class, 'updateUser']);
+    Route::delete('/users/{id}', [App\Http\Controllers\Api\AdminController::class, 'deleteUser']);
+    Route::get('/cabinets', [App\Http\Controllers\Api\AdminController::class, 'cabinets']);
+    Route::get('/cabinets/{id}', [App\Http\Controllers\Api\AdminController::class, 'showCabinet']);
+    Route::put('/cabinets/{id}/toggle-suspend', [App\Http\Controllers\Api\AdminController::class, 'toggleSuspendCabinet']);
+    Route::get('/charts/monthly-revenue', [App\Http\Controllers\Api\AdminController::class, 'monthlyRevenueChart']);
+});

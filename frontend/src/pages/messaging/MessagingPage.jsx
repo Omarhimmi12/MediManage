@@ -7,7 +7,7 @@ import ConversationList from "./ConversationList";
 import ChatWindow from "./ChatWindow";
 import "./MessagingPage.css";
 
-const MessagingPage = () => {
+const MessagingPage = ({ onGoBack }) => {
   const { user } = useContext(AuthContext);
   const { decrementUnread, refreshAll } = useContext(NotificationContext);
   const location = useLocation();
@@ -103,6 +103,7 @@ const MessagingPage = () => {
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           loading={loading}
+          onGoBack={onGoBack}
         />
         <ChatWindow
           conversation={conversationData}

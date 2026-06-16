@@ -6,6 +6,7 @@ import Register from "./pages/auth/register";
 import MedecinDashboard from "./pages/dashboards/medecinDashboard";
 import SecretaireDashboard from "./pages/dashboards/secretaireDashboard";
 import PatientDashboard from "./pages/dashboards/patientDashboard";
+import AdminDashboard from "./pages/dashboards/adminDashboard";
 import MessagingPage from "./pages/messaging/MessagingPage";
 import ProtectedRoute from "./routes/protectedRoute";
 import NotFound from "./pages/notFound";
@@ -22,8 +23,7 @@ function App() {
           <Route path="/register" element={<Register />} />
 
           {/* Medecin */}
-          <Route
-            path="/medecin/*"
+          <Route path="/medecin/*"
             element={
               <ProtectedRoute role="medecin">
                 <MedecinDashboard />
@@ -32,8 +32,7 @@ function App() {
           />
 
           {/* Secretaire */}
-          <Route
-            path="/secretaire/*"
+          <Route path="/secretaire/*"
             element={
               <ProtectedRoute role="secretaire">
                 <SecretaireDashboard />
@@ -42,8 +41,7 @@ function App() {
           />
 
           {/* Patient */}
-          <Route
-            path="/patient/*"
+          <Route path="/patient/*"
             element={
               <ProtectedRoute role="patient">
                 <PatientDashboard />
@@ -51,9 +49,17 @@ function App() {
             }
           />
 
+          {/* Admin */}
+          <Route path="/admin/*"
+            element={
+              <ProtectedRoute role="admin">
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Messages (all roles) */}
-          <Route
-            path="/messages"
+          <Route path="/messages"
             element={
               <ProtectedRoute>
                 <MessagingPage />

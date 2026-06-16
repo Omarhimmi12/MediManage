@@ -2,6 +2,8 @@ import { useContext, useState } from "react";
 import { AuthContext } from "../../../context/authContext";
 import api from "../../../api/axios";
 import "./profil.css";
+import AlertModal from '../../../components/AlertModal';
+import ConfirmModal from '../../../components/ConfirmModal';
 
 const ProfilPage = () => {
   const { user, logout } = useContext(AuthContext);
@@ -15,6 +17,8 @@ const ProfilPage = () => {
   });
   const [submitting, setSubmitting] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [alertInfo, setAlertInfo] = useState(null);
+  const [confirmDeleteModal, setConfirmDeleteModal] = useState(false);
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -29,37 +33,33 @@ const ProfilPage = () => {
     try {
       setSubmitting(true);
       await api.put(`/patients/${user?.patient_id ?? user?.id}`, form);
-      alert("Profil mis à jour avec succès ✅");
+      setAlertInfo({ title: "Succès", message: "Profil mis à jour avec succès ✅", variant: "success" });
       setEditMode(false);
     } catch (err) {
       const msg =
         err?.response?.data?.message ||
         err?.message ||
         "Erreur lors de la mise à jour";
-      alert(typeof msg === "string" ? msg : JSON.stringify(msg));
+      setAlertInfo({ title: "Erreur", message: typeof msg === "string" ? msg : JSON.stringify(msg), variant: "danger" });
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleSupprimer = async () => {
-    if (!deleteConfirm) {
-      setDeleteConfirm(true);
-      return;
-    }
-
     try {
       setSubmitting(true);
       await api.delete(`/patients/${user?.patient_id ?? user?.id}`);
-      alert("Compte supprimé.");
-      await logout();
+      setConfirmDeleteModal(false);
+      setAlertInfo({ title: "Compte supprimé", message: "Votre compte a été supprimé.", variant: "success" });
+      setTimeout(() => logout(), 1500);
     } catch (err) {
       const msg =
         err?.response?.data?.message ||
         err?.message ||
         "Erreur lors de la suppression";
-      alert(typeof msg === "string" ? msg : JSON.stringify(msg));
-      setDeleteConfirm(false);
+      setAlertInfo({ title: "Erreur", message: typeof msg === "string" ? msg : JSON.stringify(msg), variant: "danger" });
+      setConfirmDeleteModal(false);
     } finally {
       setSubmitting(false);
     }
@@ -185,7 +185,7 @@ const ProfilPage = () => {
                   email: user?.email ?? "",
                   telephone: user?.telephone ?? "",
                 });
-                setDeleteConfirm(false);
+                setConfirmDeleteModal(false);
               }}
               disabled={submitting}
               style={{ justifyContent: "center" }}
@@ -197,20 +197,31 @@ const ProfilPage = () => {
 
           <button
             type="button"
-            className={`mmd-btn mmd-btn-lg ${deleteConfirm ? "mmd-btn-danger" : "mmd-btn-secondary"}`}
-            onClick={handleSupprimer}
+            className="mmd-btn mmd-btn-lg mmd-btn-secondary"
+            onClick={() => setConfirmDeleteModal(true)}
             disabled={submitting}
-            style={{
-              justifyContent: "center",
-              border: deleteConfirm ? "none" : "1px solid var(--danger-color)",
-              color: deleteConfirm ? undefined : "var(--danger-color)",
-            }}
+            style={{ justifyContent: "center", border: "1px solid var(--danger-color)", color: "var(--danger-color)" }}
           >
-            <i className={deleteConfirm ? "bi bi-exclamation-triangle-fill" : "bi bi-trash-fill"}></i>
-            {deleteConfirm ? (submitting ? "Suppression..." : "Confirmer la suppression") : "Supprimer"}
+            <i className="bi bi-trash-fill"></i>
+            Supprimer
           </button>
         </div>
       </div>
+      <AlertModal
+        isOpen={!!alertInfo}
+        title={alertInfo?.title}
+        message={alertInfo?.message}
+        variant={alertInfo?.variant || "success"}
+        onClose={() => { setAlertInfo(null); if (alertInfo?.variant === "success" && alertInfo?.title === "Compte supprimé") logout(); }}
+      />
+      <ConfirmModal
+        isOpen={confirmDeleteModal}
+        title="Confirmer la suppression"
+        message="Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible."
+        onConfirm={handleSupprimer}
+        onCancel={() => setConfirmDeleteModal(false)}
+        confirmLabel="Supprimer"
+      />
     </div>
   );
 };

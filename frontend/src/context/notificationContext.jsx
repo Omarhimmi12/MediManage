@@ -47,10 +47,15 @@ export const NotificationProvider = ({ children }) => {
     refreshAll();
     pollingRef.current = setInterval(refreshAll, 15000);
 
-    // Initialize Echo for real-time updates
     const initEcho = async () => {
       try {
-        const { default: echo } = await import("../echo");
+        const token = localStorage.getItem("token");
+        if (!token) return;
+        const { initEcho: createEcho, destroyEcho } = await import("../echo");
+        destroyEcho();
+
+        const echo = createEcho(token);
+        if (!echo) return; // initialization failed
         echoRef.current = echo;
 
         const channel = echo.private(`user.${user.id}`);
@@ -75,7 +80,7 @@ export const NotificationProvider = ({ children }) => {
           }
         });
       } catch (err) {
-        // Echo/Pusher not configured - polling fallback will work
+        // WebSocket not available - polling fallback works fine
       }
     };
 

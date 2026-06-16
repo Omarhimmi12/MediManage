@@ -29,7 +29,8 @@ const Login = () => {
 
     try {
       const role = await login(email, password);
-      if (role === 'medecin') navigate('/medecin');
+      if (role === 'admin') navigate('/admin');
+      else if (role === 'medecin') navigate('/medecin');
       else if (role === 'secretaire') navigate('/secretaire');
       else navigate('/patient');
     } catch (err) {

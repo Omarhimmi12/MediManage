@@ -25,7 +25,6 @@ class NewMessageEvent implements ShouldBroadcast
     public function broadcastOn()
     {
         $channels = [];
-
         foreach ($this->message->conversation->participants as $participant) {
             $channels[] = new PrivateChannel('user.' . $participant->user_id);
         }

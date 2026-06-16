@@ -131,7 +131,7 @@ class ConversationController extends Controller
     {
         $request->validate([
             'participant_id' => 'required|exists:users,id',
-            'participant_type' => 'required|in:medecin,secretaire,patient',
+            'participant_type' => 'required|in:admin,medecin,secretaire,patient',
             'message' => 'required|string|max:5000',
         ]);
 
@@ -254,6 +254,15 @@ class ConversationController extends Controller
                         if ($patient->user_id !== $user->id) {
                             $relatedUsers[] = ['user_id' => $patient->user_id, 'user_type' => 'patient'];
                         }
+                    }
+                }
+
+            } elseif ($user->role === 'admin') {
+                // Admin can message all medecins
+                $medecins = Medecin::with('user')->get();
+                foreach ($medecins as $medecin) {
+                    if ($medecin->user_id !== $user->id) {
+                        $relatedUsers[] = ['user_id' => $medecin->user_id, 'user_type' => 'medecin'];
                     }
                 }
 

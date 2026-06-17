@@ -380,14 +380,14 @@ const SecretairePatients = () => {
         <div className="secretaire-patients-view-card">
           <div className="secretaire-patients-view-header">
             <h3>
-              Dossier médical — {selectedPatient.user?.nom}{" "}
+              Dossier patient — {selectedPatient.user?.nom}{" "}
               {selectedPatient.user?.prenom}
             </h3>
             <button
               className="mmd-btn mmd-btn-secondary mmd-btn-sm"
               onClick={handleBackToList}
             >
-              ← Retour
+              <i className="bi bi-arrow-left"></i> Retour à la liste
             </button>
           </div>
 
@@ -406,15 +406,48 @@ const SecretairePatients = () => {
                 </span>
               </div>
               <div className="secretaire-patients-detail-item">
+                <span className="secretaire-patients-detail-label">Email</span>
+                <span className="secretaire-patients-detail-value">
+                  {selectedPatient.user?.email ?? "—"}
+                </span>
+              </div>
+              <div className="secretaire-patients-detail-item">
                 <span className="secretaire-patients-detail-label">Téléphone</span>
                 <span className="secretaire-patients-detail-value">
                   {selectedPatient.user?.telephone ?? "—"}
                 </span>
               </div>
               <div className="secretaire-patients-detail-item">
-                <span className="secretaire-patients-detail-label">Date création</span>
+                <span className="secretaire-patients-detail-label">Date de naissance</span>
                 <span className="secretaire-patients-detail-value">
-                  {selectedPatient.dossierMedical?.date_creation ?? "—"}
+                  {selectedPatient.date_naissance ?? "—"}
+                </span>
+              </div>
+              <div className="secretaire-patients-detail-item">
+                <span className="secretaire-patients-detail-label">Âge</span>
+                <span className="secretaire-patients-detail-value">
+                  {selectedPatient.date_naissance
+                    ? (() => {
+                        const today = new Date();
+                        const birth = new Date(selectedPatient.date_naissance);
+                        let age = today.getFullYear() - birth.getFullYear();
+                        const m = today.getMonth() - birth.getMonth();
+                        if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+                        return age + " ans";
+                      })()
+                    : "—"}
+                </span>
+              </div>
+              <div className="secretaire-patients-detail-item">
+                <span className="secretaire-patients-detail-label">Genre</span>
+                <span className="secretaire-patients-detail-value">
+                  {selectedPatient.sexe === "male" ? "Homme" : "Femme"}
+                </span>
+              </div>
+              <div className="secretaire-patients-detail-item">
+                <span className="secretaire-patients-detail-label">Adresse</span>
+                <span className="secretaire-patients-detail-value">
+                  {selectedPatient.adresse ?? "—"}
                 </span>
               </div>
               <div className="secretaire-patients-detail-item">
@@ -433,6 +466,14 @@ const SecretairePatients = () => {
                 <span className="secretaire-patients-detail-label">Notes générales</span>
                 <span className="secretaire-patients-detail-value">
                   {selectedPatient.dossierMedical?.notes_generales ?? "—"}
+                </span>
+              </div>
+              <div className="secretaire-patients-detail-item" style={{ gridColumn: "1 / -1" }}>
+                <span className="secretaire-patients-detail-label">Date d'inscription</span>
+                <span className="secretaire-patients-detail-value">
+                  {selectedPatient.created_at
+                    ? new Date(selectedPatient.created_at).toLocaleDateString("fr-FR")
+                    : "—"}
                 </span>
               </div>
             </div>
@@ -597,7 +638,7 @@ const SecretairePatients = () => {
                 <table className="mmd-table">
                   <thead>
                     <tr>
-                      <th>Nom</th>
+                      <th>Patient</th>
                       <th>Prénom</th>
                       <th>Téléphone</th>
                       <th className="text-center">Actions</th>

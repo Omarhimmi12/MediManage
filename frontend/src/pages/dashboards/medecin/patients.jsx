@@ -274,6 +274,24 @@ const PatientsPage = () => {
                   {selectedPatient.adresse ?? "—"}
                 </span>
               </div>
+              <div className="patients-detail-item">
+                <span className="patients-detail-label">Antécédents</span>
+                <span className="patients-detail-value">
+                  {selectedPatient.dossierMedical?.antecedents ?? "—"}
+                </span>
+              </div>
+              <div className="patients-detail-item">
+                <span className="patients-detail-label">Allergies</span>
+                <span className="patients-detail-value">
+                  {selectedPatient.dossierMedical?.allergies ?? "—"}
+                </span>
+              </div>
+              <div className="patients-detail-item" style={{ gridColumn: "1 / -1" }}>
+                <span className="patients-detail-label">Notes générales</span>
+                <span className="patients-detail-value">
+                  {selectedPatient.dossierMedical?.notes_generales ?? "—"}
+                </span>
+              </div>
               <div className="patients-detail-item" style={{ gridColumn: "1 / -1" }}>
                 <span className="patients-detail-label">Date d'inscription</span>
                 <span className="patients-detail-value">

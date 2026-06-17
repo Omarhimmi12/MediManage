@@ -28,6 +28,7 @@ export const dict = {
     'hero.cta.secondary': 'Contact Us',
     'hero.trust.rating': '4.9/5',
     'hero.trust.text': 'from 1,200+ reviews',
+    'hero.form.name3': 'Said Mohamed',
 
     'social.proof.text': 'Trusted by innovative healthcare teams worldwide',
     'social.proof.clinic1': 'Atlas Santé',
@@ -50,8 +51,8 @@ export const dict = {
     'features.revenue.desc': 'Real-time dashboards showing revenue trends, billing insights, insurance claims status, and financial forecasting tools.',
     'features.team.title': 'Team Collaboration',
     'features.team.desc': 'Role-based access, internal messaging, shift management, and task assignment — keep your entire staff in sync.',
-    'features.notif.title': 'Smart Notifications',
-    'features.notif.desc': 'Automated SMS & email reminders for appointments, follow-ups, and prescription refills. Reduce no-shows by 60%.',
+    'features.notif.title': 'Messaging Feature',
+    'features.notif.desc': 'Secure real-time messaging between patients and healthcare providers. Share updates, ask questions, and receive medical guidance instantly from anywhere.',
 
     'how.label': 'How It Works',
     'how.title': 'Up and running in minutes',
@@ -162,6 +163,7 @@ export const dict = {
     'float.revenue.title': 'Revenue',
     'float.revenue.change': '↑ 24%',
     'float.notif.title': 'Notifications',
+    'float.messages.title': 'Recent Messages',
     'float.analytics.title': 'Patients This Week',
     
     'social.proof.stat1': 'Active clinics',
@@ -171,6 +173,9 @@ export const dict = {
     'float.notif.item1': 'Appointment confirmed for 2:30 PM',
     'float.notif.item2': 'Lab results ready',
     'float.notif.item3': 'Prescription renewal pending',
+    'float.messages.item1': 'Kaoutar: Please send my lab results',
+    'float.messages.item2': 'Dr. Kamal: Patient 204 needs follow-up',
+    'float.messages.item3': 'You: Meeting confirmed for 3PM',
 
     'float.appt.sarah': 'Kaoutar El mghari',
     'float.appt.michael': 'Youssef Kamal',
@@ -273,6 +278,7 @@ export const dict = {
     'hero.cta.secondary': 'Nous contacter',
     'hero.trust.rating': '4,9/5',
     'hero.trust.text': "d'après 1 200+ avis",
+    'hero.form.name3': 'Said Mohamed',
 
     'social.proof.text': 'Approuvé par des équipes de santé innovantes à travers le Maroc',
 
@@ -296,8 +302,8 @@ export const dict = {
     'features.revenue.desc': "Des tableaux de bord en temps réel pour suivre les tendances de revenus, les informations de facturation, le statut des demandes d'assurance et la prévision financière.",
     'features.team.title': "Collaboration d'équipe",
     'features.team.desc': "Accès selon les rôles, messagerie interne, gestion des horaires et attribution des tâches — pour garder tout le personnel aligné.",
-    'features.notif.title': 'Notifications intelligentes',
-    'features.notif.desc': "Rappels SMS & e-mail automatisés pour les rendez-vous, suivis et renouvellements d'ordonnances. Réduisez les absences non justifiées de 60%.",
+    'features.notif.title': 'Fonctionnalité de messagerie',
+    'features.notif.desc': "Messagerie sécurisée en temps réel entre les patients et les professionnels de santé. Échangez des informations, posez des questions et recevez des conseils médicaux instantanément, où que vous soyez.",
 
     'how.label': 'Comment ça marche',
     'how.title': 'En ligne en quelques minutes',
@@ -407,6 +413,7 @@ export const dict = {
     'float.revenue.title': 'Revenus',
     'float.revenue.change': '↑ 24%',
     'float.notif.title': 'Notifications',
+    'float.messages.title': 'Messages récents',
     'float.analytics.title': 'Patients cette semaine',
     'social.proof.stat1': 'Cliniques actives',
     'social.proof.stat2': 'Patients gérés',
@@ -415,6 +422,9 @@ export const dict = {
     'float.notif.item1': 'Rendez-vous confirmé pour 14:30',
     'float.notif.item2': 'Résultats de laboratoire prêts',
     'float.notif.item3': "Renouvellement d'ordonnance en attente",
+    'float.messages.item1': 'Kaoutar : envoyez mes résultats svp',
+    'float.messages.item2': 'Dr Kamal : patient 204 à suivre',
+    'float.messages.item3': 'Vous : réunion confirmée à 15h',
 
     'float.appt.sarah': 'Kaoutar El mghari',
     'float.appt.michael': 'Youssef Kamal',
@@ -517,6 +527,8 @@ export const dict = {
     'hero.cta.secondary': 'تواصل معنا',
     'hero.trust.rating': '4.9/5',
     'hero.trust.text': 'من 1200+ تقييم',
+    'hero.form.name3': 'سعيد محمد',
+
 
     'social.proof.text': 'موثوق به من طرف فرق طبية مبتكرة في جميع أنحاء المغرب',
 
@@ -539,8 +551,8 @@ export const dict = {
     'features.revenue.desc': 'لوحات تحكم فورية تُظهر اتجاهات الإيرادات، رؤى الفوترة، حالة مطالبات التأمين، وأدوات التنبؤ المالي.',
     'features.team.title': 'تعاون الفريق',
     'features.team.desc': 'صلاحيات حسب الدور، رسائل داخلية، إدارة المناوبات وتوزيع المهام — ليبقى فريقك كله متزامنًا.',
-    'features.notif.title': 'إشعارات ذكية',
-    'features.notif.desc': 'تذكيرات SMS والبريد الإلكتروني آلية للمواعيد والمتابعات وتجديد الوصفات. قلل الإلغاءات بنسبة 60%.',
+    'features.notif.title': 'ميزة المراسلة',
+    'features.notif.desc': 'نظام مراسلة آمن وفوري يربط المرضى بمقدمي الرعاية الصحية. يمكنك تبادل المعلومات، طرح الأسئلة، وتلقي الإرشادات الطبية بشكل مباشر ومن أي مكان.',
 
     'how.label': 'كيف تعمل',
     'how.title': 'جاهز خلال دقائق',
@@ -651,6 +663,7 @@ export const dict = {
     'float.revenue.title': 'الإيرادات',
     'float.revenue.change': '↑ 24%',
     'float.notif.title': 'الإشعارات',
+    'float.messages.title': 'الرسائل الأخيرة',
     'float.analytics.title': 'مرضى هذا الأسبوع',
     'social.proof.stat1': 'عيادات نشطة',
     'social.proof.stat2': 'مرضى مُدارون',
@@ -659,6 +672,9 @@ export const dict = {
     'float.notif.item1': 'تم تأكيد الموعد الساعة 2:30',
     'float.notif.item2': 'نتائج المختبر جاهزة',
     'float.notif.item3': 'تجديد الوصفة قيد الانتظار',
+    'float.messages.item1': 'كوثر: أرسل نتائج المختبر من فضلك',
+    'float.messages.item2': 'د. كمال: المريض 204 يحتاج متابعة',
+    'float.messages.item3': 'أنت: تم تأكيد الاجتماع 3 مساءً',
 
     'float.appt.sarah': 'كوثر المغاري',
     'float.appt.michael': 'يوسف كمال',

@@ -421,7 +421,7 @@ export default function LandingPage() {
         bgClass: 'medi-feature-bg-emerald',
       },
       {
-        iconClass: 'bi bi-bell',
+        iconClass: 'bi bi-chat-left-text',
         iconColorClass: 'medi-feature-icon-warm',
         hoverBorderColor: '#fb7185',
         titleKey: 'features.notif.title',
@@ -714,37 +714,49 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                {/* Notifications */}
-                <div className="medi-floating-card medi-float-notif">
-                  <div className="medi-float-notif-title">
-                    <span className="medi-float-notif-dot" />
-                    {t('float.notif.title')}
+                {/* Messages */}
+                <div className="medi-floating-card medi-float-messages">
+                  <div className="medi-float-messages-title">
+                    <span className="medi-float-messages-dot" />
+                    {t('float.messages.title')}
                   </div>
-                  <div className="medi-float-notif-item">
-                    <div className="medi-float-notif-icon"
-                      style={{ background: "#ecfdf5", color: "#059669" }}
+                  <div className="medi-float-messages-item">
+                    <div className="medi-float-messages-avatar"
+                      style={{ background: "#dbeafe", color: "#1d4ed8" }}
                     >
-                      <i className="bi bi-check2"></i>
+                      K
                     </div>
-                    <div className="medi-float-notif-text">{t("float.notif.item1")}</div>
+                    <div className="medi-float-messages-content">
+                      <div className="medi-float-messages-sender">Kaoutar</div>
+                      <div className="medi-float-messages-text">{t("float.messages.item1")}</div>
+                    </div>
+                    <div className="medi-float-messages-time">2m</div>
                   </div>
 
-                  <div className="medi-float-notif-item">
-                    <div className="medi-float-notif-icon" style={{ background: "#fef3c7", color: "#b45309" }}>
-                      <i className="bi bi-lightning-fill"></i>
+                  <div className="medi-float-messages-item">
+                    <div className="medi-float-messages-avatar" style={{ background: "#dcfce7", color: "#16a34a" }}>
+                      D
                     </div>
-                    <div className="medi-float-notif-text">
-                      {t("float.notif.item2")}
+                    <div className="medi-float-messages-content">
+                      <div className="medi-float-messages-sender">Dr. Kamal</div>
+                      <div className="medi-float-messages-text">
+                        {t("float.messages.item2")}
+                      </div>
                     </div>
+                    <div className="medi-float-messages-time">1h</div>
                   </div>
 
-                  <div className="medi-float-notif-item">
-                    <div className="medi-float-notif-icon" style={{ background: "#f3e8ff", color: "#6d28d9" }}>
-                      <i className="bi bi-capsule"></i>
+                  <div className="medi-float-messages-item">
+                    <div className="medi-float-messages-avatar" style={{ background: "#fce7f3", color: "#db2777" }}>
+                      Y
                     </div>
-                    <div className="medi-float-notif-text">
-                      {t("float.notif.item3")}
+                    <div className="medi-float-messages-content">
+                      <div className="medi-float-messages-sender">{t('hero.form.name3')}</div>
+                      <div className="medi-float-messages-text">
+                        {t("float.messages.item3")}
+                      </div>
                     </div>
+                    <div className="medi-float-messages-time">3h</div>
                   </div>
                 </div>
 

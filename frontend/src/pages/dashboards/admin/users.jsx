@@ -166,8 +166,8 @@ const UsersAdmin = () => {
                       <div className="admin-user-avatar-sm">
                         {((u.nom?.[0] || "") + (u.prenom?.[0] || "")).toUpperCase()}
                       </div>
-                      <div>
-                        <div className="admin-user-name">Dr. {u.nom} {u.prenom}</div>
+                    <div>
+                        <div className={`admin-user-name ${u.role === "admin" ? "admin-user-name--gold" : ""}`}>{u.role === "medecin" ? `Dr. ${u.nom} ${u.prenom}` : `${u.nom} ${u.prenom}`}</div>
                         <div className="admin-user-email">{u.email}</div>
                       </div>
                     </div>

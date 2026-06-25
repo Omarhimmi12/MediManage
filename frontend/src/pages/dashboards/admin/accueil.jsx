@@ -59,31 +59,8 @@ const AccueilAdmin = () => {
       value: stats?.suspended_cabinets ?? 0,
       icon: "bi-building-slash",
       color: "#f43f5e",
-    },
-    {
-      label: "Total Rendez-vous",
-      value: stats?.total_rendez_vous ?? 0,
-      icon: "bi-calendar-check-fill",
-      color: "#10b981",
-    },
-    {
-      label: "Consultations",
-      value: stats?.total_consultations ?? 0,
-      icon: "bi-file-medical-fill",
-      color: "#f59e0b",
-    },
-    {
-      label: "Revenu total",
-      value: `${(stats?.total_revenue ?? 0).toLocaleString()} DH`,
-      icon: "bi-currency-dollar",
-      color: "#22c55e",
-    },
-    {
-      label: "Revenu aujourd'hui",
-      value: `${(stats?.today_revenue ?? 0).toLocaleString()} DH`,
-      icon: "bi-graph-up-arrow",
-      color: "#3b82f6",
-    },
+    },   
+  
   ];
 
   return (

@@ -94,10 +94,7 @@ const CabinetsAdmin = () => {
                 <th>Cabinet</th>
                 <th>Médecin</th>
                 <th>Spécialité</th>
-                <th>Statut</th>
-                <th>RDV</th>
-                <th>Consultations</th>
-                <th>Revenu</th>
+                <th>Statut</th>                
                 <th>Actions</th>
               </tr>
             </thead>
@@ -120,9 +117,6 @@ const CabinetsAdmin = () => {
                       : <span className="admin-badge admin-badge-success">Actif</span>
                     }
                   </td>
-                  <td>{c.total_rendez_vous}</td>
-                  <td>{c.total_consultations}</td>
-                  <td><strong>{c.total_revenue.toLocaleString()} DH</strong></td>
                   <td>
                     <div className="admin-action-btns">
                       <button className="admin-btn admin-btn-sm admin-btn-ghost" onClick={() => openDetails(c)} title="Détails">
@@ -144,12 +138,8 @@ const CabinetsAdmin = () => {
         </div>
       )}
 
-      <ConfirmModal
-        isOpen={confirmAction !== null}
-        title="Confirmer l'opération"
-        message={getConfirmMessage()}
-        confirmLabel="Confirmer"
-        cancelLabel="Annuler"
+      <ConfirmModal isOpen={confirmAction !== null} title="Confirmer l'opération"
+        message={getConfirmMessage()} confirmLabel="Confirmer" cancelLabel="Annuler"
         variant="warning"
         onConfirm={toggleSuspend}
         onCancel={() => setConfirmAction(null)}
@@ -193,23 +183,7 @@ const CabinetsAdmin = () => {
                       : <span className="admin-badge admin-badge-success">Actif</span>
                     }
                   </span>
-                </div>
-                <div className="admin-detail-item">
-                  <span className="admin-detail-label">Secrétaires</span>
-                  <span className="admin-detail-value">{selectedCabinet.total_secretaires}</span>
-                </div>
-                <div className="admin-detail-item">
-                  <span className="admin-detail-label">Rendez-vous</span>
-                  <span className="admin-detail-value">{selectedCabinet.total_rendez_vous}</span>
-                </div>
-                <div className="admin-detail-item">
-                  <span className="admin-detail-label">Consultations</span>
-                  <span className="admin-detail-value">{selectedCabinet.total_consultations}</span>
-                </div>
-                <div className="admin-detail-item">
-                  <span className="admin-detail-label">Revenu total</span>
-                  <span className="admin-detail-value admin-detail-value--highlight">{selectedCabinet.total_revenue.toLocaleString()} DH</span>
-                </div>
+                </div>                               
               </div>
             </div>
             <div className="admin-modal-footer">

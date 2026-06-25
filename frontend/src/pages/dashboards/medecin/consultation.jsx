@@ -2,6 +2,7 @@ import { useContext, useEffect, useMemo, useState } from "react";
 import ConfirmModal from "../../../components/ConfirmModal";
 import api from "../../../api/axios";
 import { AuthContext } from "../../../context/authContext";
+import exportConsultationPDF from "../../../utils/exportConsultationPDF";
 import "./consultation.css";
 
 const PAGE_SIZE = 5;
@@ -84,6 +85,8 @@ const MedecinConsultationPage = () => {
           rdvId: r.id,
           consultationId: hasConsultation ? consultation.id : null,
           patient: r.patient?.user,
+          medecin: r.medecin,
+          cabinet: r.cabinet,
           date: r.date_rdv,
           motif: r.motif,
 
@@ -325,6 +328,14 @@ const MedecinConsultationPage = () => {
                             onClick={() => openView(it.consultationId)}
                           >
                             <i className="bi bi-eye"></i>
+                          </button>
+                          <button
+                            type="button"
+                            className="mmd-btn mmd-btn-sm mmd-btn-info"
+                            onClick={() => exportConsultationPDF(it)}
+                            title="Exporter en PDF"
+                          >
+                            <i className="bi bi-download"></i>
                           </button>
                           <button
                             type="button"

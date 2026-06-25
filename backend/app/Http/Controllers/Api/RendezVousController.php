@@ -16,7 +16,7 @@ class RendezVousController extends Controller
 
             $cabinetId = $user->medecin->cabinet->id;
 
-            return RendezVous::with(['patient.user', 'consultation'])
+            return RendezVous::with(['patient.user', 'medecin.user', 'cabinet', 'consultation'])
                 ->where('cabinet_id', $cabinetId)
                 ->orderBy('date_rdv')
                 ->get();
@@ -26,7 +26,7 @@ class RendezVousController extends Controller
 
             $cabinetId = $user->secretaire->cabinet_id;
 
-            return RendezVous::with(['patient.user', 'consultation'])
+            return RendezVous::with(['patient.user', 'medecin.user', 'cabinet', 'consultation'])
                 ->where('cabinet_id', $cabinetId)
                 ->orderBy('date_rdv')
                 ->get();

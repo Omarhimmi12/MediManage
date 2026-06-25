@@ -5,6 +5,7 @@ import { NotificationContext } from "../../context/notificationContext";
 import NotificationDropdown from "../../components/NotificationDropdown";
 import MessagingPage from "../messaging/MessagingPage";
 import api from "../../api/axios";
+import exportConsultationPDF from "../../utils/exportConsultationPDF";
 import ProfilPage from "./patient/profil";
 import "./patientDashboard.css";
 
@@ -258,7 +259,12 @@ const PatientDashboard = () => {
                   <td>{cons.medecinNom ?? "—"}</td>
                   <td>{cons.cabinetNom ?? "—"}</td>
                   <td>{cons.montant ?? "—"}</td>
-                  <td><button className="mmd-btn mmd-btn-info mmd-btn-sm" onClick={() => { setConsultationView(cons); setConsultationViewOpen(true); }}><i className="bi bi-eye-fill"></i> Voir</button></td>
+                  <td>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button className="mmd-btn mmd-btn-info mmd-btn-sm" onClick={() => { setConsultationView(cons); setConsultationViewOpen(true); }}><i className="bi bi-eye-fill"></i> Voir</button>
+                      <button className="mmd-btn mmd-btn-info mmd-btn-sm" onClick={() => exportConsultationPDF(cons)} title="Exporter en PDF"><i className="bi bi-download"></i></button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>

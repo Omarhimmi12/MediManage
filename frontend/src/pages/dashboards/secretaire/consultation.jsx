@@ -1,6 +1,7 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import api from "../../../api/axios";
 import { AuthContext } from "../../../context/authContext";
+import exportConsultationPDF from "../../../utils/exportConsultationPDF";
 import "./consultation.css";
 
 const PAGE_SIZE = 8;
@@ -83,6 +84,8 @@ const SecretaireConsultationPage = () => {
           rdvId: r.id,
           consultationId: hasConsultation ? r.consultation.id : null,
           patient: r.patient?.user,
+          medecin: r.medecin,
+          cabinet: r.cabinet,
           date: r.date_rdv,
           motif: r.motif,
           diagnostic: r.consultation?.diagnostic ?? "",
@@ -397,6 +400,13 @@ const SecretaireConsultationPage = () => {
                               onClick={() => openView(c.consultationId)}
                             >
                               <i className="bi bi-eye"></i>
+                            </button>
+                            <button
+                              className="mmd-btn mmd-btn-info mmd-btn-sm"
+                              onClick={() => exportConsultationPDF(c)}
+                              title="Exporter en PDF"
+                            >
+                              <i className="bi bi-download"></i>
                             </button>
                             <button
                               className="mmd-btn mmd-btn-info mmd-btn-sm"

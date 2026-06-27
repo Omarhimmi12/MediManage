@@ -56,7 +56,7 @@ export default function exportConsultationPDF(data) {
   const getMotif = () => data.motif || data.rendez_vous?.motif || "—";
   const getDiagnostic = () => data.diagnostic || "—";
   const getOrdonnance = () => data.ordonnance || "—";
-  const getMontant = () => {
+  const getMontant = () => {dossi
     const val = data.montant ?? data.tarif;
     return val ? `${Number(val).toFixed(2)} DH` : "—";
   };

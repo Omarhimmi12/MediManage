@@ -34,6 +34,11 @@ const PatientsPage = () => {
     date_naissance: "",
     sexe: "male",
     adresse: "",
+    password: "",
+    password_confirmation: "",
+    antecedents: "",
+    allergies: "",
+    notes_generales: "",
   });
 
   useEffect(() => {
@@ -113,6 +118,11 @@ const PatientsPage = () => {
       date_naissance: "",
       sexe: "male",
       adresse: "",
+      password: "",
+      password_confirmation: "",
+      antecedents: "",
+      allergies: "",
+      notes_generales: "",
     });
     setFormErrors([]);
   };
@@ -120,6 +130,7 @@ const PatientsPage = () => {
   const handleOpenModal = (patient = null) => {
     if (patient) {
       setEditingId(patient.id);
+      const dm = patient.dossier_medical ?? patient.dossierMedical ?? {};
       setFormData({
         nom: patient.user?.nom || "",
         prenom: patient.user?.prenom || "",
@@ -128,6 +139,11 @@ const PatientsPage = () => {
         date_naissance: patient.date_naissance || "",
         sexe: patient.sexe || "male",
         adresse: patient.adresse || "",
+        password: "",
+        password_confirmation: "",
+        antecedents: dm.antecedents || "",
+        allergies: dm.allergies || "",
+        notes_generales: dm.notes_generales || "",
       });
     } else {
       setEditingId(null);
@@ -277,19 +293,19 @@ const PatientsPage = () => {
               <div className="patients-detail-item">
                 <span className="patients-detail-label">Antécédents</span>
                 <span className="patients-detail-value">
-                  {selectedPatient.dossierMedical?.antecedents ?? "—"}
+                  {(selectedPatient.dossier_medical?.antecedents ?? selectedPatient.dossierMedical?.antecedents) || "—"}
                 </span>
               </div>
               <div className="patients-detail-item">
                 <span className="patients-detail-label">Allergies</span>
                 <span className="patients-detail-value">
-                  {selectedPatient.dossierMedical?.allergies ?? "—"}
+                  {(selectedPatient.dossier_medical?.allergies ?? selectedPatient.dossierMedical?.allergies) || "—"}
                 </span>
               </div>
               <div className="patients-detail-item" style={{ gridColumn: "1 / -1" }}>
                 <span className="patients-detail-label">Notes générales</span>
                 <span className="patients-detail-value">
-                  {selectedPatient.dossierMedical?.notes_generales ?? "—"}
+                  {(selectedPatient.dossier_medical?.notes_generales ?? selectedPatient.dossierMedical?.notes_generales) || "—"}
                 </span>
               </div>
               <div className="patients-detail-item" style={{ gridColumn: "1 / -1" }}>
@@ -628,6 +644,74 @@ const PatientsPage = () => {
                       }
                     />
                   </div>
+                </div>
+
+{!editingId && (
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                    <div className="mmd-form-group">
+                      <label className="mmd-label">Mot de passe</label>
+                      <input
+                        type="password"
+                        className="mmd-input"
+                        value={formData.password}
+                        onChange={(e) =>
+                          setFormData({ ...formData, password: e.target.value })
+                        }
+                        required={!editingId}
+                      />
+                    </div>
+                    <div className="mmd-form-group">
+                      <label className="mmd-label">Confirmer le mot de passe</label>
+                      <input
+                        type="password"
+                        className="mmd-input"
+                        value={formData.password_confirmation}
+                        onChange={(e) =>
+                          setFormData({ ...formData, password_confirmation: e.target.value })
+                        }
+                        required={!editingId}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <hr style={{ margin: "16px 0", borderColor: "var(--border-color)" }} />
+                <h4 style={{ margin: "0 0 12px", color: "var(--teal-2)", fontWeight: 600 }}>Dossier médical</h4>
+
+                <div className="mmd-form-group">
+                  <label className="mmd-label">Antécédents</label>
+                  <textarea
+                    className="mmd-input"
+                    rows="3"
+                    value={formData.antecedents}
+                    onChange={(e) =>
+                      setFormData({ ...formData, antecedents: e.target.value })
+                    }
+                  />
+                </div>
+
+                <div className="mmd-form-group">
+                  <label className="mmd-label">Allergies</label>
+                  <textarea
+                    className="mmd-input"
+                    rows="3"
+                    value={formData.allergies}
+                    onChange={(e) =>
+                      setFormData({ ...formData, allergies: e.target.value })
+                    }
+                  />
+                </div>
+
+                <div className="mmd-form-group">
+                  <label className="mmd-label">Notes générales</label>
+                  <textarea
+                    className="mmd-input"
+                    rows="3"
+                    value={formData.notes_generales}
+                    onChange={(e) =>
+                      setFormData({ ...formData, notes_generales: e.target.value })
+                    }
+                  />
                 </div>
               </div>
 

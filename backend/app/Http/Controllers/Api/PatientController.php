@@ -107,7 +107,10 @@ class PatientController extends Controller
 
         DossierMedical::create([
             'patient_id' => $patient->id,
-            'date_creation' => now()
+            'date_creation' => now(),
+            'antecedents' => $request->input('antecedents'),
+            'allergies' => $request->input('allergies'),
+            'notes_generales' => $request->input('notes_generales'),
         ]);
 
         return response()->json([

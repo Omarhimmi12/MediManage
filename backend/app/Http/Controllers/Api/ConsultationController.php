@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Consultation;
+use App\Models\DossierMedical;
 use App\Models\RendezVous;
+use Illuminate\Http\Request;
 
 class ConsultationController extends Controller
 {

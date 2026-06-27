@@ -85,10 +85,7 @@ const SplashScreen = ({ onFinish = () => {} }) => {
 
           <div className="logo-box">
             <div className="logo-gloss" />
-            <svg className="logo-icon" viewBox="0 0 64 64" fill="none" aria-hidden="true">
-              <rect x="24" y="10" width="16" height="44" rx="4" fill="white" />
-              <rect x="10" y="24" width="44" height="16" rx="4" fill="white" />
-            </svg>
+            <img src="/images/brand.png" alt="MediManage" className="logo-icon" />
           </div>
         </div>
 

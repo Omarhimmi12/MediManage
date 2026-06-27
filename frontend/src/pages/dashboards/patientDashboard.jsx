@@ -279,9 +279,9 @@ const PatientDashboard = () => {
       <div className="mmd-card-header"><h3 className="mmd-card-title">Trouver un cabinet</h3></div>
       {cabinetsError && <div className="mmd-alert mmd-alert-warning">Erreur: <b>{cabinetsError}</b></div>}
       <div className="mmd-grid mmd-grid-3 mmd-mb-16">
-        <div><label className="mmd-label">Recherche</label><input className="mmd-input" value={cabinetQuery} onChange={(e) => setCabinetQuery(e.target.value)} placeholder="Nom / Spécialité / Médecin" /></div>
-        <div><label className="mmd-label">Ville</label><select className="mmd-select" value={selectedCity} onChange={(e) => setSelectedCity(e.target.value)}><option value="Toutes">Toutes</option>{MAROC_VILLES.map((v) => <option key={v} value={v}>{v}</option>)}</select></div>
-        <div style={{ display: "flex", alignItems: "flex-end" }}><button className="mmd-btn mmd-btn-secondary" onClick={() => { setCabinetQuery(""); setSelectedCity("Toutes"); }}>Réinitialiser</button></div>
+        <div className="me-3"><label className="mmd-label">Recherche</label><input className="mmd-input" value={cabinetQuery} onChange={(e) => setCabinetQuery(e.target.value)} placeholder="Nom / Spécialité / Médecin" /></div>
+        <div className="me-3"><label className="mmd-label">Ville</label><select className="mmd-select" value={selectedCity} onChange={(e) => setSelectedCity(e.target.value)}><option value="Toutes">Toutes</option>{MAROC_VILLES.map((v) => <option key={v} value={v}>{v}</option>)}</select></div>
+        <div className="me-3 mb-1" style={{ display: "flex", alignItems: "flex-end" }}><button className="mmd-btn mmd-btn-secondary" onClick={() => { setCabinetQuery(""); setSelectedCity("Toutes"); }}>Réinitialiser</button></div>
       </div>
       {cabinetsLoading ? (
         <div className="mmd-text-muted">Chargement...</div>
